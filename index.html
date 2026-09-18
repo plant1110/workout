@@ -215,7 +215,6 @@ nav svg{width:25px;height:25px;stroke:currentColor;fill:none;stroke-width:1.9;st
 <script>
 "use strict";
 const KEY = "workout.v1";
-const SNAPKEY = "workout.snaps.v1";   // day-snapshot archive: separate store so every-tap saves stay small
 const DAYS = ["Monday","Tuesday","Wednesday","Thursday","Friday","Saturday","Sunday"];
 const uid = () => Math.random().toString(36).slice(2,9);
 const num = (v, d=0) => { const n = parseFloat(String(v).replace(",",".")); return isNaN(n) ? d : n; };
@@ -327,14 +326,9 @@ let gSel = null;               // trend graph: date of the tapped point (its val
 let gEdit = null;              // trend history: date of the log being edited
 let gAdd = false;              // trend graph: add-log inset open
 try { state = JSON.parse(localStorage.getItem(KEY)) || seed(); } catch(e) { state = seed(); }
-// history split (photos-style): snapshots live under SNAPKEY; a pre-split state
-// still carries them inline — adopt those and let the first save move them over
-let snapDirty = false;
-try {
-  const storedSnaps = JSON.parse(localStorage.getItem(SNAPKEY));
-  if (storedSnaps) state.snaps = storedSnaps;
-  else if (state.snaps) snapDirty = true;
-} catch(e) {}
+// v147: history snapshots REMOVED — every day is judged by the current plan + that day's logs
+delete state.snaps;
+try { localStorage.removeItem("workout.snaps.v1"); } catch(e) {}
 if (state.profile.regimeDays == null) state.profile.regimeDays = 90;
 if (!state.backup){
   const ex = (name, sets, reps, weight) => ({ id: uid(), name, sets, reps, weight });
@@ -560,12 +554,8 @@ const gcTypes = () => {
 };
 const save = () => {
   for (const k in dayFlagsCache) delete dayFlagsCache[k];
-  try { gcTypes(); if (snapDays()) snapDirty = true; } catch(e) {}
-  try {
-    const { snaps, ...live } = state;
-    localStorage.setItem(KEY, JSON.stringify(live));
-    if (snapDirty){ localStorage.setItem(SNAPKEY, JSON.stringify(state.snaps || {})); snapDirty = false; }
-  } catch(e) {}
+  try { gcTypes(); } catch(e) {}
+  try { localStorage.setItem(KEY, JSON.stringify(state)); } catch(e) {}
 };
 
 /* ---------- progression engine ---------- */
@@ -657,15 +647,14 @@ function weekStrip(kind){
     const d = new Date(mon); d.setDate(d.getDate() + i);
     const id = iso(d);
     let dot = "";
-    const s = snapOf(id);
     if (kind === "nutrition"){
-      const habs = s ? s.habits : state.nutrition.rules;
+      const habs = state.nutrition.rules;
       if (habs.length){
         const done = habs.filter(r => habitDone(r, id)).length;
         dot = done >= habs.length ? "full" : done > 0 ? "part" : "plan";
       }
     } else {
-      const exIds = s ? s.w.flatMap(w => w.exs.map(e => e.id)) : exercisesFor(id).map(e => e.id);
+      const exIds = exercisesFor(id).map(e => e.id);
       if (exIds.length){
         const done = exIds.filter(eid => exDone(id, { id: eid })).length;
         dot = done >= exIds.length ? "full" : done > 0 ? "part" : "plan";
@@ -864,49 +853,6 @@ function wkCardEdit(w){
   </div>`;
 }
 
-function wkCardHist(w){
-  const live = state.workouts.find(x => x.id === w.id);
-  const hasAlts = !!(live && state.workouts.some(o => o.id !== live.id));
-  const titleAct = hasAlts ? `data-act="wchoose" data-w="${w.id}"` : "";
-  const isAct = w.exs.length === 1 && w.exs[0].id === w.id;
-  if (isAct){
-    const e = w.exs[0], on = exDone(sel, e);
-    return `<div class="card">
-      <div class="chead solo">
-        <div class="row grow" style="gap:10px">${wicon({ icon: w.icon })}
-          <div class="grow ${hasAlts ? "tap" : ""}" ${titleAct}>
-            <div style="font-size:19px;font-weight:650;${on ? "color:var(--dim);text-decoration:line-through" : ""}">${esc(w.title)}</div>
-            <div class="target">${e.t}</div>
-          </div>
-        </div>
-        <div class="chk ${on ? "on" : ""}" data-act="exdone" data-ex="${e.id}">&#10003;</div>
-      </div>
-    </div>`;
-  }
-  let done = 0;
-  const rows = w.exs.map(e => {
-    const on = exDone(sel, e); if (on) done++;
-    return `<div class="ex between">
-      <div class="grow">
-        <div class="name" style="${on ? "color:var(--dim);text-decoration:line-through" : ""}">${esc(e.name)}</div>
-        <div class="target">${e.t}</div>
-      </div>
-      <div class="chk ${on ? "on" : ""}" data-act="exdone" data-ex="${e.id}">&#10003;</div>
-    </div>`;
-  }).join("");
-  const total = w.exs.length;
-  const allDone = total > 0 && done === total;
-  return `<div class="card">
-    <div class="chead">
-      <div class="row grow" style="gap:10px">${wicon({ icon: w.icon })}
-        <div class="grow ${hasAlts ? "tap" : ""}" ${titleAct}>
-          <div style="font-size:19px;font-weight:650;${allDone ? "color:var(--dim);text-decoration:line-through" : ""}">${esc(w.title)}</div>
-        </div>
-      </div>
-      ${ring(total ? done/total : 0)}
-    </div>${rows}</div>`;
-}
-
 function wkRowEdit(w){
   const summ = w.type === "activity"
     ? `${fmt(num(w.mins, 60))} min`
@@ -928,7 +874,6 @@ function wkRowEdit(w){
 }
 
 function viewWorkout(){
-  const s = editing ? null : snapOf(sel);
   let html = weekStrip("workout");
   if (editing){
     // edit mode lists EVERY workout in three sections; an open editor stays in the
@@ -941,14 +886,6 @@ function viewWorkout(){
     if (secs.other.length) html += `<h2>Other days</h2>` + secs.other.map(rowOf).join("");
     if (secs.unsched.length) html += `<h2>Unscheduled &mdash; available in choosers</h2>` + secs.unsched.map(rowOf).join("");
     html += `<button class="addbtn" data-act="addwk">+ Add workout</button>`;
-  } else if (s){
-    html += s.w.length ? s.w.map(wkCardHist).join("")
-      : `<div class="card">
-      <div class="between">
-        <div style="font-size:19px;font-weight:650">Rest day</div>
-        <span class="badge rest">Rest</span>
-      </div>
-    </div>`;
   } else {
     const wks = workoutsFor(sel);
     html += wks.length ? wks.map(wkCardView).join("")
@@ -1217,15 +1154,10 @@ function unXmeal(mid){
   const link = (state.nutrition.xmeal[sel] || {})[mid];
   if (!link) return;
   delete state.nutrition.xmeal[sel][mid];
-  if (link.t){   // v140 link: remove the matching entry from the type log
+  if (link.t){   // remove the matching entry from the type log
     const list = ((state.nutrition.tlog[sel] || {})[link.t]) || [];
     for (let i = list.length - 1; i >= 0; i--) if (list[i].slot === mid){ list.splice(i, 1); break; }
-    return;
   }
-  const lg = state.nutrition.exlog[sel] || {};
-  if (lg[link.x]){ lg[link.x]--; if (!lg[link.x]) delete lg[link.x]; }
-  const pk = (state.nutrition.xpicks[sel] || {})[link.x];
-  if (pk){ const i = pk.lastIndexOf(link.label); if (i >= 0) pk.splice(i, 1); }
 }
 
 // current weight/fat = the latest log that has that metric
@@ -1422,89 +1354,8 @@ const NICONS = {
 const nicon = k => `<span class="wicon" style="width:21px;height:21px">&#8203;<svg viewBox="0 0 24 24">${NICONS[k]}</svg></span>`;
 const secTitle = (k, label, done) => `<div class="row" style="gap:9px">${nicon(k)}<div style="font-size:19px;font-weight:650;${done ? "color:var(--dim);text-decoration:line-through" : ""}">${label}</div></div>`;
 
-function weekCount(exId, dateIso){
-  const mon = mondayOf(parseIso(dateIso || sel));
-  let n = 0;
-  for (let i = 0; i < 7; i++){
-    const d = new Date(mon); d.setDate(d.getDate() + i);
-    n += (state.nutrition.exlog[iso(d)] || {})[exId] || 0;
-  }
-  return n;
-}
-
-function weekPicks(exId){
-  const mon = mondayOf(parseIso(sel));
-  const out = [];
-  for (let i = 0; i < 7; i++){
-    const d = new Date(mon); d.setDate(d.getDate() + i);
-    out.push(...(((state.nutrition.xpicks)[iso(d)] || {})[exId] || []));
-  }
-  return out;
-}
-
-/* ---------- daily snapshots: each day is judged by the plan that was in effect that day ---------- */
-const snapEx = e => {
-  const r = resolve(e);
-  return { id: e.id, name: e.name, t: r.time ? `${fmt(r.mins)} min` : `${r.sets} &times; ${fmt(r.reps)}${r.weight ? ` @ ${fmt(r.weight)} kg` : ""}` };
-};
-const snapWk = (w, ds) => {
-  const eff = effOf(w, ds);
-  return { id: w.id, title: eff.title, icon: iconOfW(eff), exs: unitsOf(eff).map(snapEx) };
-};
-function daySnap(ds){
-  const di = dayIdx(parseIso(ds));
-  return {
-    w: workoutsFor(ds).map(w => snapWk(w, ds)),
-    habits: state.nutrition.rules.map(r => ({ id: r.id, name: r.name, kind: r.kind, target: r.target, unit: r.unit, xper: r.xper })),
-    menu: state.nutrition.menu.filter(m => !m.days || m.days.includes(di)).map(m => ({ id: m.id, mtype: m.mtype })),
-    cheats: state.xtypes.map(t => ({ t: t.id, name: t.name, limit: num(t.limit, 0), xper: t.xper, replaces: t.replaces }))
-  };
-}
-function snapDays(){
-  state.snaps = state.snaps || {};
-  let changed = false;
-  const today = iso(new Date());
-  const start = parseIso(state.profile.anchor || today);
-  if (!isNaN(start)) for (let d = new Date(start), i = 0; iso(d) < today && i < 400; d.setDate(d.getDate() + 1), i++){
-    if (!state.snaps[iso(d)]){ state.snaps[iso(d)] = daySnap(iso(d)); changed = true; }   // missed day: freeze with the config we have now
-  }
-  const t2 = daySnap(today);                                           // today always mirrors the current config
-  if (JSON.stringify(state.snaps[today]) !== JSON.stringify(t2)){ state.snaps[today] = t2; changed = true; }
-  const cut = new Date(); cut.setDate(cut.getDate() - 400);
-  const cutIso = iso(cut);
-  for (const k in state.snaps) if (k < cutIso){ delete state.snaps[k]; changed = true; }
-  return changed;
-}
-const snapOf = ds => ds < iso(new Date()) ? (state.snaps || {})[ds] : null;
-function resnapWorkout(ds, wid){
-  const s = (state.snaps || {})[ds]; if (!s) return;
-  const w = state.workouts.find(x => x.id === wid); if (!w) return;
-  const i = s.w.findIndex(x => x.id === wid);
-  if (i >= 0) s.w[i] = snapWk(w, ds); else s.w.push(snapWk(w, ds));
-  snapDirty = true;
-}
-
-// a cheat's limit applies per its period: day | week (default) | month
-function periodCount(x, dateIso){
-  const per = x.xper || "week";
-  const d = dateIso || sel;
-  if (per === "day") return (state.nutrition.exlog[d] || {})[x.id] || 0;
-  if (per === "month"){
-    const pre = d.slice(0, 7);
-    let n = 0;
-    for (const k in state.nutrition.exlog) if (k.slice(0, 7) === pre) n += state.nutrition.exlog[k][x.id] || 0;
-    return n;
-  }
-  return weekCount(x.id, d);
-}
 const perWord = x => (x.xper || "week") === "day" ? "today" : (x.xper === "month" ? "this month" : "this week");
-const weekOkFor = ds => {
-  const sn = snapOf(ds);
-  const cs = sn ? (sn.cheats || []) : state.xtypes.map(t => ({ t: t.id, limit: num(t.limit, 0), xper: t.xper }));
-  return cs.every(c => c.t
-    ? typePoints(c.t, ds, c.xper) <= num(c.limit, 0)
-    : periodCount(c, ds) <= num(c.limit, 0));   // pre-v140 snapshot: per-cheat limits over exlog
-};
+const weekOkFor = ds => state.xtypes.every(t => typePoints(t.id, ds, t.xper) <= num(t.limit, 0));
 
 function habitPeriodCount(h, ds){
   const per = h.xper || "day";
@@ -1532,11 +1383,10 @@ function habitDone(h, ds){
 const dayFlagsCache = {};   // a past day's result only changes through a save (retro edits) — save() clears this
 function dayFlags(ds){
   if (dayFlagsCache[ds]) return dayFlagsCache[ds];
-  const s = snapOf(ds);
-  const exIds = s ? s.w.flatMap(w => w.exs.map(e => e.id)) : exercisesFor(ds).map(e => e.id);
+  const exIds = exercisesFor(ds).map(e => e.id);
   const wPlanned = exIds.length > 0;
   const wOk = !wPlanned || exIds.every(id => exDone(ds, { id }));
-  const habs = s ? s.habits : state.nutrition.rules;
+  const habs = state.nutrition.rules;
   const nTracked = habs.length > 0;
   const nOk = !nTracked || (habs.every(h => habitDone(h, ds)) && weekOkFor(ds) && !num((state.nutrition.xnoslot || {})[ds], 0));
   const r = { wPlanned, wOk, nTracked, nOk };
@@ -1593,9 +1443,8 @@ const amtLabel = it => esc(it.name) + (it.amt ? ` &middot; ${esc(it.amt)}` : "")
 function freeSlotForType(t, ds){
   if (t.replaces !== "meal" && t.replaces !== "snack") return undefined;
   const d = ds || sel;
-  const sn = snapOf(d);
   const di2 = dayIdx(parseIso(d));
-  const mm = sn ? sn.menu : state.nutrition.menu.filter(m => !m.days || m.days.includes(di2));
+  const mm = state.nutrition.menu.filter(m => !m.days || m.days.includes(di2));
   const l2 = state.nutrition.logs[d] || {};
   const want = t.replaces === "snack" ? ["snack"] : ["lunch", "dinner"];
   return mm.find(m => want.includes(m.mtype || "snack") && !l2[m.id]) || null;
@@ -1680,15 +1529,9 @@ function menuItemEdit(m){
 function viewNutrition(){
   const home = !!state.homeDays[sel];
   const di = dayIdx(parseIso(sel));
-  const s = editN ? null : snapOf(sel);
-  const rules = s ? s.habits.map(h => { const live = state.nutrition.rules.find(r => r.id === h.id);
-                   return live ? { ...h, name: live.name } : h; })
-                 : state.nutrition.rules;
-  const menu = s ? s.menu.map(m0 => state.nutrition.menu.find(m => m.id === m0.id) || m0)
-                 : state.nutrition.menu.filter(m => !m.days || m.days.includes(di));
-  const xts = s ? (s.cheats || []).filter(c => c.t)
-                : state.xtypes.map(t => ({ t: t.id, name: t.name, limit: num(t.limit, 0), xper: t.xper, replaces: t.replaces }));
-  const xlegacy = s ? (s.cheats || []).filter(c => !c.t) : [];   // pre-v140 snapshot days
+  const rules = state.nutrition.rules;
+  const menu = state.nutrition.menu.filter(m => !m.days || m.days.includes(di));
+  const xts = state.xtypes.map(t => ({ t: t.id, name: t.name, limit: num(t.limit, 0), xper: t.xper, replaces: t.replaces }));
   const l = state.nutrition.logs[sel] || {};
   const mdone = menu.filter(m => l[m.id]).length;
   let html = weekStrip("nutrition");
@@ -1851,10 +1694,7 @@ function viewNutrition(){
   }
 
   {
-    // legacy snapshots (pre-universal-habits) stored water separately as wgoal
-    const hl = s && s.wgoal != null
-      ? [...rules, { id: "water", name: "Water", kind: "count", target: s.wgoal, unit: "glasses" }]
-      : rules;
+    const hl = rules;
     const hdone = hl.filter(h => habitDone(h, sel)).length;
     const hrow = h => {
       if (h.kind === "limit"){
@@ -1932,7 +1772,7 @@ function viewNutrition(){
     ${shownMenu.map(m => editN === m.id ? mEdit(m) : mrow(m)).join("") || `<div class="muted" style="margin-top:10px">No menu items for this day.</div>`}
   </div>`;
 
-  if (xts.length || xlegacy.length){
+  if (xts.length){
     const trow = t => {
       const pts = typePoints(t.t, sel, t.xper), lim = num(t.limit, 0), over = pts > lim;
       const picks = ((state.nutrition.tlog[sel] || {})[t.t]) || [];
@@ -1953,25 +1793,13 @@ function viewNutrition(){
         </div>
       </div>`;
     };
-    // pre-v140 snapshot days: display-only rows from the old per-cheat log
-    const lrow = x => {
-      const c = periodCount(x, sel), over = c > num(x.limit, 0);
-      const todays = ((state.nutrition.xpicks[sel] || {})[x.id]) || [];
-      return `<div class="ex between">
-        <div class="grow">
-          <div class="name">${esc(x.name)}</div>
-          <div class="target" style="${over ? "color:var(--bad)" : ""}">${c}/${fmt(num(x.limit, 0))} ${perWord(x)}${over ? " &middot; over limit" : ""}</div>
-          ${todays.length ? `<div class="target">${todays.map(g => `<div>&bull;&nbsp; ${esc(g)}</div>`).join("")}</div>` : ""}
-        </div>
-      </div>`;
-    };
     const xused = xts.reduce((s2, t) => s2 + typePoints(t.t, sel, t.xper), 0);
     const xcap = xts.reduce((s2, t) => s2 + num(t.limit, 0), 0);
     const xover = xts.some(t => typePoints(t.t, sel, t.xper) > num(t.limit, 0));
     html += `<div class="card">
       <div class="chead">${secTitle("limits", "Cheats")}${ring(xcap ? Math.min(xused / xcap, 1) : 0, xover ? "var(--bad)" : "var(--warm)")}</div>
       ${num((state.nutrition.xnoslot || {})[sel], 0) ? `<div class="target" style="color:var(--bad);margin:2px 0 6px">Cheat used with no free slot &mdash; this day is not counted</div>` : ""}
-      ${xts.map(trow).join("")}${xlegacy.map(lrow).join("")}
+      ${xts.map(trow).join("")}
     </div>`;
   }
 
@@ -2209,7 +2037,6 @@ document.addEventListener("click", e => {
     const wid = sheet.wid;
     const wo = state.wopts[sel] || (state.wopts[sel] = {});
     if (el.dataset.id === wid) delete wo[wid]; else wo[wid] = el.dataset.id;
-    resnapWorkout(sel, wid);
     sheet = null; save(); render(); return;
   }
   if (a === "wkwtype"){
