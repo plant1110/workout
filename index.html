@@ -367,6 +367,7 @@ if (!state.nutrition.xmeal) state.nutrition.xmeal = {};
 if (!state.xtypes) state.xtypes = [];                 // cheat TYPES carry the budget: {id, name, limit, xper, replaces}
 if (!state.nutrition.tlog) state.nutrition.tlog = {};  // { date: { typeId: [{x, label, cost, slot?, ns?}] } } — the one cheat log
 if (!state.nutrition.xnoslot) state.nutrition.xnoslot = {};   // per-day count of cheat uses with no free menu slot (voids the day)
+if (!state.verdicts) state.verdicts = {};   // frozen day results: once a day has ended its color is FINAL
 if (!state.wopts) state.wopts = {};
 const normFood = it => typeof it === "string" ? { name: it, amt: "" } : it;
 state.nutrition.menu.forEach(m => {
@@ -553,7 +554,7 @@ const gcTypes = () => {
     t.name === "strength" || t.name === "cardio" || state.workouts.some(x => wtypeOfW(x) === t.name));
 };
 const save = () => {
-  for (const k in dayFlagsCache) delete dayFlagsCache[k];
+  if (state.verdicts) delete state.verdicts[sel];
   try { gcTypes(); } catch(e) {}
   try { localStorage.setItem(KEY, JSON.stringify(state)); } catch(e) {}
 };
@@ -647,17 +648,16 @@ function weekStrip(kind){
     const d = new Date(mon); d.setDate(d.getDate() + i);
     const id = iso(d);
     let dot = "";
+    const f = dayFlags(id);
     if (kind === "nutrition"){
-      const habs = state.nutrition.rules;
-      if (habs.length){
-        const done = habs.filter(r => habitDone(r, id)).length;
-        dot = done >= habs.length ? "full" : done > 0 ? "part" : "plan";
+      if (f.nTracked){
+        const done = state.nutrition.rules.filter(r => habitDone(r, id)).length;
+        dot = f.nOk ? "full" : done > 0 ? "part" : "plan";
       }
     } else {
-      const exIds = exercisesFor(id).map(e => e.id);
-      if (exIds.length){
-        const done = exIds.filter(eid => exDone(id, { id: eid })).length;
-        dot = done >= exIds.length ? "full" : done > 0 ? "part" : "plan";
+      if (f.wPlanned){
+        const done = exercisesFor(id).map(e => e.id).filter(eid => exDone(id, { id: eid })).length;
+        dot = f.wOk ? "full" : done > 0 ? "part" : "plan";
       }
     }
     cells += `<div class="dcell ${id===sel?"sel":""} ${id===todayIso?"istoday":""}" data-act="pick" data-date="${id}">
@@ -1380,9 +1380,12 @@ function habitDone(h, ds){
   return h.kind === "count" ? num(v, 0) >= num(h.target, 1) : !!v;
 }
 
-const dayFlagsCache = {};   // a past day's result only changes through a save (retro edits) — save() clears this
+// an ENDED day's result is frozen in state.verdicts — later plan changes never recolor it.
+// Acting on that day (logging/unchecking while it's selected) clears its verdict via save(),
+// so it re-judges once and freezes again. Today is always judged live.
 function dayFlags(ds){
-  if (dayFlagsCache[ds]) return dayFlagsCache[ds];
+  const past = ds < iso(new Date());
+  if (past && state.verdicts[ds]) return state.verdicts[ds];
   const exIds = exercisesFor(ds).map(e => e.id);
   const wPlanned = exIds.length > 0;
   const wOk = !wPlanned || exIds.every(id => exDone(ds, { id }));
@@ -1390,7 +1393,7 @@ function dayFlags(ds){
   const nTracked = habs.length > 0;
   const nOk = !nTracked || (habs.every(h => habitDone(h, ds)) && weekOkFor(ds) && !num((state.nutrition.xnoslot || {})[ds], 0));
   const r = { wPlanned, wOk, nTracked, nOk };
-  if (ds < iso(new Date())) dayFlagsCache[ds] = r;
+  if (past) state.verdicts[ds] = r;   // persists with the next save; deterministic until then
   return r;
 }
 
@@ -2530,7 +2533,30 @@ document.addEventListener("pointercancel", () => {
   drag = null; render();
 });
 
-save();   // freeze today's (and any missed days') plan snapshot before first paint
+// one-time (v148): seed frozen verdicts so the ring looks as it did before v147 removed
+// history — an item counts on a past day only if it shows any logged activity by that day,
+// so recently added workouts/menu items don't retro-poison old days. Then the freeze rule owns it.
+if (!state.verdictSeed1){
+  const today = iso(new Date());
+  const firstLog = {};
+  const noteLog = (id, d) => { if (!firstLog[id] || d < firstLog[id]) firstLog[id] = d; };
+  for (const d in state.logs) for (const id in state.logs[d]) noteLog(id, d);
+  for (const d in state.nutrition.logs) for (const id in state.nutrition.logs[d]) noteLog(id, d);
+  const existedBy = (id, ds) => firstLog[id] && firstLog[id] <= ds;
+  const start = parseIso(state.profile.anchor || today);
+  if (!isNaN(start)) for (let d = new Date(start), i = 0; iso(d) < today && i < 400; d.setDate(d.getDate() + 1), i++){
+    const ds = iso(d);
+    const exIds = exercisesFor(ds).map(e => e.id).filter(id => existedBy(id, ds));
+    const wPlanned = exIds.length > 0;
+    const wOk = !wPlanned || exIds.every(id => exDone(ds, { id }));
+    const habs = state.nutrition.rules.filter(h => existedBy(h.id, ds));
+    const nTracked = habs.length > 0;
+    const nOk = !nTracked || (habs.every(h => habitDone(h, ds)) && weekOkFor(ds) && !num((state.nutrition.xnoslot || {})[ds], 0));
+    state.verdicts[ds] = { wPlanned, wOk, nTracked, nOk };
+  }
+  state.verdictSeed1 = true;
+}
+save();
 render();
 loadPhotos().then(render);   // photos arrive async from IndexedDB, repaint when ready
 // installable app: register the service worker when served over http(s) with sw.js alongside
