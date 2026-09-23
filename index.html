@@ -2633,6 +2633,10 @@ if (!state.verdictSeed1){
 save();
 render();
 loadPhotos().then(render);   // photos arrive async from IndexedDB, repaint when ready
+// iOS standalone underreports the window height by the status-bar inset (win 793 vs screen 852
+// on iPhone 15 Pro) — in that container only 100vh resolves to the full glass, so use it there
+if (navigator.standalone) document.body.style.height = "100vh";
+
 /* TEMP DIAG — remove after the nav-height bug is confirmed fixed */
 try {
   const pr = document.createElement("div");
