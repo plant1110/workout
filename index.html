@@ -122,7 +122,7 @@ nav svg{width:25px;height:25px;stroke:currentColor;fill:none;stroke-width:1.8;st
 .chip{display:inline-block;font-size:11px;padding:3px 8px;border-radius:99px;background:var(--card2);color:var(--dim);border:1px solid var(--line)}
 .hist{display:flex;justify-content:space-between;padding:11px 0;border-bottom:1px solid var(--line);font-size:16px}
 .hist:last-child{border-bottom:0}
-.bigring{width:296px;height:296px;max-width:100%}
+.bigring{width:318px;height:318px;max-width:100%}
 .arc{filter:drop-shadow(0 0 11px rgba(195,245,60,.32))}
 .ringwrap{display:flex;justify-content:center;padding:30px 0 0;
   background:radial-gradient(circle at 50% 52%, rgba(195,245,60,.07), transparent 62%)}
@@ -264,24 +264,28 @@ nav svg{width:25px;height:25px;stroke:currentColor;fill:none;stroke-width:1.8;st
 .dock{position:absolute;left:0;right:0;bottom:0;z-index:45;max-width:560px;margin:0 auto;animation:dockup .24s ease}
 .dock.noanim{animation:none}
 @keyframes dockup{from{transform:translateY(60px);opacity:.3}to{transform:none;opacity:1}}
-.dkdone{display:block;width:calc(100% - 32px);margin:0 16px 10px;background:#2b2f37;border:1px solid #3a4049;border-radius:99px;padding:15px;
-  font-size:17px;font-weight:600;color:var(--tx);box-shadow:0 10px 30px rgba(0,0,0,.55)}
-.dkwheel{background:#1b1e24;border-radius:28px 28px 0 0;padding:14px 10px calc(12px + env(safe-area-inset-bottom));box-shadow:0 -14px 36px rgba(0,0,0,.5)}
-.wheel{position:relative;height:200px;overflow:hidden}
-.wband{position:absolute;left:10px;right:10px;top:80px;height:40px;background:rgba(255,255,255,.085);border-radius:12px;pointer-events:none}
-.wgrp{position:relative;display:flex;justify-content:center;height:100%}
-.wcol{position:relative;flex:none;height:200px;overflow-y:scroll;scroll-snap-type:y mandatory;-webkit-overflow-scrolling:touch;scrollbar-width:none;perspective:560px;
+.dkdone{display:block;width:calc(100% - 32px);margin:0 16px 10px;padding:15px;border-radius:99px;font-size:17px;font-weight:600;color:var(--tx);
+  background:rgba(72,77,88,.38);border:1px solid rgba(255,255,255,.16);box-shadow:0 8px 26px rgba(0,0,0,.28);
+  -webkit-backdrop-filter:blur(22px) saturate(170%);backdrop-filter:blur(22px) saturate(170%)}
+.dkwheel{border-radius:28px 28px 0 0;padding:14px 10px calc(12px + env(safe-area-inset-bottom));
+  background:rgba(30,33,40,.58);border-top:1px solid rgba(255,255,255,.1);
+  -webkit-backdrop-filter:blur(30px) saturate(170%);backdrop-filter:blur(30px) saturate(170%)}
+.wheel{position:relative;height:200px;overflow:hidden;touch-action:pan-y}
+.wgrp{position:relative;display:flex;justify-content:center;gap:34px;height:100%}
+/* one pill per part: the band sits behind its own column and unit */
+.wg{position:relative;display:flex;align-items:center;height:200px}
+.wg::before{content:"";position:absolute;left:-8px;right:-8px;top:80px;height:40px;background:rgba(255,255,255,.1);border-radius:12px;pointer-events:none}
+.wlab{position:relative;font-size:20px;color:var(--dim);padding-left:6px}
+.wcol{position:relative;flex:none;height:200px;overflow-y:scroll;overflow-x:hidden;overscroll-behavior:contain;touch-action:pan-y;scroll-snap-type:y mandatory;-webkit-overflow-scrolling:touch;scrollbar-width:none;perspective:560px;
   -webkit-mask-image:linear-gradient(transparent 0,#000 40%,#000 60%,transparent 100%);mask-image:linear-gradient(transparent 0,#000 40%,#000 60%,transparent 100%)}
 .wcol::-webkit-scrollbar{display:none}
 .wpad{height:80px}
-.witem{height:40px;line-height:40px;scroll-snap-align:center;font-size:23px;color:#a3abb5;white-space:nowrap;cursor:pointer;user-select:none;-webkit-user-select:none;
+.witem{height:40px;line-height:40px;scroll-snap-align:center;font-size:23px;color:#a3abb5;white-space:nowrap;overflow:hidden;cursor:pointer;user-select:none;-webkit-user-select:none;
   backface-visibility:hidden;transform-origin:50% 50%}
 .witem.on{color:var(--tx)}
-.wcol.ar .witem{text-align:right;padding-right:1px}
-.wcol.al .witem{text-align:left;padding-left:1px}
+.wcol.ar .witem{text-align:right;padding-right:2px}
+.wcol.al .witem{text-align:left;padding-left:2px}
 .wcol.ac .witem{text-align:center}
-.wcol.au .witem{text-align:left;padding-left:10px}
-.wunit{flex:none;align-self:center;font-size:21px;color:var(--dim);padding-left:10px;min-width:60px}
 /* a log or food being edited: a titled panel inside the list */
 .lpanel{padding:14px 16px 2px;background:#1a1e24}
 .lptitle{font-size:15px;font-weight:650;color:var(--acc);margin:0 2px 10px}
@@ -334,7 +338,7 @@ nav svg{width:25px;height:25px;stroke:currentColor;fill:none;stroke-width:1.8;st
 .bigbtn{display:block;width:100%;background:var(--acc);border:0;color:#0f1400;border-radius:16px;padding:17px;font-size:17px;font-weight:650}
 .onote{font-size:16px;color:var(--dim);margin:4px 4px 0}
 /* home + results */
-.hring{display:flex;justify-content:center;padding:10px 0 0;cursor:pointer;background:radial-gradient(circle at 50% 50%, rgba(195,245,60,.07), transparent 62%)}
+.hring{display:flex;justify-content:center;padding:0;margin-top:-2px;cursor:pointer;background:radial-gradient(circle at 50% 50%, rgba(195,245,60,.07), transparent 62%)}
 .hstats{display:flex;justify-content:center;gap:48px;margin:14px 0 22px;font-size:22px;font-weight:650}
 .hstats span{display:inline-flex;align-items:center;gap:9px}
 .hstats svg{width:23px;height:23px;stroke:var(--dim);fill:none;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
@@ -1002,7 +1006,7 @@ function bigRing(sub, subColor){
       stroke-dasharray="${(seg - gap).toFixed(2)} ${(C - seg + gap).toFixed(2)}"
       stroke-dashoffset="${(-i2 * seg).toFixed(2)}" transform="rotate(-90 75 75)"/>`;
   }
-  return `<svg class="bigring" viewBox="0 0 150 150">
+  return `<svg class="bigring" viewBox="5 5 140 140">
     <circle cx="75" cy="75" r="${r}" stroke="#1c232d" stroke-width="10" fill="none"/>
     ${arcs}
     <text x="75" y="81" text-anchor="middle" style="font-size:42px;font-weight:700;fill:var(--tx);letter-spacing:-1.5px">${Math.min(de, total)}</text>
@@ -1131,7 +1135,8 @@ function photoMeta(p){
 }
 
 function trendSvg(points, target, color, fromIso, toIso){
-  const W = 560, H = 230, L = 38, R = 16, T = 20, B = 34;
+  // drawn at phone size, so its text renders at real size (the old 560-wide chart shrank labels to ~7px)
+  const W = 330, H = 200, L = 36, R = 12, T = 24, B = 30;
   const ys = points.map(p => p.v);
   let lo = Math.min(...ys), hi = Math.max(...ys);
   if (target != null){ lo = Math.min(lo, target); hi = Math.max(hi, target); }
@@ -1142,7 +1147,7 @@ function trendSvg(points, target, color, fromIso, toIso){
   const px = t => L + (W - L - R) * (x1 === x0 ? 0.5 : (t - x0) / (x1 - x0));
   const py = v => T + (H - T - B) * (1 - (v - y0) / (y1 - y0));
   const base = H - B;
-  const clampX = x => Math.max(L + 24, Math.min(W - R - 24, x));
+  const clampX = x => Math.max(L + 16, Math.min(W - R - 16, x));
   const P = points.map(p => [px(parseIso(p.date).getTime()), py(p.v)]);
   let d = P.length ? `M${P[0][0].toFixed(1)},${P[0][1].toFixed(1)}` : "";
   for (let i = 0; i < P.length - 1; i++){
@@ -1153,18 +1158,6 @@ function trendSvg(points, target, color, fromIso, toIso){
   const gx = px(x1), gy = target != null ? py(target) : 0;
   const lastP = P.length ? P[P.length - 1] : null;
   const todayT = parseIso(iso(new Date())).getTime();
-  const sel = gSel != null ? points.findIndex(p => p.date === gSel) : -1;
-  let tip = "";
-  if (sel >= 0){
-    const label = `${fmt(points[sel].v)} \u00b7 ${pdate(points[sel].date)}`;
-    const tw = label.length * 6.8 + 20;
-    const tx = Math.max(L + tw / 2, Math.min(W - R - tw / 2, P[sel][0]));
-    const ty = Math.max(P[sel][1] - 38, 4);
-    tip = `<g>
-      <rect x="${(tx - tw / 2).toFixed(1)}" y="${ty.toFixed(1)}" width="${tw.toFixed(1)}" height="25" rx="9" fill="var(--card2)" stroke="var(--line)"/>
-      <text x="${tx.toFixed(1)}" y="${(ty + 17).toFixed(1)}" text-anchor="middle" style="font-size:12.5px;font-weight:650;fill:var(--tx)">${label}</text>
-    </g>`;
-  }
   return `<svg viewBox="0 0 ${W} ${H}" style="width:100%;height:auto;display:block">
     <defs><linearGradient id="tg" x1="0" y1="0" x2="0" y2="1">
       <stop offset="0" stop-color="${color}" stop-opacity=".22"/>
@@ -1173,27 +1166,21 @@ function trendSvg(points, target, color, fromIso, toIso){
     <line x1="${L}" y1="${py(hi).toFixed(1)}" x2="${W - R}" y2="${py(hi).toFixed(1)}" stroke="#212a35" stroke-width="1" stroke-dasharray="3 6"/>
     <line x1="${L}" y1="${py(lo).toFixed(1)}" x2="${W - R}" y2="${py(lo).toFixed(1)}" stroke="#212a35" stroke-width="1" stroke-dasharray="3 6"/>
     ${todayT > x0 && todayT < x1 ? `<line x1="${px(todayT).toFixed(1)}" y1="${T}" x2="${px(todayT).toFixed(1)}" y2="${base}" stroke="#3a4656" stroke-width="1" stroke-dasharray="2 5"/>` : ""}
-    <text x="${L - 7}" y="${(py(hi) + 4).toFixed(1)}" text-anchor="end" style="font-size:11px;fill:var(--dim)">${fmt(hi)}</text>
-    <text x="${L - 7}" y="${(py(lo) + 4).toFixed(1)}" text-anchor="end" style="font-size:11px;fill:var(--dim)">${fmt(lo)}</text>
+    <text x="${L - 6}" y="${(py(hi) + 4.5).toFixed(1)}" text-anchor="end" style="font-size:13px;fill:var(--dim)">${fmt(hi)}</text>
+    <text x="${L - 6}" y="${(py(lo) + 4.5).toFixed(1)}" text-anchor="end" style="font-size:13px;fill:var(--dim)">${fmt(lo)}</text>
     ${area ? `<path d="${area}" fill="url(#tg)"/>` : ""}
     ${target != null && lastP ? `<line x1="${lastP[0].toFixed(1)}" y1="${lastP[1].toFixed(1)}" x2="${gx.toFixed(1)}" y2="${gy.toFixed(1)}" stroke="${color}" stroke-width="1.5" stroke-dasharray="2 6" opacity=".5"/>` : ""}
     ${P.length > 1 ? `<path d="${d}" fill="none" stroke="${color}" stroke-width="7" opacity=".15" stroke-linejoin="round" stroke-linecap="round"/>
       <path d="${d}" fill="none" stroke="${color}" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>` : ""}
-    ${points.map((p, i) => {
-      const x = P[i][0].toFixed(1), y = P[i][1].toFixed(1);
-      return `${gSel === p.date ? `<circle cx="${x}" cy="${y}" r="8" fill="none" stroke="${color}" stroke-width="1.5" opacity=".55"/>` : ""}
-      <circle cx="${x}" cy="${y}" r="3.6" fill="${color}" stroke="var(--bg)" stroke-width="1.6"/>
-      <circle cx="${x}" cy="${y}" r="15" fill="transparent" class="tap" data-act="gpt" data-d="${p.date}"/>`;
-    }).join("")}
-    ${target != null ? `<circle cx="${gx.toFixed(1)}" cy="${gy.toFixed(1)}" r="4.5" fill="var(--bg)" stroke="${color}" stroke-width="2.5"/>
-      <text x="${clampX(gx).toFixed(1)}" y="${Math.max(gy - 11, 12).toFixed(1)}" text-anchor="middle" style="font-size:13.5px;font-weight:750;fill:${color}">${fmt(target)}</text>` : ""}
-    ${tip}
+    ${P.map(q => `<circle cx="${q[0].toFixed(1)}" cy="${q[1].toFixed(1)}" r="4" fill="${color}" stroke="var(--bg)" stroke-width="1.6"/>`).join("")}
+    ${target != null ? `<circle cx="${gx.toFixed(1)}" cy="${gy.toFixed(1)}" r="5" fill="var(--bg)" stroke="${color}" stroke-width="2.5"/>
+      <text x="${clampX(gx).toFixed(1)}" y="${Math.max(gy - 12, 14).toFixed(1)}" text-anchor="middle" style="font-size:14px;font-weight:700;fill:${color}">${fmt(target)}</text>` : ""}
     <line x1="${L}" y1="${base}" x2="${W - R}" y2="${base}" stroke="#2b3544" stroke-width="1.5"/>
-    ${[0, 0.25, 0.5, 0.75, 1].map(f => {
+    ${[0, 1 / 3, 2 / 3, 1].map(f => {
       const x = L + (W - L - R) * f;
       const dd = new Date(x0 + (x1 - x0) * f);
       return `<line x1="${x.toFixed(1)}" y1="${base}" x2="${x.toFixed(1)}" y2="${base + 4}" stroke="#2b3544" stroke-width="1.5"/>
-        <text x="${x.toFixed(1)}" y="${H - 9}" text-anchor="${f === 0 ? "start" : f === 1 ? "end" : "middle"}" style="font-size:11px;fill:var(--dim)">${pdate(iso(dd))}</text>`;
+        <text x="${x.toFixed(1)}" y="${H - 7}" text-anchor="${f === 0 ? "start" : f === 1 ? "end" : "middle"}" style="font-size:12.5px;fill:var(--dim)">${pdate(iso(dd))}</text>`;
     }).join("")}
   </svg>`;
 }
@@ -1275,7 +1262,7 @@ function trendCard(){
   </div>
   <div class="lst">
     ${[...points].reverse().map(p => logDraft && logDraft.mode === "edit" && logDraft.orig === p.date ? logPanel()
-      : li(`<span class="lk">${pdate(p.date)}</span><span class="lv">${fmt(p.v)} ${unitG}</span>`, `data-act="ledit" data-d="${p.date}"`, `tap ${gSel === p.date ? "sel" : ""}`)).join("")}
+      : li(`<span class="lk">${pdate(p.date)}</span><span class="lv">${fmt(p.v)} ${unitG}</span>`, `data-act="ledit" data-d="${p.date}"`, "tap")).join("")}
     ${logDraft && logDraft.mode === "new" ? logPanel() : addLi("lnew", "Add log")}
   </div>`;
 }
@@ -2023,7 +2010,8 @@ function wheelCols(f, v){
     n = clamp(n, f.min, f.max + 0.9);
     const ip = Math.floor(n + 1e-9), dp = Math.round((n - ip) * 10);
     const cols = [{ items: ints.map(String), idx: clamp(ints.indexOf(ip), 0, ints.length - 1) }];
-    if (f.dec) cols.push({ items: [...Array(10).keys()].map(k => "." + k), idx: clamp(dp, 0, 9) });
+    // kilograms split as kg + g (74 kg | 200 g); other decimals as tenths
+    if (f.dec) cols.push({ items: [...Array(10).keys()].map(k => f.unit === "kg" ? String(k * 100) : "." + k), idx: clamp(dp, 0, 9) });
     return cols;
   }
   if (f.t === "date"){
@@ -2049,13 +2037,17 @@ function wheelVal(f, idxs, cols){
   const q = cols[0].vals[idxs[0]];
   return q ? `${q} ${cols[1].vals[idxs[1]]}` : "";
 }
-// the wheel: columns sit together in the middle, the value reads as one ("74.2 kg")
+// the wheel: every part is its own pill (column + its unit), with space between the pills
 function wheelHTML(f, cols){
-  const plain = f.t === "num" && !f.dec && !f.unit;
-  const lay = f.t === "num" ? (f.dec ? [["r", 84], ["l", 44]] : [[plain ? "c" : "r", plain ? 120 : 96]])
-    : f.t === "date" ? [["c", 64], ["c", 84], ["c", 84]] : f.t === "amt" ? [["r", 104], ["u", 84]] : [["c", 260]];
-  return `<div class="wheel"><div class="wband"></div><div class="wgrp">${cols.map((c, ci) => `<div class="wcol a${lay[ci][0]}" style="width:${lay[ci][1]}px" data-c="${ci}"><div class="wpad"></div>${c.items.map((it, k) =>
-    `<div class="witem ${k === c.idx ? "on" : ""}" data-act="witem" data-k="${k}">${it}</div>`).join("")}<div class="wpad"></div></div>`).join("")}${f.t === "num" && f.unit ? `<div class="wunit">${f.unit}</div>` : ""}</div></div>`;
+  const g = (ci, w, al, lab, lw) => `<div class="wg"><div class="wcol a${al}" style="width:${w}px" data-c="${ci}"><div class="wpad"></div>${cols[ci].items.map((it, k) =>
+    `<div class="witem ${k === cols[ci].idx ? "on" : ""}" data-act="witem" data-k="${k}">${it}</div>`).join("")}<div class="wpad"></div></div>${lab ? `<div class="wlab" style="width:${lw}px">${lab}</div>` : ""}</div>`;
+  let groups;
+  if (f.t === "num" && f.dec) groups = f.unit === "kg" ? [g(0, 64, "r", "kg", 40), g(1, 60, "r", "g", 26)] : [g(0, 64, "r"), g(1, 50, "l", f.unit, f.unit ? 44 : 0)];
+  else if (f.t === "num") groups = f.unit ? [g(0, 76, "r", f.unit, 64)] : [g(0, 140, "c")];
+  else if (f.t === "date") groups = [g(0, 56, "c"), g(1, 72, "c"), g(2, 80, "c")];
+  else if (f.t === "amt") groups = [g(0, 88, "r"), g(1, 64, "c")];
+  else groups = [g(0, 240, "c")];
+  return `<div class="wheel"><div class="wgrp">${groups.join("")}</div></div>`;
 }
 // the drum: rows tilt and fade as they move away from the middle
 function wheelPaint(col){
@@ -2240,7 +2232,7 @@ function render(){
   const head = document.getElementById("head");
   head.style.display = top ? "none" : "";
   head.innerHTML = top ? "" : tab === "home"
-    ? `<h1>${esc(modeLbl(state.profile.mode))}</h1>`
+    ? `<h1>${esc(modeLbl(state.profile.mode))}</h1><div class="pgsub">${dRange(state.profile.anchor, cycleEnd())}</div>`
     : `<h1>${esc(HEAD[tab]().t)}</h1>`;
   const pcar0 = document.querySelector("#view .pcar");
   const pscroll = pcar0 ? pcar0.scrollLeft : null;
@@ -2451,7 +2443,6 @@ document.addEventListener("click", e => {
   if (a === "fclose"){ foodOpen = null; render(); return; }
 
   if (a === "gmetric"){ gMetric = el.dataset.t; gAdd = false; gSel = null; gEdit = null; logDraft = null; dock = null; render(); return; }
-  if (a === "gpt"){ gSel = gSel === el.dataset.d ? null : el.dataset.d; render(); return; }
   if (a === "gledit"){ gEdit = el.dataset.d; gAdd = false; render(); return; }
   if (a === "glupd"){
     const nd = (document.getElementById("gedate") || {}).value;
