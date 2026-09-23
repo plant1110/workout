@@ -31,10 +31,10 @@ body{
   touch-action:manipulation;
 }
 #app{max-width:560px;margin:0 auto;padding:calc(16px + env(safe-area-inset-top)) 18px 8px}
-h1{font-size:27px;margin:0;letter-spacing:-.4px}
+h1{font-size:30px;font-weight:650;letter-spacing:-.6px;margin:0;line-height:1.15}
 h2{font-size:14px;text-transform:uppercase;letter-spacing:.08em;color:var(--dim);margin:22px 0 10px;font-weight:600}
 .sub{color:var(--dim);font-size:15px;margin-top:3px}
-.card{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:18px;margin-bottom:14px}
+.card{background:var(--card);border-radius:20px;padding:18px;margin-bottom:14px}
 .row{display:flex;align-items:center;gap:10px}
 .between{display:flex;align-items:center;justify-content:space-between;gap:10px}
 .grow{flex:1;min-width:0}
@@ -196,24 +196,110 @@ nav svg{width:25px;height:25px;stroke:currentColor;fill:none;stroke-width:1.9;st
 .pdots i{width:6px;height:6px;border-radius:99px;background:#2b3544;transition:all .15s}
 .pdots i.on{background:var(--acc);width:18px}
 .pcount{text-align:center;margin-top:13px;font-size:13px;color:var(--dim);font-weight:600;letter-spacing:.04em}
+
+/* ---------- v159 design code: plain lists, section heads, pages ---------- */
+:root{--hair:#20252c}
+#head{margin-bottom:14px}
+.hrow{display:flex;align-items:center;gap:12px}
+.gtag{font-size:14px;font-weight:650;color:var(--acc);background:rgba(195,245,60,.14);padding:5px 12px;border-radius:99px}
+.gtag.bulk{color:var(--warm);background:rgba(255,138,61,.14)}
+.gtag.maintain{color:var(--dim);background:rgba(139,150,162,.16)}
+.back{display:inline-flex;align-items:center;gap:2px;color:var(--acc);font-size:17px;padding:8px 10px 8px 0;margin:-8px 0 6px;cursor:pointer;user-select:none;-webkit-user-select:none}
+.back svg{width:22px;height:22px;stroke:currentColor;fill:none;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}
+.pgsub{font-size:16px;color:var(--dim);margin-top:3px}
+.lst{background:var(--card);border-radius:20px;overflow:hidden;margin-bottom:14px}
+.lst > * + *{border-top:1px solid var(--hair)}
+.li{display:flex;align-items:center;gap:12px;padding:13px 16px;min-height:54px;font-size:17px}
+.li.col{flex-direction:column;align-items:stretch;gap:14px}
+.li .grow{min-width:0}
+.lt{font-size:17px;font-weight:500}
+.ls{font-size:15px;color:var(--dim);margin-top:2px}
+.lk{flex:1;color:var(--dim)}
+.lv{display:inline-flex;align-items:center;justify-content:flex-end;gap:7px;color:var(--tx);text-align:right;white-space:nowrap}
+.lv.dim{color:var(--dim)}
+.li.acts{color:var(--acc);font-weight:500}
+.ic{width:22px;height:22px;flex:none;stroke:currentColor;fill:none;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
+.dimi{color:var(--dim);display:flex;flex:none}
+.dt{color:var(--dim);text-decoration:line-through}
+.sech{display:flex;align-items:center;gap:10px;margin:24px 2px 10px;font-size:20px;font-weight:650}
+.grp{font-size:15px;color:var(--dim);margin:22px 4px 8px}
+.cb{width:32px;height:32px;border-radius:99px;border:2px solid #334050;flex:none;display:flex;align-items:center;justify-content:center;color:transparent;font-size:16px;font-weight:700;cursor:pointer;user-select:none;-webkit-user-select:none}
+.cb.on{background:var(--acc);border-color:var(--acc);color:#0f1400}
+.cb.blue.on{background:#38bdf8;border-color:#38bdf8}
+.danger{display:block;width:100%;background:none;border:0;text-align:center;color:var(--bad);font-size:17px;padding:14px;margin:6px 0 10px}
+.bl{list-style:none;margin:5px 0 0;padding:0}
+.bl li{position:relative;padding-left:15px;font-size:15px;line-height:1.55;color:#c9d0d7}
+.bl li::before{content:"";position:absolute;left:2px;top:.64em;width:5px;height:5px;border-radius:99px;background:#4a5563}
+.bl .am{color:var(--dim);margin-left:6px}
+.bl.dimmed li{color:var(--dim)}
+.vin{background:transparent;border:0;border-radius:0;padding:4px 0;width:96px;text-align:right;color:var(--tx);font-size:17px;flex:none}
+.vin:focus{outline:none;border:0;color:var(--acc)}
+.fin{background:var(--card2);border:1px solid var(--line);border-radius:11px;padding:9px 11px;font-size:16px}
+.ttlin{background:transparent;border:0;border-radius:0;padding:0;font:inherit;font-size:30px;font-weight:650;letter-spacing:-.6px;width:100%;color:var(--tx)}
+.ttlin:focus{outline:none;border:0}
+.addrow{display:flex;align-items:center;gap:10px;color:var(--acc);font-size:17px;font-weight:500;padding:14px 0 2px;margin-top:12px;border-top:1px solid var(--hair);cursor:pointer}
+.chips{display:flex;gap:7px;flex-wrap:wrap}
+.dchips{display:flex;justify-content:space-between;gap:4px}
+/* swipe a row left to reveal Edit */
+.swr{position:relative}
+.swa{position:absolute;right:12px;top:0;bottom:0;display:flex;align-items:center;visibility:hidden}
+.swr.open .swa,.swr.drg .swa{visibility:visible}
+.swbtn{background:none;border:0;padding:0;display:flex;flex-direction:column;align-items:center;gap:4px;color:var(--dim);font-size:12px;font-weight:500}
+.swbtn .pl{width:64px;height:36px;border-radius:99px;background:#2c323b;color:var(--tx);display:flex;align-items:center;justify-content:center}
+.swbtn .pl svg{width:19px;height:19px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.swf{position:relative;z-index:1;background:var(--card);touch-action:pan-y;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none;transition:margin .22s ease,border-radius .22s,background-color .22s}
+.swr.hdr .swf{background:var(--bg);border-radius:16px}
+.swf.lift,.swr.open .swf{background:var(--card2);border-radius:16px}
+.swr.open .swf{margin-right:92px}
+.whead{display:flex;align-items:center;gap:11px;padding:9px 10px;min-height:52px;font-size:20px;font-weight:650}
+.wsub{font-size:15px;color:var(--dim);font-weight:400;margin-top:1px}
+.wblk + .wblk{margin-top:18px}
+/* onboarding + results: full-screen pages */
+#app.full{min-height:100%;display:flex;flex-direction:column}
+#app.full main{flex:1;display:flex;flex-direction:column}
+.otop{display:flex;align-items:center;gap:12px;margin-bottom:34px}
+.otop .back{margin:0;padding:6px 6px 6px 0}
+.obar{flex:1;display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
+.obar i{height:4px;border-radius:9px;background:var(--line)}
+.obar i.on{background:var(--acc)}
+.oq{font-size:30px;font-weight:650;letter-spacing:-.6px;line-height:1.2;margin-bottom:26px}
+.ocard{display:flex;align-items:center;gap:14px;background:var(--card);border:1.5px solid var(--line);border-radius:18px;padding:18px;font-size:19px;font-weight:600;margin-bottom:10px;cursor:pointer;user-select:none;-webkit-user-select:none}
+.ocard svg{width:24px;height:24px;stroke:var(--dim);fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex:none}
+.ocard.on{border-color:var(--acc);background:rgba(195,245,60,.08)}
+.ocard.on svg{stroke:var(--acc)}
+.ocard .ok{margin-left:auto;width:26px;height:26px;border-radius:99px;background:var(--acc);color:#0f1400;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:800}
+.ofoot{margin-top:auto;padding:22px 0 calc(8px + env(safe-area-inset-bottom))}
+.bigbtn{display:block;width:100%;background:var(--acc);border:0;color:#0f1400;border-radius:16px;padding:17px;font-size:17px;font-weight:650}
+.onote{font-size:16px;color:var(--dim);margin:4px 4px 0}
+/* home + results */
+.hring{display:flex;justify-content:center;padding:10px 0 0;cursor:pointer;background:radial-gradient(circle at 50% 50%, rgba(195,245,60,.07), transparent 62%)}
+.hstats{display:flex;justify-content:center;gap:48px;margin:14px 0 22px;font-size:22px;font-weight:650}
+.hstats span{display:inline-flex;align-items:center;gap:9px}
+.hstats svg{width:23px;height:23px;stroke:var(--dim);fill:none;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
+.brow{display:flex;justify-content:space-between;align-items:baseline;gap:10px}
+.bnum{font-size:23px;font-weight:650;letter-spacing:-.3px}
+.bgoal{font-size:16px;color:var(--dim)}
+.bar2{height:6px;background:#222a34;border-radius:9px;margin-top:10px;overflow:hidden}
+.bar2 > i{display:block;height:100%;border-radius:9px;background:var(--acc)}
+.bar2.warm > i{background:var(--warm)}
+.xclose{display:flex;justify-content:flex-end;margin:-6px -6px 4px 0}
+.xclose button{background:none;border:0;color:var(--dim);padding:6px}
+.xclose svg{width:24px;height:24px;stroke:currentColor;fill:none;stroke-width:2.2;stroke-linecap:round}
+.ctr{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.mring{position:relative;width:48px;height:48px;flex:none}
+.mring b{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:650}
+[data-hold]{-webkit-touch-callout:none;-webkit-user-select:none;user-select:none}
 </style>
 </head>
 <body>
 <div id="scroll">
 <div id="app">
-  <div class="between" style="margin-bottom:16px">
-    <div>
-      <h1 id="hTitle">Today</h1>
-      <div class="sub" id="hSub"></div>
-    </div>
-    <div id="hRight"></div>
-  </div>
+  <div id="head"></div>
   <main id="view"></main>
 </div>
 </div>
 <nav><div class="in" id="nav"></div></nav>
 <div id="sheetRoot"></div>
-<div id="fabRoot"></div>
 
 <script>
 "use strict";
@@ -309,25 +395,23 @@ function seed(){
 let state, tab = "home";
 let sel = iso(new Date());     // selected date on the main screen
 let weekOffset = 0;            // which week the strip shows, 0 = current
-let editing = false;           // Workout page in edit mode
-let editTargets = false;       // targets form open on Home
-let editN = false;             // nutrition rules edit mode
-let showRules = false;         // autorules section expanded on Workout
 let armed = null;              // destructive button awaiting second tap
 let sheet = null;              // bottom sheet: { kind: "workout"|"menu", toBackup?, draft }
 let sheetNew = false;          // sheet just opened -> play the slide-in once
-let exOpen = null;             // exercise expanded inside an editor
-let wkOpen = null;             // which workout is expanded in edit mode (accordion)
-let wkHome = null;             // edit-mode section the open workout editor was opened in
-let exHome = null;             // same for an open menu-item editor
 let wtAdd = null;              // workout editor currently showing the new-type inset
-let xtOpen = null;             // which cheat TYPE is expanded in edit mode (accordion)
 let wtAddIcon = null;          // icon selected in that inset
 let wtAddName = "";            // name typed in that inset (survives re-renders)
 let gMetric = "weight";        // trend graph: which metric
 let gSel = null;               // trend graph: date of the tapped point (its value shown), null = none
 let gEdit = null;              // trend history: date of the log being edited
 let gAdd = false;              // trend graph: add-log inset open
+let pages = [];                // full pages pushed over the tab: {k, id?, w?, i?, y?}
+let tabY = 0;                  // tab scroll position, restored when the last page closes
+let rowOpen = null;            // which value row is expanded on the open page ("goal", "wdays", ...)
+let foodOpen = null;           // menu item page: index of the food edited in place
+let onb = null;                // new-cycle onboarding draft
+let swOpen = null;             // key of the row swiped open to show its Edit button
+let swSup = 0;                 // time a swipe/drag ended: the click right after it is not a tap
 try { state = JSON.parse(localStorage.getItem(KEY)) || seed(); } catch(e) { state = seed(); }
 // v147: history snapshots REMOVED — every day is judged by the current plan + that day's logs
 delete state.snaps;
@@ -371,7 +455,7 @@ if (!state.xtypes) state.xtypes = [];                 // cheat TYPES carry the b
 if (!state.nutrition.tlog) state.nutrition.tlog = {};  // { date: { typeId: [{x, label, cost, slot?, ns?}] } } — the one cheat log
 if (!state.nutrition.xnoslot) state.nutrition.xnoslot = {};   // per-day count of cheat uses with no free menu slot (voids the day)
 if (!state.verdicts) state.verdicts = {};   // frozen day results: once a day has ended its color is FINAL
-if (!state.regimes) state.regimes = [];      // finished challenges: {from, to, days:"gor...", w:{start,end,target}, f:{...}}
+if (!state.regimes) state.regimes = [];      // finished cycles: {from, to, days:"gor...", w:{start,end,target}, f:{...}}
 if (!state.wopts) state.wopts = {};
 const normFood = it => typeof it === "string" ? { name: it, amt: "" } : it;
 state.nutrition.menu.forEach(m => {
@@ -608,9 +692,6 @@ function resolve(ex){
   };
 }
 const occursOn = (w, dateIso) => (w.days || []).includes(dayIdx(parseIso(dateIso)));
-// which edit-mode section an item belongs to, relative to the selected day
-const wkSec = w => (w.days || []).length ? (occursOn(w, sel) ? "today" : "other") : "unsched";
-const mSec = m => !m.days ? "today" : !m.days.length ? "unsched" : m.days.includes(dayIdx(parseIso(sel))) ? "today" : "other";
 const workoutsFor = dateIso => state.workouts.filter(w => occursOn(w, dateIso));
 const effOf = (w, dateIso) => {
   const cid = (state.wopts[dateIso] || {})[w.id];
@@ -651,23 +732,9 @@ function weekStrip(kind){
   for (let i = 0; i < 7; i++){
     const d = new Date(mon); d.setDate(d.getDate() + i);
     const id = iso(d);
-    let dot = "";
-    const f = dayFlags(id);
-    if (kind === "nutrition"){
-      if (f.nTracked){
-        const done = state.nutrition.rules.filter(r => habitDone(r, id)).length;
-        dot = f.nOk ? "full" : done > 0 ? "part" : "plan";
-      }
-    } else {
-      if (f.wPlanned){
-        const done = exercisesFor(id).map(e => e.id).filter(eid => exDone(id, { id: eid })).length;
-        dot = f.wOk ? "full" : done > 0 ? "part" : "plan";
-      }
-    }
     cells += `<div class="dcell ${id===sel?"sel":""} ${id===todayIso?"istoday":""}" data-act="pick" data-date="${id}">
       <div class="dw">${DAYS[i][0]}</div>
       <div class="dn">${d.getDate()}</div>
-      <div class="dot ${dot}"></div>
     </div>`;
   }
   return `<div class="strip">
@@ -710,27 +777,41 @@ const wtInset = wid => `<div style="margin-top:9px;background:var(--card2);borde
     </div>
   </div>`;
 
+// small building blocks of the v159 design code
+const svgI = (paths, cls = "ic") => `<svg class="${cls}" viewBox="0 0 24 24">${paths}</svg>`;
+const PLUS = '<path d="M12 5v14M5 12h14"/>';
+const PENCIL = '<path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"/>';
+// a row that slides left to reveal Edit (opens that one item's page)
+const swRow = (key, inner, cls = "") => `<div class="swr ${cls}" data-swipe="${key}">
+    <div class="swa"><button class="swbtn" data-act="swedit" data-k="${key}"><span class="pl"><svg viewBox="0 0 24 24">${PENCIL}</svg></span>Edit</button></div>
+    <div class="swf">${inner}</div></div>`;
+// small progress ring for section heads
+function pring(pct, color = "var(--acc)"){
+  const r = 12, c = 2 * Math.PI * r, p2 = Math.max(0, Math.min(1, pct || 0));
+  return `<svg width="30" height="30" viewBox="0 0 30 30" style="flex:none;display:block">
+    <circle cx="15" cy="15" r="${r}" stroke="#222a34" stroke-width="4" fill="none"/>
+    ${p2 > 0 ? `<circle cx="15" cy="15" r="${r}" stroke="${color}" stroke-width="4" fill="none" stroke-linecap="round"
+      stroke-dasharray="${c.toFixed(2)}" stroke-dashoffset="${(c * (1 - p2)).toFixed(2)}" transform="rotate(-90 15 15)"/>` : ""}
+  </svg>`;
+}
+
 function wkCardView(w){
   const eff = effOf(w, sel);
   const hasAlts = state.workouts.some(o => o.id !== w.id);
-  const origin = eff !== w ? `<div class="target">${esc(w.title)}</div>` : "";
   const titleAct = hasAlts ? `data-act="wchoose" data-w="${w.id}"` : "";
+  const origin = eff !== w ? `<div class="wsub">${esc(w.title)}</div>` : "";
   if (eff.type === "activity"){
     const r = resolve({ id: eff.id, type: "time", mins: eff.mins });
     const on = exDone(sel, { id: eff.id });
     const bump = r.d.mins ? ` <span class="up">&uarr; ${(r.d.mins > 0 ? "+" : "") + fmt(r.d.mins)} min</span>` : "";
-    return `<div class="card">
-      <div class="chead solo">
-        <div class="row grow" style="gap:10px">${wicon(eff)}
-          <div class="grow ${hasAlts ? "tap" : ""}" ${titleAct}>
-            <div style="font-size:19px;font-weight:650;${on ? "color:var(--dim);text-decoration:line-through" : ""}">${esc(eff.title)}</div>
-            ${origin}
-            <div class="target">${fmt(r.mins)} min${bump}</div>
-          </div>
+    // a single activity is one row in a card: the row itself is the workout
+    return `<div class="lst">${swRow("wk:" + eff.id, `<div class="li">${wicon(eff)}
+        <div class="grow ${hasAlts ? "tap" : ""}" ${titleAct}>
+          <div class="lt ${on ? "dt" : ""}">${esc(eff.title)}</div>${origin ? `<div class="ls">${esc(w.title)}</div>` : ""}
+          <div class="ls">${fmt(r.mins)} min${bump}</div>
         </div>
-        <div class="chk ${on ? "on" : ""}" data-act="exdone" data-ex="${eff.id}">&#10003;</div>
-      </div>
-    </div>`;
+        <div class="cb ${on ? "on" : ""}" data-act="exdone" data-ex="${eff.id}">&#10003;</div>
+      </div>`)}</div>`;
   }
   const total = (eff.exercises || []).length;
   let done = 0;
@@ -747,163 +828,28 @@ function wkCardView(w){
       if (r.d.sets)   bump.push(`${sign(r.d.sets)} set${Math.abs(r.d.sets) === 1 ? "" : "s"}`);
     }
     const targetTxt = r.time ? `${fmt(r.mins)} min` : `${r.sets} &times; ${fmt(r.reps)}${r.weight ? ` @ ${fmt(r.weight)} kg` : ""}`;
-    return `<div class="ex between">
+    return `<div class="li">
       <div class="grow">
-        <div class="name" style="${on ? "color:var(--dim);text-decoration:line-through" : ""}">${esc(ex.name)}</div>
-        <div class="target">${targetTxt}
-          ${bump.length ? `<span class="up">&nbsp;&uarr; ${bump.join(", ")}</span>` : ""}</div>
+        <div class="lt ${on ? "dt" : ""}">${esc(ex.name)}</div>
+        <div class="ls">${targetTxt}${bump.length ? `<span class="up">&nbsp; &uarr; ${bump.join(", ")}</span>` : ""}</div>
       </div>
-      <div class="chk ${on ? "on" : ""}" data-act="exdone" data-ex="${ex.id}">&#10003;</div>
+      <div class="cb ${on ? "on" : ""}" data-act="exdone" data-ex="${ex.id}">&#10003;</div>
     </div>`;
   }).join("");
   const allDone = total > 0 && done === total;
-  return `<div class="card">
-    <div class="chead">
-      <div class="row grow" style="gap:10px">${wicon(eff)}
-        <div class="grow ${hasAlts ? "tap" : ""}" ${titleAct}>
-          <div style="font-size:19px;font-weight:650;${allDone ? "color:var(--dim);text-decoration:line-through" : ""}">${esc(eff.title)}</div>
-          ${origin}
-        </div>
+  return swRow("wk:" + eff.id, `<div class="whead">${wicon(eff)}
+      <div class="grow ${hasAlts ? "tap" : ""}" ${titleAct}>
+        <div class="${allDone ? "dt" : ""}">${esc(eff.title)}</div>${origin}
       </div>
-      ${ring(total ? done/total : 0)}
-    </div>${rows}</div>`;
-}
-
-function scheduleRow(w){
-  return `<div style="margin-top:12px"><label>Days</label>
-    <div class="row" style="margin-top:2px;gap:6px">
-      ${DAYS.map((d,i) => `<button class="daychip ${(w.days || []).includes(i+1) ? "on" : ""}" data-act="wkday" data-w="${w.id}" data-d="${i+1}">${d[0]}</button>`).join("")}
-    </div>
-  </div>`;
-}
-
-function wkCardEdit(w){
-  const isAct = !(w.exercises || []).length;   // mode is derived: no exercises = single activity
-  const wkChips = `<div style="margin-top:12px"><label>Type: ${esc(cap1(wtypeOfW(w)))}</label>
-    <div class="row" style="gap:8px;flex-wrap:wrap">
-      ${state.wtypes.map(t => `<button class="ibtn ${wtypeOfW(w) === t.name ? "on" : ""}" data-act="wkwtype" data-w="${w.id}" data-t="${esc(t.name)}" title="${esc(cap1(t.name))}">
-        <svg viewBox="0 0 24 24">${WICONS[t.icon] || ""}</svg></button>`).join("")}
-      ${wtAdd === w.id ? "" : `<button class="ibtn" data-act="wtadd" data-w="${w.id}" title="Add type" style="font-size:24px;line-height:1">+</button>`}
-    </div>
-  </div>
-  ${wtAdd === w.id ? wtInset(w.id) : ""}`;
-
-  const titleRow = `<div class="row">
-        <input class="grow" data-act="wktitle" data-w="${w.id}" value="${esc(w.title)}" style="font-weight:650">
-        ${armed === "delwk:" + w.id
-          ? `<button class="ghost sm" data-act="delwk" data-w="${w.id}" style="color:var(--bad);border-color:rgba(255,95,87,.35);flex:none">Tap again</button>`
-          : `<button class="x" data-act="delwk" data-w="${w.id}" title="Delete">&times;</button>`}
-        <button class="okbtn" data-act="wkopen" data-w="${w.id}" title="Done">&#10003;</button>
-      </div>`;
-  let inner;
-  if (isAct){
-    inner = `
-      ${titleRow}
-      ${wkChips}
-      ${scheduleRow(w)}
-      <div class="f3" style="margin-top:12px">
-        <div><label>Minutes</label><input inputmode="numeric" data-act="wkmins" data-w="${w.id}" value="${esc(w.mins ?? 60)}"></div>
-      </div>
-      <div style="margin-top:10px"><button class="ghost" data-act="addex" data-w="${w.id}">+ Add exercise</button></div>
-      <div class="tiny" style="margin-top:12px">One checkmark for the whole activity &mdash; add exercises to turn it into a list.</div>`;
-  } else {
-    const rows = (w.exercises || []).map(ex => {
-      const r = resolve(ex);
-      const time = ex.type === "time";
-      const summary = time ? `${fmt(r.mins)} min` : `${r.sets} &times; ${fmt(r.reps)}${r.weight ? ` @ ${fmt(r.weight)} kg` : ""}`;
-      if (exOpen !== ex.id){
-        return `<div class="exedit" data-drag-row data-id="${ex.id}">
-          <div class="between">
-            <span class="dragh" data-drag="exs:${w.id}">&#8801;</span>
-            <div class="grow tap" data-act="exopen" data-ex="${ex.id}">
-              <div style="font-weight:600">${esc(ex.name)}</div>
-              <div class="tiny">${summary}</div>
-            </div>
-            ${delBtn("delex", ex.id, `data-w="${w.id}" data-ex="${ex.id}"`)}
-          </div>
-        </div>`;
-      }
-      const f = (field, mode, label) => `<div><label>${label}</label>
-        <input inputmode="${mode}" data-act="exf" data-w="${w.id}" data-ex="${ex.id}" data-f="${field}" value="${esc(ex[field] ?? "")}"></div>`;
-      const typeChips = `<div class="row" style="margin-top:9px;gap:7px">
-        <button class="sm ${time ? "ghost" : "pri"}" data-act="extype" data-w="${w.id}" data-ex="${ex.id}" data-t="str">Sets &times; reps</button>
-        <button class="sm ${time ? "pri" : "ghost"}" data-act="extype" data-w="${w.id}" data-ex="${ex.id}" data-t="time">Minutes</button>
-      </div>`;
-      const fields = time
-        ? `<div class="f3" style="margin-top:9px">${f("mins","numeric","Minutes")}</div>`
-        : `<div class="f3" style="margin-top:9px">${f("sets","numeric","Sets")}${f("reps","numeric","Reps")}${f("weight","decimal","Kg")}</div>`;
-      return `<div class="exedit" style="background:rgba(195,245,60,.05);margin:0 -8px;padding-left:8px;padding-right:8px;border-radius:12px">
-        <div class="row">
-          <input class="grow" data-act="exf" data-w="${w.id}" data-ex="${ex.id}" data-f="name" value="${esc(ex.name)}">
-          ${delBtn("delex", ex.id, `data-w="${w.id}" data-ex="${ex.id}"`)}
-          <button class="okbtn" data-act="exopen" data-ex="${ex.id}" title="Done">&#10003;</button>
-        </div>
-        ${typeChips}
-        ${fields}
-      </div>`;
-    }).join("");
-    inner = `
-      ${titleRow}
-      ${wkChips}
-      ${scheduleRow(w)}
-      <div style="margin-top:8px">${rows}</div>
-      <div style="margin-top:10px"><button class="ghost" data-act="addex" data-w="${w.id}">+ Add exercise</button></div>
-      <div class="tiny" style="margin-top:12px">Sets / reps / kg are the <b>base</b> values. Autorules add on top. ${w._backup || state.backup.some(x => x.id === w.id) ? "This edits your home backup set, shown on any day you switch to Home." : "Changes apply everywhere this workout appears."}</div>`;
-  }
-
-  return `<div class="card" data-drag-row data-id="${w.id}">
-    <div class="gripbar"><span class="dragh" data-drag="workouts">&#8801;&#8801;</span></div>
-    ${inner}
-  </div>`;
-}
-
-function wkRowEdit(w){
-  const summ = w.type === "activity"
-    ? `${fmt(num(w.mins, 60))} min`
-    : `${(w.exercises || []).length} exercise${(w.exercises || []).length === 1 ? "" : "s"}`;
-  const daysTxt = (w.days || []).length ? w.days.map(d2 => DAYS[d2 - 1][0]).join(" ") : "Unscheduled";
-  return `<div class="card" data-drag-row data-id="${w.id}" style="padding:13px 18px">
-    <div class="between">
-      <span class="dragh" data-drag="workouts">&#8801;</span>
-      ${wicon(w)}
-      <div class="grow tap" data-act="wkopen" data-w="${w.id}">
-        <div style="font-weight:650;font-size:17px">${esc(w.title)}</div>
-        <div class="tiny">${esc(cap1(wtypeOfW(w)))} &middot; ${daysTxt} &middot; ${summ}</div>
-      </div>
-      ${armed === "delwk:" + w.id
-        ? `<button class="ghost sm" data-act="delwk" data-w="${w.id}" style="color:var(--bad);border-color:rgba(255,95,87,.35)">Tap again</button>`
-        : `<button class="x" data-act="delwk" data-w="${w.id}" title="Delete">&times;</button>`}
-    </div>
-  </div>`;
+      ${pring(total ? done / total : 0)}
+    </div>`, "hdr") + (rows ? `<div class="lst">${rows}</div>` : "");
 }
 
 function viewWorkout(){
   let html = weekStrip("workout");
-  if (editing){
-    // edit mode lists EVERY workout in three sections; an open editor stays in the
-    // section it was opened in (wkHome) until closed, so day toggles never move it
-    const secs = { today: [], other: [], unsched: [] };
-    state.workouts.forEach(w => secs[wkOpen === w.id && wkHome ? wkHome : wkSec(w)].push(w));
-    const rowOf = w => wkOpen === w.id ? wkCardEdit(w) : wkRowEdit(w);
-    html += `<h2>${sel === iso(new Date()) ? "Today" : DAYS[dayIdx(parseIso(sel)) - 1]}</h2>`;
-    html += secs.today.map(rowOf).join("") || `<div class="muted" style="margin-bottom:14px">No workouts on this day.</div>`;
-    if (secs.other.length) html += `<h2>Other days</h2>` + secs.other.map(rowOf).join("");
-    if (secs.unsched.length) html += `<h2>Unscheduled &mdash; available in choosers</h2>` + secs.unsched.map(rowOf).join("");
-    html += `<button class="addbtn" data-act="addwk">+ Add workout</button>`;
-  } else {
-    const wks = workoutsFor(sel);
-    html += wks.length ? wks.map(wkCardView).join("")
-      : `<div class="card">
-      <div class="between">
-        <div style="font-size:19px;font-weight:650">Rest day</div>
-        <span class="badge rest">Rest</span>
-      </div>
-    </div>`;
-  }
-  html += `<button class="wide" data-act="rulestoggle">
-    <svg viewBox="0 0 24 24" style="width:19px;height:19px;stroke:currentColor;fill:none;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round"><path d="M4 18 9 9l4 5 3-4 4 8z"/></svg>
-    Autorules (${state.rules.length}) ${showRules ? "&#9652;" : "&#9662;"}</button>`;
-  if (showRules) html += `<div style="margin-top:14px">${viewRules()}</div>`;
+  const wks = workoutsFor(sel);
+  html += wks.length ? wks.map(w => `<div class="wblk">${wkCardView(w)}</div>`).join("")
+    : `<div class="lst"><div class="li"><div class="grow lt">Rest day</div><span class="badge rest">Rest</span></div></div>`;
   return html;
 }
 
@@ -933,11 +879,11 @@ function viewRules(){
     </div>`;
   }).join("");
   return `${rows || `<div class="card muted">No rules yet.</div>`}
-    <div><button class="pri" data-act="addrule">+ Add rule</button></div>
-    <div class="tiny" style="margin-top:12px">Volume updates on Mondays. Rules stack: two rules on the same exercise both apply. Base values (in a day's edit mode) never change.</div>`;
+    <div class="lst">${addLi("addrule", "Add rule")}</div>
+    <div class="onote">Updates every Monday. Rules on the same exercise stack.</div>`;
 }
 
-function bigRing(endTxt){
+function bigRing(sub, subColor){
   const p = state.profile;
   const total = Math.max(1, num(p.regimeDays, 90));
   const de = daysElapsed();
@@ -969,9 +915,8 @@ function bigRing(endTxt){
   return `<svg class="bigring" viewBox="0 0 150 150">
     <circle cx="75" cy="75" r="${r}" stroke="#1c232d" stroke-width="10" fill="none"/>
     ${arcs}
-    <text x="75" y="76" text-anchor="middle" style="font-size:40px;font-weight:750;fill:var(--tx);letter-spacing:-1.5px">${Math.min(de, total)}</text>
-    <text x="75" y="97" text-anchor="middle" style="font-size:11.5px;fill:var(--dim)">of ${total} days</text>
-    <text x="75" y="114" text-anchor="middle" style="font-size:10px;fill:#57647a">${endTxt}</text>
+    <text x="75" y="81" text-anchor="middle" style="font-size:42px;font-weight:700;fill:var(--tx);letter-spacing:-1.5px">${Math.min(de, total)}</text>
+    <text x="75" y="102" text-anchor="middle" style="font-size:12.5px;font-weight:500;fill:${subColor || "var(--dim)"}">${sub}</text>
   </svg>`;
 }
 
@@ -984,105 +929,100 @@ function tapeBF(p){
   return { state: bf >= 3 && bf <= 60 ? "ok" : "off", bf };
 }
 
-function targetsForm(){
+/* ---------- cycles ---------- */
+const MODE_LBL = { bulk: "Bulk", cut: "Cut", maintain: "Maintain" };
+const modeLbl = m => MODE_LBL[m] || cap1(m || "");
+const cycleNo = () => (state.regimes || []).length + 1;
+function cycleEnd(){
   const p = state.profile;
-  const tb = tapeBF(p);
-  const end2 = parseIso(p.anchor); end2.setDate(end2.getDate() + Math.max(1, num(p.regimeDays, 90)) - 1);
-  const ended2 = iso(new Date()) > iso(end2);
-  return `
-  <div class="card">
-    <div class="between" style="margin-bottom:10px">
-      <div style="font-weight:650">Challenge setup</div>
-      <button class="pri sm" data-act="edittgt">Done</button>
-    </div>
-    <div class="f2">
-      <div><label>Regime</label>
-        <select data-act="prof" data-f="mode">
-          ${["bulk","cut","maintain"].map(m => `<option value="${m}" ${p.mode===m?"selected":""}>${m[0].toUpperCase()+m.slice(1)}</option>`).join("")}
-        </select></div>
-      <div><label>Length, days</label><input inputmode="numeric" data-act="prof" data-f="regimeDays" value="${esc(p.regimeDays)}"></div>
-    </div>
-    <div class="f3" style="margin-top:10px">
-      <div><label>Weight start</label><input inputmode="decimal" data-act="prof" data-f="weightStart" value="${esc(p.weightStart)}"></div>
-      <div><label>Weight now</label><input inputmode="decimal" data-act="prof" data-f="weightNow" value="${esc(p.weightNow)}"></div>
-      <div><label>Weight target</label><input inputmode="decimal" data-act="prof" data-f="weightTarget" value="${esc(p.weightTarget)}"></div>
-    </div>
-    <div class="f3" style="margin-top:10px">
-      <div><label>Fat start %</label><input inputmode="decimal" data-act="prof" data-f="fatStart" value="${esc(p.fatStart)}"></div>
-      <div><label>Fat now %</label><input inputmode="decimal" data-act="prof" data-f="fatNow" value="${esc(p.fatNow)}"></div>
-      <div><label>Fat target %</label><input inputmode="decimal" data-act="prof" data-f="fatTarget" value="${esc(p.fatTarget)}"></div>
-    </div>
-    <div class="f3" style="margin-top:10px">
-      <div><label>Height cm</label><input inputmode="decimal" data-act="prof" data-f="heightCm" value="${esc(p.heightCm ?? "")}"></div>
-      <div><label>Waist cm</label><input inputmode="decimal" data-act="prof" data-f="waistCm" value="${esc(p.waistCm ?? "")}"></div>
-      <div><label>Neck cm</label><input inputmode="decimal" data-act="prof" data-f="neckCm" value="${esc(p.neckCm ?? "")}"></div>
-    </div>
-    <div class="tiny" style="margin-top:8px">${
-      tb.state === "bad" ? `<span style="color:var(--bad)">Waist must be larger than neck &mdash; check the tape.</span>`
-      : tb.state === "off" ? `<span style="color:var(--warm)">${fmt(tb.bf)}% looks off &mdash; re-measure. Tape horizontal: waist at navel, neck just below the larynx.</span>`
-      : tb.state === "ok" ? `Body fat from tape: <b class="up">${fmt(tb.bf)}%</b> &mdash; US Navy method, applied to Fat now.`
-      : `Fill height, waist and neck to auto-calculate Fat now (US Navy tape method). Waist at navel, neck just below the larynx.`
-    }</div>
-    <div style="margin-top:14px;border-top:1px solid var(--line);padding-top:12px">
-      <div class="tiny" style="margin-bottom:9px">Day ${Math.min(daysElapsed(), Math.max(1, num(p.regimeDays, 90)))} of ${Math.max(1, num(p.regimeDays, 90))} &middot; started ${pdate(p.anchor)} &middot; ends ${pdate(iso(end2))}</div>
-      ${ended2
-        ? `<button class="wide" data-act="newchal" style="background:var(--acc);border-color:var(--acc);color:#0f1400;font-weight:650">Start new challenge</button>`
-        : armed === "newchal"
-          ? `<button class="wide" data-act="newchal" style="color:var(--bad);border-color:rgba(255,95,87,.35)">Tap again to finish early</button>`
-          : `<button class="wide ghost" data-act="newchal">Finish &amp; start new challenge</button>`}
-      <div class="tiny" style="margin-top:9px">Finishing saves this challenge&rsquo;s results to Progress and starts day 1 from today.</div>
-    </div>
-  </div>`;
+  const e = parseIso(p.anchor); e.setDate(e.getDate() + Math.max(1, num(p.regimeDays, 30)) - 1);
+  return iso(e);
+}
+const cycleEnded = () => iso(new Date()) > cycleEnd();
+const dRange = (a, b) => `${pdate(a)} &ndash; ${pdate(b)}`;
+// a day's ring color: g = workout and nutrition done, o = one of them, r = neither
+function dayCode(ds){
+  const f = dayFlags(ds);
+  const fails = (f.wPlanned && !f.wOk ? 1 : 0) + (f.nTracked && !f.nOk ? 1 : 0);
+  return fails === 0 ? "g" : fails === 1 ? "o" : "r";
+}
+// the running cycle as ring codes: past days colored, today live (p = nothing yet), future empty
+function curCodes(){
+  const p = state.profile, total = Math.max(1, num(p.regimeDays, 30)), de = daysElapsed(), today = iso(new Date());
+  const out = [];
+  for (let i = 0; i < total; i++){
+    if (i >= de){ out.push("e"); continue; }
+    const d = parseIso(p.anchor); d.setDate(d.getDate() + i);
+    const ds = iso(d);
+    if (ds !== today){ out.push(dayCode(ds)); continue; }
+    const f = dayFlags(ds);
+    const fails = (f.wPlanned && !f.wOk ? 1 : 0) + (f.nTracked && !f.nOk ? 1 : 0);
+    const doneOne = (f.wPlanned && f.wOk) || (f.nTracked && f.nOk);
+    out.push(fails === 0 && (f.wPlanned || f.nTracked) ? "g" : doneOne ? "o" : "p");
+  }
+  return out.join("");
+}
+const SEGC = { g: "var(--acc)", o: "var(--warm)", r: "var(--bad)", p: "#3a4656" };
+function segRing(codes, px, sw){
+  const n = Math.max(1, codes.length), r = 50 - sw / 2 - 1, C = 2 * Math.PI * r, seg = C / n;
+  const gap = Math.min(1.8, seg * 0.3);
+  let arcs = "";
+  [...codes].forEach((c, i) => {
+    if (!SEGC[c]) return;
+    arcs += `<circle cx="50" cy="50" r="${r}" stroke="${SEGC[c]}" stroke-width="${sw}" fill="none"
+      stroke-dasharray="${(seg - gap).toFixed(2)} ${(C - seg + gap).toFixed(2)}" stroke-dashoffset="${(-i * seg).toFixed(2)}" transform="rotate(-90 50 50)"/>`;
+  });
+  return `<svg viewBox="0 0 100 100" width="${px}" height="${px}" style="display:block">
+    <circle cx="50" cy="50" r="${r}" stroke="#1c232d" stroke-width="${sw}" fill="none"/>${arcs}</svg>`;
+}
+const mring = codes => `<div class="mring">${segRing(codes, 48, 10)}<b>${[...codes].filter(c => c === "g").length}</b></div>`;
+function lastValTo(k, to){
+  const m = (state.measurements || []).filter(x => x[k] != null && !isNaN(num(x[k], NaN)) && x.date <= to)
+    .sort((a, b) => a.date < b.date ? -1 : 1).at(-1);
+  return m ? num(m[k]) : null;
+}
+// the part of the running cycle that is over (never includes today)
+function archiveRange(){
+  if (!Object.keys(state.logs).length && !Object.keys(state.nutrition.logs).length) return null;   // nothing logged, nothing to keep
+  const y = new Date(); y.setDate(y.getDate() - 1);
+  const end = cycleEnd(), to = end < iso(y) ? end : iso(y);
+  const from = state.profile.anchor;
+  return from && from <= to ? { from, to } : null;
+}
+// the running cycle as a results record (stored when the next cycle starts)
+function cycleRecord(from, to){
+  const p = state.profile;
+  const days = [];
+  let wd = 0, nd = 0;
+  for (let d = parseIso(from); iso(d) <= to; d.setDate(d.getDate() + 1)){
+    const ds = iso(d), f = dayFlags(ds);
+    days.push(dayCode(ds));
+    if (f.wPlanned && f.wOk) wd++;
+    if (f.nTracked && f.nOk) nd++;
+  }
+  return { from, to, mode: p.mode, days: days.join(""), wd, nd,
+    w: { start: p.weightStart, end: lastValTo("weight", to) ?? p.weightNow, target: p.weightTarget },
+    f: { start: p.fatStart, end: lastValTo("fat", to) ?? p.fatNow, target: p.fatTarget } };
 }
 
 function viewHome(){
   const p = state.profile;
-  const total = num(p.regimeDays, 90), de = daysElapsed();
-  const end = parseIso(p.anchor); end.setDate(end.getDate() + total - 1);
-  const prog = (now, start, target) => (target === start) ? 1 : clamp((num(now)-num(start)) / (num(target)-num(start)), 0, 1);
+  const ended = cycleEnded();
+  const total = Math.max(1, num(p.regimeDays, 30));
+  const prog = (now, start, target) => (num(target) === num(start)) ? 1 : clamp((num(now) - num(start)) / (num(target) - num(start)), 0, 1);
   const wp = prog(p.weightNow, p.weightStart, p.weightTarget);
   const fp = prog(p.fatNow, p.fatStart, p.fatTarget);
-  if (editTargets) return targetsForm();
-  const ended = iso(new Date()) > iso(end);
-  const fresh = !Object.keys(state.logs).length && !Object.keys(state.nutrition.logs).length && !(state.regimes || []).length;
-  return `
-  ${ended ? `<div class="card" style="padding:20px 18px">
-    <div style="font-size:19px;font-weight:650">Challenge finished</div>
-    <div class="tiny" style="margin:5px 0 14px">${pdate(p.anchor)} &ndash; ${pdate(iso(end))} &middot; ${total} days. Starting a new one saves these results to Progress.</div>
-    <button class="wide" data-act="newchal" style="background:var(--acc);border-color:var(--acc);color:#0f1400;font-weight:650">Start new challenge</button>
-  </div>` : ""}
-  <div class="card" style="padding:20px 18px">
-    <div class="trow">
-      <div class="tcol">
-        <div class="k">Weight</div>
-        <div class="tval">${fmt(num(p.weightNow))}<span class="tgoal"> &rarr; ${fmt(num(p.weightTarget))} kg</span></div>
-        <div class="bar" style="margin-top:11px"><i style="width:${(wp*100).toFixed(0)}%"></i></div>
-      </div>
-      <div class="tdiv"></div>
-      <div class="tcol">
-        <div class="k">Body fat</div>
-        <div class="tval">${fmt(num(p.fatNow))}<span class="tgoal"> &rarr; ${fmt(num(p.fatTarget))} %</span></div>
-        <div class="bar warm" style="margin-top:11px"><i style="width:${(fp*100).toFixed(0)}%"></i></div>
-      </div>
-    </div>
+  return `<div class="hring" data-act="ring">${bigRing(ended ? "complete" : `of ${total}`, ended ? "var(--acc)" : "")}</div>
+  <div class="hstats">
+    <span><svg viewBox="0 0 24 24">${TABS[1].icon}</svg>${daysDone("w")}</span>
+    <span><svg viewBox="0 0 24 24">${TABS[2].icon}</svg>${daysDone("n")}</span>
   </div>
-  <div class="card" style="padding:20px 18px">
-    <div class="trow">
-      <div class="tcol">
-        <div class="k">Workout days</div>
-        <div class="tval">${daysDone("w")}<span class="tgoal"> done</span></div>
-      </div>
-      <div class="tdiv"></div>
-      <div class="tcol">
-        <div class="k">Nutrition days</div>
-        <div class="tval">${daysDone("n")}<span class="tgoal"> done</span></div>
-      </div>
-    </div>
-  </div>
-  <div class="ringwrap">
-    ${bigRing("ends " + end.toLocaleDateString(undefined,{day:"numeric",month:"short"}))}
-  </div>
-  ${fresh ? `<div class="tiny" style="text-align:center;margin:10px 14px 0">A ${total}-day challenge &mdash; days turn green, orange or red as you complete workouts and nutrition. Tap &#9998; to set length and goals.</div>` : ""}`;
+  <div class="card">
+    <div class="brow"><span class="bgoal">Weight</span><span><span class="bnum">${fmt(num(p.weightNow))}</span><span class="bgoal"> &rarr; ${fmt(num(p.weightTarget))} kg</span></span></div>
+    <div class="bar2"><i style="width:${(wp * 100).toFixed(0)}%"></i></div>
+    <div class="brow" style="margin-top:18px"><span class="bgoal">Body fat</span><span><span class="bnum">${fmt(num(p.fatNow))}</span><span class="bgoal"> &rarr; ${fmt(num(p.fatTarget))} %</span></span></div>
+    <div class="bar2 warm"><i style="width:${(fp * 100).toFixed(0)}%"></i></div>
+  </div>`;
 }
 
 function photoMeta(p){
@@ -1207,14 +1147,13 @@ function trendCard(){
     .map(m => ({ date: m.date, v: num(m[gMetric]) }));
   const tRaw = state.profile[isW ? "weightTarget" : "fatTarget"];
   const target = tRaw == null || String(tRaw).trim() === "" ? null : num(tRaw);
-  return `<div class="card" style="margin-top:14px">
-    <div class="chead">
-      ${secTitle("trend", "Trend")}
+  return `<div class="sech"><span class="grow">Trend</span>
       <div class="seg">
         <button class="${isW ? "on" : ""}" data-act="gmetric" data-t="weight">Weight</button>
         <button class="${isW ? "" : "on warm"}" data-act="gmetric" data-t="fat">Fat</button>
       </div>
     </div>
+    <div class="card">
     ${points.length ? (() => {
       const lastP = points[points.length - 1], firstP = points[0];
       const delta = lastP.v - firstP.v;
@@ -1231,7 +1170,7 @@ function trendCard(){
       </div>`;
     })() : ""}
     ${points.length ? trendSvg(points, target, color, pFrom, pTo)
-      : `<div class="tiny" style="margin:8px 0 4px">No logs in this range &mdash; add one below.</div>`}
+      : `<div class="onote" style="margin:0 0 2px">No logs yet</div>`}
     ${points.length ? `<div style="margin-top:10px">${[...points].reverse().map(p => gEdit === p.date
       ? `<div style="background:var(--card2);border:1px solid var(--line);border-radius:12px;padding:12px;margin:8px 0">
           <div class="between">
@@ -1259,7 +1198,7 @@ function trendCard(){
         <div><label>Date</label><input type="date" id="gldate" value="${iso(new Date())}"></div>
         <div><label>${isW ? "Weight, kg" : "Fat, %"}</label><input inputmode="decimal" id="glval" placeholder="${isW ? "79.2" : "17.4"}"></div>
       </div>
-    </div>` : `<button class="addbtn" data-act="gladd" style="padding:13px;font-size:15px;margin:14px 0 0">+ Add log</button>`}
+    </div>` : `<div class="addrow" data-act="gladd">${svgI(PLUS)}<span>Add log</span></div>`}
   </div>`;
 }
 
@@ -1269,7 +1208,6 @@ function viewPhotos(){
     html += `<div class="card" style="text-align:center;padding:46px 18px">
       <span class="wicon" style="width:46px;height:46px;display:inline-block;margin-bottom:10px"><svg viewBox="0 0 24 24">${NICONS.photos}</svg></span>
       <div style="font-size:19px;font-weight:650">No photos yet</div>
-      <div class="tiny" style="margin-top:5px">Add the first one &mdash; the app stamps the date for you.</div>
     </div>`;
   } else {
     html += `<div class="pcar">${photos.map(p => {
@@ -1292,43 +1230,33 @@ function viewPhotos(){
       ? `<div class="pdots" id="pdots">${photos.map((_, i) => `<i class="${i === 0 ? "on" : ""}"></i>`).join("")}</div>`
       : `<div class="pcount" id="pcount">1 / ${photos.length}</div>`;
   }
-  html += `<button class="addbtn" data-act="paddphoto" style="margin-top:16px">+ Add photo</button>
+  html += `<div class="lst" style="margin-top:14px">${addLi("paddphoto", "Add photo")}</div>
     <input type="file" accept="image/*" multiple data-act="pfile" style="display:none">`;
   html += trendCard();
-  if ((state.regimes || []).length){
-    const gv = v => v == null ? "&mdash;" : fmt(num(v, 0));
-    const goal = (label, g, unit) => {
-      if (!g || (g.start == null && g.end == null)) return "";
-      const hit = g.target != null && g.end != null &&
-        (num(g.start, 0) >= num(g.target, 0) ? num(g.end, 9e9) <= num(g.target, 0) : num(g.end, -9e9) >= num(g.target, 0));
-      return `<div class="between" style="margin-top:9px">
-        <div style="font-size:15px"><span style="color:var(--dim)">${label}</span>&ensp;${gv(g.start)} &rarr; <b>${gv(g.end)}</b><span style="color:var(--dim)">${unit}</span></div>
-        <span style="font-size:12.5px;font-weight:650;padding:3px 10px;border-radius:99px;${hit
-          ? "background:rgba(195,245,60,.14);color:var(--acc)" : "background:var(--card2);border:1px solid var(--line);color:var(--dim)"}">${hit ? "&#10003;&nbsp;" : "goal "}${gv(g.target)}</span>
-      </div>`;
-    };
-    html += `<div class="card">
-      <div class="chead">${secTitle("flag", "Challenges")}</div>
-      ${state.regimes.slice().reverse().map(rg => {
-        const greens = [...rg.days].filter(c2 => c2 === "g").length;
-        return `<div style="background:var(--card2);border:1px solid var(--line);border-radius:14px;padding:14px 14px 13px;margin-top:10px">
-        <div class="between" style="margin-bottom:10px">
-          <div style="font-weight:650;font-size:16px">${pdate(rg.from)} &ndash; ${pdate(rg.to)}</div>
-          <div class="tiny">${greens}/${rg.days.length} green</div>
-        </div>
-        <div class="row" style="gap:2px">${[...rg.days].map(c2 =>
-          `<div style="flex:1;height:10px;border-radius:3px;background:${c2 === "g" ? "var(--acc)" : c2 === "o" ? "var(--warm)" : "var(--bad)"}"></div>`).join("")}</div>
-        ${goal("Weight", rg.w, " kg")}${goal("Fat", rg.f, " %")}
-      </div>`; }).join("")}
-    </div>`;
-  }
+  html += `<div class="sech">Cycles</div><div class="lst">${cycleRows()}</div>`;
   return html;
 }
 
-function xring(c, limit, color){
+function cycleRows(){
+  const p = state.profile, ended = cycleEnded();
+  const cur = `<div class="li tap" data-act="go" data-k="${ended ? "review" : "cycle"}">${mring(curCodes())}
+    <div class="grow"><div class="lt">Cycle ${cycleNo()} &middot; ${esc(modeLbl(p.mode))}</div><div class="ls">${dRange(p.anchor, cycleEnd())}</div></div>
+    <span style="color:var(--acc)">${ended ? "Review" : "Now"}</span></div>`;
+  const past = (state.regimes || []).map((rg, i) => {
+    const s0 = rg.w && rg.w.start, e0 = rg.w && rg.w.end;
+    const dW = s0 != null && s0 !== "" && e0 != null && e0 !== "" ? Math.round((num(e0) - num(s0)) * 10) / 10 : null;
+    const dTxt = dW == null ? "" : `${dW < 0 ? "&minus;" : dW > 0 ? "+" : ""}${fmt(Math.abs(dW))} kg`;
+    return `<div class="li tap" data-act="go" data-k="review" data-i="${i}">${mring(rg.days || "")}
+      <div class="grow"><div class="lt">Cycle ${i + 1}${rg.mode ? ` &middot; ${esc(modeLbl(rg.mode))}` : ""}</div><div class="ls">${dRange(rg.from, rg.to)}</div></div>
+      <span>${dTxt}</span></div>`;
+  }).reverse().join("");
+  return cur + past;
+}
+
+function xring(c, limit, color, px = 54){
   const r = 20, cc = 2*Math.PI*r;
   const pct = limit > 0 ? Math.min(c / limit, 1) : 0;
-  return `<svg viewBox="0 0 48 48" style="width:54px;height:54px;display:block">
+  return `<svg viewBox="0 0 48 48" style="width:${px}px;height:${px}px;display:block">
     <circle cx="24" cy="24" r="${r}" stroke="#222a34" stroke-width="4.5" fill="none"/>
     <circle cx="24" cy="24" r="${r}" stroke="${color}" stroke-width="4.5" fill="none" stroke-linecap="round"
       stroke-dasharray="${cc}" stroke-dashoffset="${(cc*(1-pct)).toFixed(1)}" transform="rotate(-90 24 24)"/>
@@ -1396,7 +1324,8 @@ const NICONS = {
   menu:   '<path d="M7 3v7M4.5 3v4a2.5 2.5 0 0 0 5 0V3M7 10v11"/><path d="M17.5 3c-1.8 1.2-2.7 3.2-2.7 5.7 0 2 .9 2.8 2.7 2.8V21"/>',
   water:  '<path d="M12 3c3.4 4.1 5.8 7.1 5.8 10a5.8 5.8 0 0 1-11.6 0C6.2 10.1 8.6 7.1 12 3z"/>',
   limits: '<circle cx="12" cy="12" r="9"/><path d="M9 9.5h.01M14.8 8.8h.01M10 14.5h.01M14.3 13.6h.01"/>',
-  flag: '<path d="M6 21V4"/><path d="M6 5h12l-2.5 3.5L18 12H6"/>'
+  flag: '<path d="M6 21V4"/><path d="M6 5h12l-2.5 3.5L18 12H6"/>',
+  presets: '<path d="M6.5 3.5h11v17l-5.5-4-5.5 4z"/>'
 };
 const nicon = k => `<span class="wicon" style="width:21px;height:21px">&#8203;<svg viewBox="0 0 24 24">${NICONS[k]}</svg></span>`;
 const secTitle = (k, label, done) => `<div class="row" style="gap:9px">${nicon(k)}<div style="font-size:19px;font-weight:650;${done ? "color:var(--dim);text-decoration:line-through" : ""}">${label}</div></div>`;
@@ -1447,8 +1376,9 @@ function dayFlags(ds){
 function daysDone(kind){
   let n = 0;
   const start = parseIso(state.profile.anchor);
-  const today = startOfDay(new Date());
-  for (let d = new Date(start); d <= today; d.setDate(d.getDate() + 1)){
+  const today = startOfDay(new Date()), end = parseIso(cycleEnd());
+  const stop = today < end ? today : end;
+  for (let d = new Date(start); d <= stop; d.setDate(d.getDate() + 1)){
     const f = dayFlags(iso(d));
     if (kind === "w" ? (f.wPlanned && f.wOk) : (f.nTracked && f.nOk)) n++;
   }
@@ -1538,322 +1468,470 @@ function typePoints(tid, ds, xper){
   return n;
 }
 
-function menuItemEdit(m){
-  if (exOpen !== m.id){
-    const daysTxt = !m.days ? "Every day" : m.days.length ? m.days.map(d => DAYS[d-1][0]).join(" ") : "Unscheduled";
-    const foods = (m.items || []).length;
-    return `<div class="exedit" data-drag-row data-id="${m.id}">
-      <div class="between">
-        <span class="dragh" data-drag="menu">&#8801;</span>
-        <div class="grow tap" data-act="exopen" data-ex="${m.id}">
-          <div style="font-weight:600">${mLabel(m)}</div>
-          <div class="tiny">${daysTxt}${foods ? ` &middot; ${foods} food${foods > 1 ? "s" : ""}` : ""}</div>
-        </div>
-        ${delBtn("nmdel", m.id, `data-m="${m.id}"`)}
-      </div>
-    </div>`;
-  }
-  const days = m.days || [1,2,3,4,5,6,7];
-  const foods = (m.items || []).map((it, i) =>
-    foodRow(it, { name: "nmif", qty: "nmiqty", unit: "nmiunit", del: "nmidel", key: `${m.id}:${i}`, i, drag: `mfoods:${m.id}`, data: `data-m="${m.id}" data-i="${i}"` })).join("");
-  return `<div class="exedit" style="background:rgba(195,245,60,.05);margin:0 -8px;padding-left:8px;padding-right:8px;border-radius:12px">
-    <div class="between">
-      <label style="margin-bottom:0">${mLabel(m)}</label>
-      <div class="row" style="gap:2px">
-        ${delBtn("nmdel", m.id, `data-m="${m.id}"`)}
-        <button class="okbtn" data-act="exopen" data-ex="${m.id}" title="Done">&#10003;</button>
-      </div>
-    </div>
-    <div class="row" style="margin-top:9px;gap:7px;flex-wrap:wrap">
-      ${MTYPES.map(t => `<button class="sm ${mtypeOf(m) === t ? "pri" : "ghost"}" data-act="nmtype" data-m="${m.id}" data-t="${t}">${cap1(t)}</button>`).join("")}
-    </div>
-    <div class="row" style="margin-top:10px;gap:6px">
-      ${DAYS.map((d,i) => `<button class="daychip ${days.includes(i+1) ? "on" : ""}" data-act="nmday" data-m="${m.id}" data-d="${i+1}">${d[0]}</button>`).join("")}
-    </div>
-    <div style="margin-top:12px"><label>Foods in this meal</label>${foods || ""}</div>
-    <div style="margin-top:9px"><button class="ghost sm" data-act="nmiadd" data-m="${m.id}">+ Add food</button></div>
-    <div class="tiny" style="margin-top:10px">Same-type items appear as swap choices when you tap a meal's name on the day view. Leave all day chips off to keep an item chooser-only.</div>
-  </div>`;
-}
-
 function viewNutrition(){
-  const home = !!state.homeDays[sel];
   const di = dayIdx(parseIso(sel));
   const rules = state.nutrition.rules;
   const menu = state.nutrition.menu.filter(m => !m.days || m.days.includes(di));
   const xts = state.xtypes.map(t => ({ t: t.id, name: t.name, limit: num(t.limit, 0), xper: t.xper, replaces: t.replaces }));
   const l = state.nutrition.logs[sel] || {};
   const mdone = menu.filter(m => l[m.id]).length;
+  const minus = (act, data) => `<button class="x" data-act="${act}" ${data} title="Undo one">&minus;</button>`;
   let html = weekStrip("nutrition");
 
-  const presets = `<div class="row" style="flex-wrap:wrap;gap:8px">
-      ${state.nutrition.presets.map(pr => `<span class="pchip">
-        <button data-act="npreset" data-id="${pr.id}">${esc(pr.name)}</button>
-        ${armed === "npresetdel:" + pr.id ? `<button class="pdel" data-act="npresetdel" data-id="${pr.id}" style="color:var(--bad);font-size:13px;font-weight:650">Tap again</button>` : `<button class="pdel" data-act="npresetdel" data-id="${pr.id}" title="Delete preset">&times;</button>`}
-      </span>`).join("")}
-    </div>`;
-  const mEdit = m => menuItemEdit(m);
-
-  if (editN === true){
-    const rrows = rules.map(r => {
-      if (exOpen !== r.id){
-        return `<div class="exedit" data-drag-row data-id="${r.id}">
-          <div class="between">
-            <span class="dragh" data-drag="habits">&#8801;</span>
-            <div class="grow tap" data-act="exopen" data-ex="${r.id}">
-              <div style="font-weight:600">${esc(r.name)}</div>
-              <div class="tiny">${r.kind === "count" ? `${fmt(num(r.target, 1))}/day${r.unit ? ` ${esc(r.unit)}` : ""}` : r.kind === "limit" ? `Limit ${fmt(num(r.target, 0))}${r.unit ? ` ${esc(r.unit)}` : ""} per ${r.xper || "day"}` : "Checkbox"}</div>
-            </div>
-            ${delBtn("ndel", r.id, `data-r="${r.id}"`)}
-          </div>
-        </div>`;
-      }
-      return `<div class="exedit" style="background:rgba(195,245,60,.05);margin:0 -8px;padding-left:8px;padding-right:8px;border-radius:12px">
-        <div class="row">
-          <input class="grow" data-act="nrulef" data-r="${r.id}" value="${esc(r.name)}">
-          ${delBtn("ndel", r.id, `data-r="${r.id}"`)}
-          <button class="okbtn" data-act="exopen" data-ex="${r.id}" title="Done">&#10003;</button>
+  // habits
+  const hdone = rules.filter(h => habitDone(h, sel)).length;
+  const hrow = h => {
+    if (h.kind === "limit"){
+      const t = num(h.target, 0), c = habitPeriodCount(h, sel), over = c > t;
+      const pw = h.xper === "month" ? "this month" : h.xper === "week" ? "this week" : "today";
+      return `<div class="li">
+        <div class="grow tap" data-act="hplus" data-r="${h.id}">
+          <div class="lt">${esc(h.name)}</div>
+          <div class="ls" style="${over ? "color:var(--bad)" : ""}">${c} of ${fmt(t)}${h.unit ? ` ${esc(h.unit)}` : ""} ${pw}${over ? " &middot; over limit" : ""}</div>
         </div>
-        <div class="row" style="margin-top:9px;gap:7px">
-          <button class="sm ${!r.kind || r.kind === "check" ? "pri" : "ghost"}" data-act="nrkind" data-r="${r.id}" data-t="check">Checkbox</button>
-          <button class="sm ${r.kind === "count" ? "pri" : "ghost"}" data-act="nrkind" data-r="${r.id}" data-t="count">Counter</button>
-          <button class="sm ${r.kind === "limit" ? "pri" : "ghost"}" data-act="nrkind" data-r="${r.id}" data-t="limit">Limit</button>
-        </div>
-        ${r.kind === "count" ? `<div class="f2" style="margin-top:9px">
-          <div><label>Target per day</label><input inputmode="numeric" data-act="nrtarget" data-r="${r.id}" value="${esc(r.target ?? 1)}"></div>
-          <div><label>Unit (optional)</label><input data-act="nrunit" data-r="${r.id}" value="${esc(r.unit || "")}"></div>
-        </div>` : ""}
-        ${r.kind === "limit" ? `<div class="f2" style="margin-top:9px">
-          <div><label>Limit per ${r.xper || "day"}</label><input inputmode="numeric" data-act="nrtarget" data-r="${r.id}" value="${esc(r.target ?? 1)}"></div>
-          <div><label>Unit (optional)</label><input data-act="nrunit" data-r="${r.id}" value="${esc(r.unit || "")}"></div>
-        </div>
-        <div class="row" style="margin-top:9px;gap:7px">
-          ${[["day","Daily"],["week","Weekly"],["month","Monthly"]].map(([k, lb]) =>
-            `<button class="sm ${(r.xper || "day") === k ? "pri" : "ghost"}" data-act="nrper" data-r="${r.id}" data-t="${k}">${lb}</button>`).join("")}
-        </div>` : ""}
+        ${minus("hminus", `data-r="${h.id}"`)}
+        <button class="tap" style="background:none;border:0;padding:0" data-act="hplus" data-r="${h.id}">${xring(c, t, over ? "var(--bad)" : "var(--warm)", 42)}</button>
       </div>`;
-    }).join("");
-    html += `<div class="card">
-      <div style="margin-bottom:8px">${secTitle("habits", "Habits")}</div>
-      ${rrows || `<div class="muted">No habits yet &mdash; add one, or use a preset below.</div>`}
-      <div style="margin-top:10px"><button class="ghost sm" data-act="naddrule">+ Add habit</button></div>
-    </div>`;
-
-    // edit mode lists EVERY menu item in three sections; an open editor stays in the
-    // section it was opened in (exHome) until closed, so day toggles never move it
-    const msecs = { today: [], other: [], unsched: [] };
-    state.nutrition.menu.forEach(m => msecs[exOpen === m.id && exHome ? exHome : mSec(m)].push(m));
-    const mlbl = (t, first) => `<label style="display:block;${first ? "margin:0 0 2px" : "margin:16px 0 2px;border-top:1px solid var(--line);padding-top:14px"}">${t}</label>`;
-    const dayName = sel === iso(new Date()) ? "Today" : DAYS[di - 1];
-    html += `<div class="card">
-      <div style="margin-bottom:8px">${secTitle("menu", "Menu")}</div>
-      ${mlbl(dayName, true)}
-      ${msecs.today.map(mEdit).join("") || `<div class="muted">No menu items on this day.</div>`}
-      ${msecs.other.length ? mlbl("Other days") + msecs.other.map(mEdit).join("") : ""}
-      ${msecs.unsched.length ? mlbl("Unscheduled &mdash; available in choosers") + msecs.unsched.map(mEdit).join("") : ""}
-      <div style="margin-top:10px"><button class="ghost" data-act="nmadd">+ Add menu item</button></div>
-    </div>`;
-
-    const optEdit = (t2, x) => {
-      if (exOpen !== x.id){
-        return `<div class="exedit" data-drag-row data-id="${x.id}">
-          <div class="between">
-            <span class="dragh" data-drag="xopts:${t2.id}">&#8801;</span>
-            <div class="grow tap" data-act="exopen" data-ex="${x.id}">
-              <div style="font-weight:600">${amtLabel(x)}</div>
-              <div class="tiny">${fmt(num(x.cost, 1))} pt${num(x.cost, 1) === 1 ? "" : "s"} &middot; ${!x.days ? "Every day" : x.days.length ? x.days.map(d2 => DAYS[d2-1][0]).join(" ") : "Chooser only"}</div>
-            </div>
-            ${delBtn("xdel", x.id, `data-x="${x.id}"`)}
-          </div>
-        </div>`;
-      }
-      return `<div class="exedit" style="background:rgba(195,245,60,.05);margin:0 -8px;padding-left:8px;padding-right:8px;border-radius:12px">
-        <div class="row">
-          <input class="grow" data-act="xf" data-x="${x.id}" value="${esc(x.name)}">
-          ${delBtn("xdel", x.id, `data-x="${x.id}"`)}
-          <button class="okbtn" data-act="exopen" data-ex="${x.id}" title="Done">&#10003;</button>
+    }
+    if (h.kind === "count"){
+      const t = num(h.target, 1), c = num(l[h.id], 0), on = c >= t;
+      return `<div class="li">
+        <div class="grow tap" data-act="hplus" data-r="${h.id}">
+          <div class="lt ${on ? "dt" : ""}">${esc(h.name)}</div>
+          <div class="ls">${c} of ${fmt(t)}${h.unit ? ` ${esc(h.unit)}` : ""}</div>
         </div>
-        ${(p2 => `<div style="margin-top:12px"><label>Serving (optional)</label>
-        <div class="row" style="gap:6px">
-          <input style="width:74px;flex:none;text-align:center" inputmode="decimal" placeholder="500" data-act="xq" data-x="${x.id}" value="${esc(p2.qty)}">
-          <select style="width:84px;flex:none" data-act="xu" data-x="${x.id}">
-            ${[...UNITS, ...(p2.unit && !UNITS.includes(p2.unit) ? [p2.unit] : [])].map(u => `<option value="${esc(u)}" ${u === p2.unit ? "selected" : ""}>${esc(u)}</option>`).join("")}
-          </select>
-        </div></div>`)(parseAmt(x.amt))}
-        <div class="f3" style="margin-top:12px">
-          <div><label>Points it costs</label><input inputmode="decimal" data-act="xcost" data-x="${x.id}" value="${esc(x.cost ?? 1)}"></div>
-        </div>
-        <div class="row" style="margin-top:10px;gap:6px">
-          ${DAYS.map((d,i) => `<button class="daychip ${(x.days || [1,2,3,4,5,6,7]).includes(i+1) ? "on" : ""}" data-act="xday" data-x="${x.id}" data-d="${i+1}">${d[0]}</button>`).join("")}
-        </div>
-        <div class="tiny" style="margin-top:10px">Days = when this option is the planned pick. All off = chooser-only.</div>
+        ${minus("hminus", `data-r="${h.id}"`)}
+        <button class="tap" style="background:none;border:0;padding:0" data-act="hplus" data-r="${h.id}">${xring(c, t, "#38bdf8", 42)}</button>
       </div>`;
-    };
-    const typeEdit = t2 => {
-      const opts = state.nutrition.exclusions.filter(x => x.xt === t2.id);
-      if (xtOpen !== t2.id){
-        return `<div class="exedit" data-drag-row data-id="${t2.id}">
-          <div class="between">
-            <span class="dragh" data-drag="limits">&#8801;</span>
-            <div class="grow tap" data-act="xtopen" data-t="${t2.id}">
-              <div style="font-weight:600">${esc(t2.name)}</div>
-              <div class="tiny">${fmt(num(t2.limit, 0))} pts per ${t2.xper || "week"} &middot; ${t2.replaces ? `replaces ${t2.replaces}` : "counts only"} &middot; ${opts.length} option${opts.length === 1 ? "" : "s"}</div>
-            </div>
-            ${delBtn("xtdel", t2.id, `data-t="${t2.id}"`)}
-          </div>
-        </div>`;
-      }
-      return `<div class="exedit" style="background:rgba(195,245,60,.05);margin:0 -8px;padding-left:8px;padding-right:8px;border-radius:12px">
-        <div class="row">
-          <input class="grow" data-act="xtname" data-t="${t2.id}" value="${esc(t2.name)}" style="font-weight:650">
-          ${delBtn("xtdel", t2.id, `data-t="${t2.id}"`)}
-          <button class="okbtn" data-act="xtopen" data-t="${t2.id}" title="Done">&#10003;</button>
-        </div>
-        <div class="f3" style="margin-top:12px">
-          <div><label>Points per ${t2.xper || "week"}</label><input inputmode="decimal" data-act="xtlimit" data-t="${t2.id}" value="${esc(t2.limit ?? 3)}"></div>
-        </div>
-        <div class="row" style="margin-top:9px;gap:7px">
-          ${[["day","Daily"],["week","Weekly"],["month","Monthly"]].map(([k, lb]) =>
-            `<button class="sm ${(t2.xper || "week") === k ? "pri" : "ghost"}" data-act="xtper" data-t="${t2.id}" data-p="${k}">${lb}</button>`).join("")}
-        </div>
-        <div style="margin-top:12px"><label>Replaces</label>
-        <div class="row" style="gap:7px">
-          ${[["meal","Meal"],["snack","Snack"],["","Nothing"]].map(([k, lb]) =>
-            `<button class="sm ${(t2.replaces || "") === k ? "pri" : "ghost"}" data-act="xtrep" data-t="${t2.id}" data-r="${k}">${lb}</button>`).join("")}
-        </div></div>
-        <div style="margin-top:12px"><label>Options</label>
-          ${opts.map(x => optEdit(t2, x)).join("") || `<div class="muted">No options yet.</div>`}
-          <div style="margin-top:8px"><button class="ghost sm" data-act="xadd" data-t="${t2.id}">+ Add option</button></div>
-        </div>
-        <div class="tiny" style="margin-top:10px">One budget for the whole type; every option costs its points. Meal/snack types fill a free menu slot when logged &mdash; none free, and the day is not counted. Deleting a type deletes its options.</div>
-      </div>`;
-    };
-    html += `<div class="card">
-      <div style="margin-bottom:8px">${secTitle("limits", "Cheats")}</div>
-      ${state.xtypes.map(typeEdit).join("") || `<div class="muted">No cheat types yet.</div>`}
-      <div style="margin-top:10px"><button class="ghost sm" data-act="xtaddnew">+ Add type</button></div>
+    }
+    return `<div class="li tap" data-act="ndone" data-r="${h.id}">
+      <div class="grow lt ${l[h.id] ? "dt" : ""}">${esc(h.name)}</div>
+      <div class="cb blue ${l[h.id] ? "on" : ""}">&#10003;</div>
     </div>`;
-    html += `<div class="card">
-      <div style="font-weight:650">Presets</div>
-      <div class="tiny" style="margin:4px 0 12px">A preset is a snapshot of the whole setup: habits, menu, cheats. Tap to apply, &times; to delete.</div>
-      ${presets}
-      <div style="margin-top:12px"><button class="ghost sm" data-act="npresetsave">Save current setup as preset</button></div>
-    </div>`;
-    html += `<button class="wide" data-act="nreset" style="color:var(--bad);border-color:rgba(255,95,87,.35)">${armed === "nreset" ? "Tap again to wipe everything" : "Reset nutrition data"}</button>`;
-    return html;
-  }
+  };
+  html += `<div class="sech">${nicon("habits")}<span class="grow">Habits</span>${rules.length ? pring(hdone / rules.length, "#38bdf8") : ""}</div>`;
+  html += rules.length
+    ? `<div class="lst">${rules.map(h => swRow("habit:" + h.id, hrow(h))).join("")}</div>`
+    : `<div class="lst">${addLi("naddrule", "Add habit")}${li(`<span class="dimi">${svgI(NICONS.presets)}</span><span class="grow">Start from a preset</span>`, `data-act="go" data-k="presets"`, "tap")}</div>`;
 
-  {
-    const hl = rules;
-    const hdone = hl.filter(h => habitDone(h, sel)).length;
-    const hrow = h => {
-      if (h.kind === "limit"){
-        const t = num(h.target, 0), c = habitPeriodCount(h, sel), over = c > t;
-        const pw = h.xper === "month" ? "this month" : h.xper === "week" ? "this week" : "today";
-        return `<div class="ex between">
-          <div class="grow tap" data-act="hplus" data-r="${h.id}">
-            <div class="name">${esc(h.name)}</div>
-            <div class="target" style="${over ? "color:var(--bad)" : ""}">${c}/${fmt(t)}${h.unit ? ` ${esc(h.unit)}` : ""} ${pw}${over ? " &middot; over limit" : ""}</div>
-          </div>
-          <div class="row" style="gap:4px">
-            <button class="x" data-act="hminus" data-r="${h.id}" title="Undo one">&minus;</button>
-            <button class="tap" style="background:none;border:0;padding:0" data-act="hplus" data-r="${h.id}">${xring(c, t, over ? "var(--bad)" : "var(--warm)")}</button>
-          </div>
-        </div>`;
-      }
-      if (h.kind === "count"){
-        const t = num(h.target, 1), c = num(l[h.id], 0), on = c >= t;
-        return `<div class="ex between">
-          <div class="grow tap" data-act="hplus" data-r="${h.id}">
-            <div class="name" style="${on ? "color:var(--dim);text-decoration:line-through" : ""}">${esc(h.name)}</div>
-            <div class="target">${c}/${fmt(t)}${h.unit ? ` ${esc(h.unit)}` : ""}</div>
-          </div>
-          <div class="row" style="gap:4px">
-            <button class="x" data-act="hminus" data-r="${h.id}" title="Undo one">&minus;</button>
-            <button class="tap" style="background:none;border:0;padding:0" data-act="hplus" data-r="${h.id}">${xring(c, t, "#38bdf8")}</button>
-          </div>
-        </div>`;
-      }
-      return `<div class="ex between tap" data-act="ndone" data-r="${h.id}">
-        <div class="grow"><div class="name" style="${l[h.id] ? "color:var(--dim);text-decoration:line-through" : ""}">${esc(h.name)}</div></div>
-        <div class="chk ${l[h.id] ? "on" : ""}" style="${l[h.id] ? "background:#38bdf8;border-color:#38bdf8" : ""}">&#10003;</div>
-      </div>`;
-    };
-    html += `<div class="card">
-      <div class="chead">
-        ${secTitle("habits", "Habits", hl.length > 0 && hdone >= hl.length)}
-        ${hl.length ? ring(hdone / hl.length, "#38bdf8") : ""}
-      </div>
-      ${hl.map(hrow).join("")}
-      ${hl.length ? "" : `<div class="tiny" style="margin:12px 0 10px">No habits yet &mdash; start with a preset:</div>${presets}`}
-    </div>`;
-  }
-
-  let shownMenu = menu;
-  if (editN && editN !== true){
-    const em = state.nutrition.menu.find(m => m.id === editN);
-    if (em && !shownMenu.includes(em)) shownMenu = [...shownMenu, em];
-  }
+  // menu
   const mopts = state.nutrition.mopts[sel] || {};
   const mrow = m => {
     const link = (state.nutrition.xmeal[sel] || {})[m.id];
     const pickId = mopts[m.id];
     const chosenObj = pickId ? state.nutrition.menu.find(o => o.id === pickId && o.id !== m.id) : null;
-    const title = mLabel(m);
     const foodsList = chosenObj ? (chosenObj.items || []) : (m.items || []);
-    const foods = link
-      ? `<div class="target"><div>&bull;&nbsp; ${link.label}</div></div>`
+    const done = !!l[m.id];
+    const bl = link
+      ? `<ul class="bl ${done ? "dimmed" : ""}"><li>${esc(link.label)}</li></ul>`
       : foodsList.length
-        ? `<div class="target">${foodsList.map(it => `<div>&bull;&nbsp; ${esc(it.name)}${it.amt ? ` &middot; ${esc(it.amt)}` : ""}</div>`).join("")}</div>` : "";
+        ? `<ul class="bl ${done ? "dimmed" : ""}">${foodsList.map(it => `<li>${esc(it.name)}${it.amt ? `<span class="am">${esc(it.amt)}</span>` : ""}</li>`).join("")}</ul>` : "";
     const canChoose = state.nutrition.menu.some(o => o.id !== m.id && mtypeOf(o) === mtypeOf(m)) || state.nutrition.exclusions.length > 0;
-    return `<div class="ex between">
+    return swRow("mi:" + (chosenObj ? chosenObj.id : m.id), `<div class="li" style="align-items:flex-start">
       <div class="grow tap" data-act="${canChoose ? "nmchoose" : "ndone"}" data-m="${m.id}" data-r="${m.id}">
-        <div class="name" style="${l[m.id] ? "color:var(--dim);text-decoration:line-through" : ""}">${title}</div>
-        ${foods}
+        <div class="lt ${done ? "dt" : ""}">${mLabel(m)}</div>${bl}
       </div>
-      <div class="chk ${l[m.id] ? "on" : ""}" data-act="ndone" data-r="${m.id}">&#10003;</div>
-    </div>`;
+      <div class="cb ${done ? "on" : ""}" data-act="ndone" data-r="${m.id}">&#10003;</div>
+    </div>`);
   };
-  html += `<div class="card">
-    <div class="chead">
-      ${secTitle("menu", "Menu", menu.length > 0 && mdone >= menu.length)}
-      ${menu.length ? ring(mdone / menu.length) : ""}
-    </div>
-    ${shownMenu.map(m => editN === m.id ? mEdit(m) : mrow(m)).join("") || `<div class="muted" style="margin-top:10px">No menu items for this day.</div>`}
-  </div>`;
+  html += `<div class="sech">${nicon("menu")}<span class="grow">Menu</span>${menu.length ? pring(mdone / menu.length) : ""}</div>`;
+  html += `<div class="lst">${menu.map(mrow).join("") || `<div class="li"><span class="grow" style="color:var(--dim)">No menu for this day</span></div>`}</div>`;
 
+  // cheats
   if (xts.length){
     const trow = t => {
       const pts = typePoints(t.t, sel, t.xper), lim = num(t.limit, 0), over = pts > lim;
       const picks = ((state.nutrition.tlog[sel] || {})[t.t]) || [];
-      return `<div class="ex between">
+      const grouped = picks.reduce((gs, e) => {
+        const g = gs.find(y => y.t === e.label);
+        if (g) g.n++; else gs.push({ t: e.label, n: 1 });
+        return gs;
+      }, []);
+      return swRow("xt:" + t.t, `<div class="li" style="align-items:flex-start">
         <div class="grow tap" data-act="xtchoose" data-t="${t.t}">
-          <div class="name" style="${picks.length ? "color:var(--dim);text-decoration:line-through" : ""}">${esc(t.name)}</div>
-          <div class="target" style="${over ? "color:var(--bad)" : ""}">${fmt(pts)}/${fmt(lim)} ${perWord(t)}${over ? " &middot; over limit" : ""}</div>
-          ${t.replaces && freeSlotForType(t) === null && pts < lim ? `<div class="target" style="color:var(--warm)">No free ${t.replaces} slot &mdash; logging voids the day</div>` : ""}
-          ${picks.length ? `<div class="target">${picks.reduce((gs, e) => {
-            const g = gs.find(y => y.t === e.label);
-            if (g) g.n++; else gs.push({ t: e.label, n: 1 });
-            return gs;
-          }, []).map(g => `<div>&bull;&nbsp; ${esc(g.t)} (${g.n})</div>`).join("")}</div>` : ""}
+          <div class="lt ${picks.length ? "dt" : ""}">${esc(t.name)}</div>
+          <div class="ls" style="${over ? "color:var(--bad)" : ""}">${fmt(pts)} of ${fmt(lim)} ${perWord(t)}${over ? " &middot; over limit" : ""}</div>
+          ${t.replaces && freeSlotForType(t) === null && pts < lim ? `<div class="ls" style="color:var(--warm)">No free ${t.replaces} slot, logging voids the day</div>` : ""}
+          ${grouped.length ? `<ul class="bl">${grouped.map(g => `<li>${esc(g.t)}<span class="am">(${g.n})</span></li>`).join("")}</ul>` : ""}
         </div>
-        <div class="row" style="gap:4px">
-          <button class="x" data-act="xtminus" data-t="${t.t}" title="Undo one">&minus;</button>
-          <button class="tap" style="background:none;border:0;padding:0" data-act="xtplus" data-t="${t.t}">${xring(pts, lim, over ? "var(--bad)" : "var(--warm)")}</button>
+        <div class="row" style="gap:2px;align-self:center">
+          ${minus("xtminus", `data-t="${t.t}"`)}
+          <button class="tap" style="background:none;border:0;padding:0" data-act="xtplus" data-t="${t.t}">${xring(pts, lim, over ? "var(--bad)" : "var(--warm)", 42)}</button>
         </div>
-      </div>`;
+      </div>`);
     };
     const xused = xts.reduce((s2, t) => s2 + typePoints(t.t, sel, t.xper), 0);
     const xcap = xts.reduce((s2, t) => s2 + num(t.limit, 0), 0);
     const xover = xts.some(t => typePoints(t.t, sel, t.xper) > num(t.limit, 0));
-    html += `<div class="card">
-      <div class="chead">${secTitle("limits", "Cheats")}${ring(xcap ? Math.min(xused / xcap, 1) : 0, xover ? "var(--bad)" : "var(--warm)")}</div>
-      ${num((state.nutrition.xnoslot || {})[sel], 0) ? `<div class="target" style="color:var(--bad);margin:2px 0 6px">Cheat used with no free slot &mdash; this day is not counted</div>` : ""}
-      ${xts.map(trow).join("")}
-    </div>`;
+    html += `<div class="sech">${nicon("limits")}<span class="grow">Cheats</span>${pring(xcap ? xused / xcap : 0, xover ? "var(--bad)" : "var(--warm)")}</div>`;
+    if (num((state.nutrition.xnoslot || {})[sel], 0)) html += `<div class="onote" style="color:var(--bad);margin:-2px 4px 10px">Cheat used with no free slot, so this day doesn't count</div>`;
+    html += `<div class="lst">${xts.map(trow).join("")}</div>`;
   }
-
   return html;
+}
+
+/* ---------- pages: one item or one group, pushed over the tab ---------- */
+const BACK_SVG = '<path d="M15 5l-7 7 7 7"/>';
+const li = (inner, attrs = "", cls = "") => `<div class="li ${cls}" ${attrs}>${inner}</div>`;
+const addLi = (act, label, data = "") => `<div class="li acts tap" data-act="${act}" ${data}>${svgI(PLUS)}<span>${label}</span></div>`;
+const editAllLi = () => `<div class="lst"><div class="li acts tap" data-act="go" data-k="cycle">${svgI('<path d="M4 6h16M4 12h16M4 18h10"/>')}<span>Edit everything</span></div></div>`;
+// a value row that expands in place to show its control
+const xrow = (key, label, value, control) => rowOpen === key
+  ? `<div class="li col"><div class="row tap" data-act="rowopen" data-r="${key}"><span class="lk">${label}</span><span class="lv">${value}</span></div>${control}</div>`
+  : `<div class="li tap" data-act="rowopen" data-r="${key}"><span class="lk">${label}</span><span class="lv">${value}</span></div>`;
+// a value row whose value is typed right in place
+const inrow = (label, input, unit) => `<div class="li"><span class="lk">${label}</span>${input}${unit ? `<span class="lv dim">${unit}</span>` : ""}</div>`;
+const segCtl = (opts, cur, act, data) => `<div class="seg" style="align-self:flex-start">${opts.map(([k, lb]) =>
+  `<button class="${cur === k ? "on" : ""}" data-act="${act}" ${data} data-t="${k}">${lb}</button>`).join("")}</div>`;
+const dayChips = (days, act, data) => `<div class="dchips">${DAYS.map((d, i) =>
+  `<button class="daychip ${days.includes(i + 1) ? "on" : ""}" data-act="${act}" ${data} data-d="${i + 1}">${d[0]}</button>`).join("")}</div>`;
+const daysShort = days => !days || days.length === 7 ? "Every day" : days.length ? days.map(d => DAYS[d - 1].slice(0, 3)).join(", ") : "";
+const delLink = (act, key, data, label) => `<button class="danger" data-act="${act}" ${data}>${armed === `${act}:${key}` ? "Tap again to delete" : label}</button>`;
+const baseTxt = ex => ex.type === "time" ? `${fmt(num(ex.mins, 30))} min`
+  : `${num(ex.sets, 1)} &times; ${fmt(num(ex.reps, 1))}${num(ex.weight, 0) ? ` @ ${fmt(num(ex.weight))} kg` : ""}`;
+
+function pageTitle(pg){
+  const k = pg.k;
+  if (k === "cycle") return `Cycle ${cycleNo()}`;
+  if (k === "wks") return "Workouts";
+  if (k === "wk"){ const w = findWk(pg.id); return w ? w.title : "Workout"; }
+  if (k === "ex"){ const w = findWk(pg.w), ex = w && (w.exercises || []).find(x => x.id === pg.id); return ex ? ex.name : "Exercise"; }
+  if (k === "menu") return "Menu";
+  if (k === "mi"){ const m = findMenu(pg.id); return m ? mLabel(m) : "Menu"; }
+  if (k === "habits") return "Habits";
+  if (k === "habit"){ const r = state.nutrition.rules.find(x => x.id === pg.id); return r ? r.name : "Habit"; }
+  if (k === "cheats") return "Cheats";
+  if (k === "xt"){ const t = state.xtypes.find(x => x.id === pg.id); return t ? t.name : "Cheats"; }
+  if (k === "xo"){ const x = state.nutrition.exclusions.find(y => y.id === pg.id); return x ? x.name : "Option"; }
+  if (k === "presets") return "Presets";
+  if (k === "rules") return "Autorules";
+  return "";
+}
+const backLink = () => {
+  const lbl = pages.length > 1 ? pageTitle(pages[pages.length - 2]) : (TABS.find(t => t.id === tab) || {}).label;
+  return `<div class="back" data-act="back"><svg viewBox="0 0 24 24">${BACK_SVG}</svg>${esc(lbl || "Back")}</div>`;
+};
+
+function pageCycle(){
+  const p = state.profile, ended = cycleEnded(), total = Math.max(1, num(p.regimeDays, 30));
+  const planRow = (k, icon, label) => li(`<span class="dimi">${svgI(icon)}</span><span class="grow">${label}</span>`, `data-act="go" data-k="${k}"`, "tap");
+  return `${backLink()}<h1>Cycle ${cycleNo()}</h1><div class="pgsub">${dRange(p.anchor, cycleEnd())}</div>
+    <div class="lst" style="margin-top:18px">
+      ${xrow("goal", "Goal", esc(modeLbl(p.mode)), segCtl([["cut", "Cut"], ["maintain", "Maintain"], ["bulk", "Bulk"]], p.mode, "pmode", ""))}
+      ${inrow("Length", `<input class="vin" inputmode="numeric" data-act="prof" data-f="regimeDays" value="${esc(total)}">`, "days")}
+      ${inrow("Target weight", `<input class="vin" inputmode="decimal" data-act="prof" data-f="weightTarget" value="${esc(p.weightTarget ?? "")}">`, "kg")}
+      ${inrow("Target body fat", `<input class="vin" inputmode="decimal" data-act="prof" data-f="fatTarget" value="${esc(p.fatTarget ?? "")}">`, "%")}
+    </div>
+    <div class="sech">Plan</div>
+    <div class="lst">
+      ${planRow("wks", TABS[1].icon, "Workouts")}
+      ${planRow("menu", NICONS.menu, "Menu")}
+      ${planRow("habits", NICONS.habits, "Habits")}
+      ${planRow("cheats", NICONS.limits, "Cheats")}
+      ${planRow("presets", NICONS.presets, "Presets")}
+    </div>
+    ${ended
+      ? `<div class="lst"><div class="li acts tap" data-act="go" data-k="review"><span>Review and start cycle ${cycleNo() + 1}</span></div></div>`
+      : `<button class="danger" data-act="endcyc">${armed === "endcyc" ? "Tap again to end this cycle" : "End cycle early"}</button>`}`;
+}
+
+function pageReview(pg){
+  const cur = pg.i == null;
+  const p = state.profile;
+  const rg = cur ? cycleRecord(p.anchor, cycleEnd()) : state.regimes[pg.i];
+  if (!rg) return backLink();
+  const no = cur ? cycleNo() : pg.i + 1;
+  const codes = rg.days || "";
+  const greens = [...codes].filter(c => c === "g").length;
+  const frac = g => {
+    const s0 = num(g.start, NaN), e0 = num(g.end, NaN), t0 = num(g.target, NaN);
+    if ([s0, e0, t0].some(isNaN)) return 0;
+    return s0 === t0 ? (e0 === t0 ? 1 : 0) : clamp((s0 - e0) / (s0 - t0), 0, 1);
+  };
+  const brow = (label, g, unit, warm, first) => g && g.end != null && g.end !== "" ? `
+    <div class="brow" ${first ? "" : 'style="margin-top:18px"'}><span class="bgoal">${label}</span><span><span class="bnum">${fmt(num(g.end))}</span><span class="bgoal">${g.target != null && g.target !== "" ? ` &rarr; ${fmt(num(g.target))}` : ""} ${unit}</span></span></div>
+    <div class="bar2 ${warm ? "warm" : ""}"><i style="width:${(frac(g) * 100).toFixed(0)}%"></i></div>` : "";
+  return `<div class="xclose"><button data-act="back" aria-label="Close"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></svg></button></div>
+    <h1>Cycle ${no} complete</h1>
+    <div class="pgsub">${dRange(rg.from, rg.to)}</div>
+    <div style="position:relative;width:196px;height:196px;margin:24px auto 4px">${segRing(codes, 196, 7)}
+      <div class="ctr"><div style="font-size:46px;font-weight:700;letter-spacing:-1.5px;line-height:1">${greens}</div><div style="font-size:15px;color:var(--dim);margin-top:6px">green days</div></div></div>
+    ${rg.wd != null ? `<div class="hstats"><span><svg viewBox="0 0 24 24">${TABS[1].icon}</svg>${rg.wd}</span><span><svg viewBox="0 0 24 24">${TABS[2].icon}</svg>${rg.nd}</span></div>` : `<div style="height:18px"></div>`}
+    <div class="card">${brow("Weight", rg.w, "kg", false, true)}${brow("Body fat", rg.f, "%", true, false)}</div>
+    ${cur ? `<div class="ofoot"><button class="bigbtn" data-act="rvstart">Start cycle ${no + 1}</button></div>` : ""}`;
+}
+
+// ---------- new cycle: onboarding, one question per screen ----------
+const ICO_DOWN = '<path d="m3 7 6 6 4-4 8 8"/><path d="M21 10.5V17h-6.5"/>';
+const ICO_FLAT = '<path d="M4 12h16"/>';
+const ICO_UP = '<path d="m3 17 6-6 4 4 8-8"/><path d="M14.5 7H21v6.5"/>';
+const onbIn = (f, v, mode = "decimal") => `<input class="vin" inputmode="${mode}" data-act="onbf" data-f="${f}" value="${esc(v ?? "")}">`;
+function startOnb(quiet){
+  const p = state.profile;
+  onb = { step: 0, mode: p.mode || "cut", wNow: p.weightNow ?? "", fNow: p.fatNow ?? "",
+    h: p.heightCm ?? "", waist: p.waistCm ?? "", neck: p.neckCm ?? "",
+    wT: p.weightTarget ?? "", fT: p.fatTarget ?? "", len: num(p.lenPlan, 0) || num(p.regimeDays, 30), err: null };
+  pages = [{ k: "onb" }]; rowOpen = null; armed = null; swOpen = null;
+  if (!quiet){ render(); document.getElementById("scroll").scrollTop = 0; }
+}
+function pageOnb(){
+  const o = onb; if (!o) return "";
+  const bar = `<div class="obar">${[0, 1, 2, 3].map(i => `<i class="${i <= o.step ? "on" : ""}"></i>`).join("")}</div>`;
+  const err = o.err ? `<div class="onote" style="color:var(--bad)">${o.err}</div>` : "";
+  let body;
+  if (o.step === 0){
+    const opt = (m, icon) => `<div class="ocard ${o.mode === m ? "on" : ""}" data-act="onbmode" data-m="${m}"><svg viewBox="0 0 24 24">${icon}</svg>${modeLbl(m)}${o.mode === m ? `<span class="ok">&#10003;</span>` : ""}</div>`;
+    body = `<div class="oq">What's the goal of this cycle?</div>${opt("cut", ICO_DOWN)}${opt("maintain", ICO_FLAT)}${opt("bulk", ICO_UP)}`;
+  } else if (o.step === 1){
+    const tb = tapeBF({ heightCm: o.h, waistCm: o.waist, neckCm: o.neck });
+    body = `<div class="oq">Where are you now?</div>
+      <div class="lst">${inrow("Weight", onbIn("wNow", o.wNow), "kg")}${inrow("Body fat", onbIn("fNow", o.fNow), "%")}</div>
+      ${err}
+      <div class="grp">Or measure body fat with tape</div>
+      <div class="lst">${inrow("Height", onbIn("h", o.h), "cm")}${inrow("Waist", onbIn("waist", o.waist), "cm")}${inrow("Neck", onbIn("neck", o.neck), "cm")}</div>
+      ${tb.state === "bad" ? `<div class="onote" style="color:var(--bad)">Waist must be larger than neck</div>`
+        : tb.state === "off" ? `<div class="onote" style="color:var(--warm)">${fmt(tb.bf)}% looks off, measure again</div>` : ""}`;
+  } else if (o.step === 2){
+    const dW = Math.round((num(o.wT, NaN) - num(o.wNow, NaN)) * 10) / 10;
+    body = `<div class="oq">Your targets</div>
+      <div class="lst">${inrow("Target weight", onbIn("wT", o.wT), "kg")}${inrow("Target body fat", onbIn("fT", o.fT), "%")}</div>
+      ${err || (!isNaN(dW) ? `<div class="onote">${dW === 0 ? "Hold your weight" : `${dW < 0 ? "&minus;" : "+"}${fmt(Math.abs(dW))} kg`} in ${fmt(num(o.len, 30))} days</div>` : "")}`;
+  } else {
+    const end = startOfDay(new Date()); end.setDate(end.getDate() + Math.max(1, Math.round(num(o.len, 30))) - 1);
+    const opt = n => `<div class="ocard ${num(o.len) === n ? "on" : ""}" data-act="onblen" data-n="${n}">${n} days${num(o.len) === n ? `<span class="ok">&#10003;</span>` : ""}</div>`;
+    body = `<div class="oq">How long?</div>${opt(30)}${opt(60)}${opt(90)}
+      <div class="lst" style="margin-top:4px">${inrow("Custom", onbIn("len", o.len, "numeric"), "days")}</div>
+      ${err || `<div class="onote">Ends ${pdate(iso(end))}</div>`}`;
+  }
+  const last = o.step === 3;
+  return `<div class="otop"><div class="back" data-act="onbback"><svg viewBox="0 0 24 24">${BACK_SVG}</svg></div>${bar}</div>
+    ${body}
+    <div class="ofoot"><button class="bigbtn" data-act="${last ? "onbstart" : "onbnext"}">${last ? `Start cycle ${cycleNo() + (archiveRange() ? 1 : 0)}` : "Continue"}</button></div>`;
+}
+function startCycle(){
+  const p = state.profile, o = onb, today = iso(new Date());
+  const r = archiveRange();
+  if (r) state.regimes.push(cycleRecord(r.from, r.to));
+  // a new weight or fat becomes today's log; an unchanged value is never re-logged
+  const wN = num(o.wNow, NaN), fN = num(o.fNow, NaN);
+  const logIt = (k, v, prev) => {
+    if (isNaN(v) || v === num(prev, NaN)) return;
+    let m = state.measurements.find(x => x.date === today);
+    if (!m){ m = { date: today }; state.measurements.push(m); }
+    m[k] = v;
+  };
+  logIt("weight", wN, p.weightNow); logIt("fat", fN, p.fatNow);
+  syncNow();
+  if (!isNaN(wN)) p.weightNow = wN;
+  if (!isNaN(fN)) p.fatNow = fN;
+  p.weightStart = p.weightNow; p.fatStart = p.fatNow;
+  p.mode = o.mode;
+  p.weightTarget = num(o.wT, num(p.weightTarget));
+  if (String(o.fT).trim() !== "") p.fatTarget = num(o.fT, num(p.fatTarget));
+  p.heightCm = o.h; p.waistCm = o.waist; p.neckCm = o.neck;
+  p.regimeDays = p.lenPlan = Math.max(1, Math.round(num(o.len, 30)));
+  p.anchor = today;
+  p.onboarded = true; delete p.reviewed;
+  onb = null; pages = []; tab = "home"; rowOpen = null;
+  save(); render(); document.getElementById("scroll").scrollTop = 0;
+}
+
+function pageWks(){
+  const row = w => li(`${wicon(w)}<span class="grow">${esc(w.title)}</span><span class="lv dim">${daysShort(w.days)}</span>`,
+    `data-act="go" data-k="wk" data-id="${w.id}" data-drag-row data-hold="workouts"`, "tap");
+  const sch = state.workouts.filter(w => (w.days || []).length), un = state.workouts.filter(w => !(w.days || []).length);
+  return `${backLink()}<h1>Workouts</h1>
+    <div class="lst" style="margin-top:18px">${sch.map(row).join("")}${addLi("addwk", "Add workout")}</div>
+    ${un.length ? `<div class="grp">Not scheduled</div><div class="lst">${un.map(row).join("")}</div>` : ""}
+    <div class="lst">${li(`<span class="dimi">${svgI(NICONS.trend)}</span><span class="grow">Autorules</span><span class="lv dim">${state.rules.length}</span>`, `data-act="go" data-k="rules"`, "tap")}</div>`;
+}
+
+function pageWk(pg){
+  const w = findWk(pg.id); if (!w) return backLink();
+  const isAct = !(w.exercises || []).length;
+  const typeCtl = `<div class="row" style="gap:8px;flex-wrap:wrap">
+      ${state.wtypes.map(t => `<button class="ibtn ${wtypeOfW(w) === t.name ? "on" : ""}" data-act="wkwtype" data-w="${w.id}" data-t="${esc(t.name)}" title="${esc(cap1(t.name))}"><svg viewBox="0 0 24 24">${WICONS[t.icon] || ""}</svg></button>`).join("")}
+      ${wtAdd === w.id ? "" : `<button class="ibtn" data-act="wtadd" data-w="${w.id}" title="Add type" style="font-size:24px;line-height:1">+</button>`}
+    </div>${wtAdd === w.id ? wtInset(w.id) : ""}`;
+  return `${backLink()}<input class="ttlin" data-act="wktitle" data-w="${w.id}" value="${esc(w.title)}">
+    <div class="lst" style="margin-top:16px">
+      ${xrow("wtype", "Type", `${wicon(w)}${esc(cap1(wtypeOfW(w)))}`, typeCtl)}
+      ${xrow("wdays", "Days", daysShort(w.days) || "Not scheduled", dayChips(w.days || [], "wkday", `data-w="${w.id}"`))}
+      ${isAct ? inrow("Duration", `<input class="vin" inputmode="numeric" data-act="wkmins" data-w="${w.id}" value="${esc(w.mins ?? 60)}">`, "min") : ""}
+    </div>
+    <div class="sech">Exercises</div>
+    <div class="lst">
+      ${(w.exercises || []).map(ex => li(`<span class="grow">${esc(ex.name)}</span><span class="lv dim">${baseTxt(ex)}</span>`,
+        `data-act="go" data-k="ex" data-w="${w.id}" data-id="${ex.id}" data-drag-row data-hold="exs:${w.id}"`, "tap")).join("")}
+      ${addLi("addex", "Add exercise", `data-w="${w.id}"`)}
+    </div>
+    ${editAllLi()}
+    ${delLink("delwk", w.id, `data-w="${w.id}"`, "Delete workout")}`;
+}
+
+function pageEx(pg){
+  const w = findWk(pg.w), ex = w && (w.exercises || []).find(x => x.id === pg.id);
+  if (!ex) return backLink();
+  const time = ex.type === "time";
+  const data = `data-w="${w.id}" data-ex="${ex.id}"`;
+  const f = (field, label, unit, mode) => inrow(label, `<input class="vin" inputmode="${mode}" data-act="exf" ${data} data-f="${field}" value="${esc(ex[field] ?? "")}">`, unit);
+  return `${backLink()}<input class="ttlin" data-act="exf" ${data} data-f="name" value="${esc(ex.name)}">
+    <div class="lst" style="margin-top:16px">
+      ${xrow("extype", "Tracking", time ? "Minutes" : "Sets &times; reps", segCtl([["str", "Sets &times; reps"], ["time", "Minutes"]], time ? "time" : "str", "extype", data))}
+      ${time ? f("mins", "Minutes", "", "numeric") : f("sets", "Sets", "", "numeric") + f("reps", "Reps", "", "numeric") + f("weight", "Weight", "kg", "decimal")}
+    </div>
+    ${delLink("delex", ex.id, data, "Delete exercise")}`;
+}
+
+function pageMenu(){
+  const row = m => li(`<div class="grow"><div>${mLabel(m)}</div>${(m.items || []).length ? `<div class="ls">${m.items.map(it => esc(it.name)).join(", ")}</div>` : ""}</div>${m.days && !m.days.length ? "" : `<span class="lv dim">${daysShort(m.days)}</span>`}`,
+    `data-act="go" data-k="mi" data-id="${m.id}" data-drag-row data-hold="menu"`, "tap");
+  const sch = state.nutrition.menu.filter(m => !m.days || m.days.length), un = state.nutrition.menu.filter(m => m.days && !m.days.length);
+  return `${backLink()}<h1>Menu</h1>
+    <div class="lst" style="margin-top:18px">${sch.map(row).join("")}${addLi("nmadd", "Add menu item")}</div>
+    ${un.length ? `<div class="grp">Not scheduled</div><div class="lst">${un.map(row).join("")}</div>` : ""}`;
+}
+
+function pageMi(pg){
+  const m = findMenu(pg.id); if (!m) return backLink();
+  const days = m.days || [1, 2, 3, 4, 5, 6, 7];
+  const typeCtl = `<div class="chips">${MTYPES.map(t => `<button class="sm ${mtypeOf(m) === t ? "pri" : "ghost"}" data-act="nmtype" data-m="${m.id}" data-t="${t}">${cap1(t)}</button>`).join("")}</div>`;
+  const foods = (m.items || []).map((it, i) => {
+    const data = `data-m="${m.id}" data-i="${i}"`;
+    if (foodOpen !== i) return li(`<span class="grow">${esc(it.name)}</span><span class="lv dim">${esc(it.amt || "")}</span>`,
+      `data-act="fopen" data-i="${i}" data-drag-row data-id="${i}" data-hold="mfoods:${m.id}"`, "tap");
+    const p = parseAmt(it.amt);
+    const units = [...UNITS]; if (p.unit && !units.includes(p.unit)) units.push(p.unit);
+    return `<div class="li col" style="gap:10px">
+      <input class="fin" data-act="nmif" ${data} value="${esc(it.name)}">
+      <div class="row" style="gap:8px">
+        <input class="fin" style="width:78px;text-align:center" inputmode="decimal" placeholder="200" data-act="nmiqty" ${data} value="${esc(p.qty)}">
+        <select class="fin" style="width:84px" data-act="nmiunit" ${data}>${units.map(u => `<option value="${esc(u)}" ${u === p.unit ? "selected" : ""}>${esc(u)}</option>`).join("")}</select>
+        <span class="grow"></span>
+        ${delBtn("nmidel", `${m.id}:${i}`, data)}
+        <button class="okbtn" data-act="fclose" title="Done">&#10003;</button>
+      </div>
+    </div>`;
+  }).join("");
+  return `${backLink()}<h1>${mLabel(m)}</h1>
+    <div class="lst" style="margin-top:16px">
+      ${xrow("mtype", "Type", mLabel(m), typeCtl)}
+      ${xrow("mdays", "Days", daysShort(m.days) || "Not scheduled", dayChips(days, "nmday", `data-m="${m.id}"`))}
+    </div>
+    <div class="sech">Foods</div>
+    <div class="lst">${foods}${addLi("nmiadd", "Add food", `data-m="${m.id}"`)}</div>
+    ${editAllLi()}
+    ${delLink("nmdel", m.id, `data-m="${m.id}"`, `Delete ${mLabel(m).toLowerCase()}`)}`;
+}
+
+function pageHabits(){
+  const sum = r => r.kind === "count" ? `${fmt(num(r.target, 1))}${r.unit ? " " + esc(r.unit) : ""} a day`
+    : r.kind === "limit" ? `max ${fmt(num(r.target, 0))} a ${r.xper || "day"}` : "";
+  return `${backLink()}<h1>Habits</h1>
+    <div class="lst" style="margin-top:18px">${state.nutrition.rules.map(r => li(`<span class="grow">${esc(r.name)}</span><span class="lv dim">${sum(r)}</span>`,
+      `data-act="go" data-k="habit" data-id="${r.id}" data-drag-row data-hold="habits"`, "tap")).join("")}${addLi("naddrule", "Add habit")}</div>`;
+}
+
+function pageHabit(pg){
+  const r = state.nutrition.rules.find(x => x.id === pg.id); if (!r) return backLink();
+  const kind = r.kind || "check";
+  const data = `data-r="${r.id}"`;
+  const tIn = `<input class="vin" inputmode="numeric" data-act="nrtarget" ${data} value="${esc(r.target ?? 1)}">`;
+  const uIn = inrow("Unit", `<input class="vin" data-act="nrunit" ${data} value="${esc(r.unit || "")}" placeholder="optional">`);
+  let rows = xrow("hkind", "Kind", { check: "Checkbox", count: "Counter", limit: "Limit" }[kind],
+    segCtl([["check", "Checkbox"], ["count", "Counter"], ["limit", "Limit"]], kind, "nrkind", data));
+  if (kind === "count") rows += inrow("Target per day", tIn) + uIn;
+  if (kind === "limit") rows += inrow("Limit", tIn)
+    + xrow("hper", "Per", cap1(r.xper || "day"), segCtl([["day", "Day"], ["week", "Week"], ["month", "Month"]], r.xper || "day", "nrper", data)) + uIn;
+  return `${backLink()}<input class="ttlin" data-act="nrulef" ${data} value="${esc(r.name)}">
+    <div class="lst" style="margin-top:16px">${rows}</div>
+    ${editAllLi()}
+    ${delLink("ndel", r.id, data, "Delete habit")}`;
+}
+
+function pageCheats(){
+  const sum = t => `${fmt(num(t.limit, 0))} pt${num(t.limit, 0) === 1 ? "" : "s"} a ${t.xper || "week"}`;
+  return `${backLink()}<h1>Cheats</h1>
+    <div class="lst" style="margin-top:18px">${state.xtypes.map(t => li(`<span class="grow">${esc(t.name)}</span><span class="lv dim">${sum(t)}</span>`,
+      `data-act="go" data-k="xt" data-id="${t.id}" data-drag-row data-hold="limits"`, "tap")).join("")}${addLi("xtaddnew", "Add cheat type")}</div>`;
+}
+
+function pageXt(pg){
+  const t = state.xtypes.find(x => x.id === pg.id); if (!t) return backLink();
+  const opts = state.nutrition.exclusions.filter(x => x.xt === t.id);
+  const per = t.xper || "week", rp = t.replaces || "";
+  return `${backLink()}<input class="ttlin" data-act="xtname" data-t="${t.id}" value="${esc(t.name)}">
+    <div class="lst" style="margin-top:16px">
+      ${inrow("Points", `<input class="vin" inputmode="decimal" data-act="xtlimit" data-t="${t.id}" value="${esc(t.limit ?? 3)}">`)}
+      ${xrow("xper", "Per", cap1(per), `<div class="seg" style="align-self:flex-start">${[["day", "Day"], ["week", "Week"], ["month", "Month"]].map(([k, lb]) =>
+        `<button class="${per === k ? "on" : ""}" data-act="xtper" data-t="${t.id}" data-p="${k}">${lb}</button>`).join("")}</div>`)}
+      ${xrow("xrep", "Replaces", rp ? cap1(rp) : "Nothing", `<div class="seg" style="align-self:flex-start">${[["meal", "Meal"], ["snack", "Snack"], ["", "Nothing"]].map(([k, lb]) =>
+        `<button class="${rp === k ? "on" : ""}" data-act="xtrep" data-t="${t.id}" data-r="${k}">${lb}</button>`).join("")}</div>`)}
+    </div>
+    <div class="sech">Options</div>
+    <div class="lst">${opts.map(x => li(`<span class="grow">${amtLabel(x)}</span><span class="lv dim">${fmt(num(x.cost, 1))} pt${num(x.cost, 1) === 1 ? "" : "s"}</span>`,
+      `data-act="go" data-k="xo" data-id="${x.id}" data-drag-row data-hold="xopts:${t.id}"`, "tap")).join("")}${addLi("xadd", "Add option", `data-t="${t.id}"`)}</div>
+    ${editAllLi()}
+    ${delLink("xtdel", t.id, `data-t="${t.id}"`, "Delete cheat type")}`;
+}
+
+function pageXo(pg){
+  const x = state.nutrition.exclusions.find(y => y.id === pg.id); if (!x) return backLink();
+  const p2 = parseAmt(x.amt);
+  const units = [...UNITS, ...(p2.unit && !UNITS.includes(p2.unit) ? [p2.unit] : [])];
+  const data = `data-x="${x.id}"`;
+  return `${backLink()}<input class="ttlin" data-act="xf" ${data} value="${esc(x.name)}">
+    <div class="lst" style="margin-top:16px">
+      <div class="li"><span class="lk">Serving</span>
+        <input class="vin" style="width:70px" inputmode="decimal" placeholder="500" data-act="xq" ${data} value="${esc(p2.qty)}">
+        <select class="fin" style="width:78px;flex:none;padding:6px 8px" data-act="xu" ${data}>${units.map(u => `<option value="${esc(u)}" ${u === p2.unit ? "selected" : ""}>${esc(u)}</option>`).join("")}</select></div>
+      ${inrow("Points", `<input class="vin" inputmode="decimal" data-act="xcost" ${data} value="${esc(x.cost ?? 1)}">`)}
+      ${xrow("xdays", "Planned on", daysShort(x.days) || "Chooser only", dayChips(x.days || [1, 2, 3, 4, 5, 6, 7], "xday", data))}
+    </div>
+    ${delLink("xdel", x.id, data, "Delete option")}`;
+}
+
+function pagePresets(){
+  const rows = state.nutrition.presets.map(pr => `<div class="li">
+      <span class="grow tap" data-act="npreset" data-id="${pr.id}">${armed === "npreset:" + pr.id ? `<span style="color:var(--acc)">Tap again to apply</span>` : esc(pr.name)}</span>
+      ${delBtn("npresetdel", pr.id, `data-id="${pr.id}"`)}
+    </div>`).join("");
+  return `${backLink()}<h1>Presets</h1>
+    <div class="lst" style="margin-top:18px">${rows}${addLi("npresetsave", "Save current setup")}</div>
+    <div class="onote" style="margin-bottom:10px">A preset replaces your habits, menu and cheats.</div>
+    <button class="danger" data-act="nreset">${armed === "nreset" ? "Tap again to wipe nutrition data" : "Reset nutrition data"}</button>`;
+}
+
+const pageRules = () => `${backLink()}<h1>Autorules</h1><div style="margin-top:18px">${viewRules()}</div>`;
+
+const PAGES = { cycle: pageCycle, review: pageReview, onb: pageOnb, wks: pageWks, wk: pageWk, ex: pageEx,
+  menu: pageMenu, mi: pageMi, habits: pageHabits, habit: pageHabit, cheats: pageCheats, xt: pageXt, xo: pageXo,
+  presets: pagePresets, rules: pageRules };
+
+function pushPage(pg){
+  const sc = document.getElementById("scroll");
+  const top = pages[pages.length - 1];
+  if (top) top.y = sc.scrollTop; else tabY = sc.scrollTop;
+  pages.push(pg);
+  rowOpen = null; foodOpen = null; armed = null; swOpen = null; wtAdd = null;
+  render(); sc.scrollTop = 0;
+}
+function popPage(){
+  const sc = document.getElementById("scroll");
+  pages.pop();
+  rowOpen = null; foodOpen = null; armed = null; wtAdd = null;
+  render();
+  const top = pages[pages.length - 1];
+  sc.scrollTop = top ? (top.y || 0) : tabY;
+}
+// after a delete on an item's own page, leave that page
+const popIf = (k, id) => { const top = pages[pages.length - 1]; if (top && top.k === k && top.id === id) popPage(); else render(); };
+// first launch opens the setup; a cycle that ended while away opens its results once
+function bootPages(){
+  const p = state.profile;
+  const fresh = !Object.keys(state.logs).length && !Object.keys(state.nutrition.logs).length && !(state.regimes || []).length;
+  if (fresh && !p.onboarded){ startOnb(true); return; }
+  if (cycleEnded() && p.reviewed !== cycleEnd()){ p.reviewed = cycleEnd(); pages = [{ k: "review" }]; save(); }
 }
 
 /* ---------- shell ---------- */
@@ -1866,32 +1944,24 @@ const TABS = [
 const VIEWS = { home:viewHome, workout:viewWorkout, nutrition:viewNutrition, photos:viewPhotos };
 const HEAD = {
   home:      () => ({ t: "Home", s: "" }),
-  workout:   () => ({ t: sel === iso(new Date()) ? "Today" : DAYS[dayIdx(parseIso(sel))-1], s: "" }),
+  workout:   () => ({ t: "Workout", s: "" }),
   nutrition: () => ({ t: "Nutrition", s: "" }),
   photos:    () => ({ t: "Progress", s: "" })
 };
 
 function render(){
-  const h = HEAD[tab]();
-  const title = document.getElementById("hTitle");
-  if (tab === "home"){
-    const modeLabel = { bulk:"Bulk", cut:"Cut", maintain:"Maintain" }[state.profile.mode] || state.profile.mode;
-    title.innerHTML = `<span class="badge big ${esc(state.profile.mode)}">${esc(modeLabel)}</span>`;
-  } else {
-    title.textContent = h.t;
-  }
-  const sub = document.getElementById("hSub");
-  sub.textContent = h.s; sub.style.display = h.s ? "" : "none";
-  const pencil = (act, on) => `<button class="iconbtn ${on ? "on" : ""}" data-act="${act}" title="Edit">
-    <svg viewBox="0 0 24 24"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"/></svg></button>`;
-  document.getElementById("hRight").innerHTML =
-    tab === "workout" ? pencil("edit", editing)
-    : tab === "nutrition" ? pencil("editn", editN)
-    : tab === "home" ? pencil("edittgt", editTargets)
-    : "";
+  const top = pages[pages.length - 1];
+  const full = !!top && (top.k === "onb" || top.k === "review");
+  document.getElementById("app").classList.toggle("full", full);
+  document.querySelector("nav").style.display = full ? "none" : "";
+  const head = document.getElementById("head");
+  head.style.display = top ? "none" : "";
+  head.innerHTML = top ? "" : tab === "home"
+    ? `<div class="hrow"><h1>Cycle ${cycleNo()}</h1><span class="gtag ${esc(state.profile.mode)}">${esc(modeLbl(state.profile.mode))}</span></div>`
+    : `<h1>${esc(HEAD[tab]().t)}</h1>`;
   const pcar0 = document.querySelector("#view .pcar");
   const pscroll = pcar0 ? pcar0.scrollLeft : null;
-  document.getElementById("view").innerHTML = VIEWS[tab]();
+  document.getElementById("view").innerHTML = top ? PAGES[top.k](top) : VIEWS[tab]();
   const pcar1 = document.querySelector("#view .pcar");
   if (pcar1){
     if (pscroll != null) pcar1.scrollLeft = pscroll;
@@ -1981,21 +2051,84 @@ function render(){
     sroot.innerHTML = "";
     document.body.style.overflow = "";
   }
-  const editAct = tab === "workout" && editing ? "edit"
-    : tab === "nutrition" && editN ? "editn"
-    : tab === "home" && editTargets ? "edittgt" : null;
-  document.getElementById("fabRoot").innerHTML = editAct && !sheet
-    ? `<button class="fab" data-act="${editAct}">Done</button>` : "";
+  if (swOpen){   // a row swiped open stays open across repaints
+    const r = document.querySelector(`.swr[data-swipe="${swOpen}"]`);
+    if (r) r.classList.add("open"); else swOpen = null;
+  }
   document.getElementById("nav").innerHTML = TABS.map(t =>
     `<button class="${t.id===tab?"on":""}" data-act="tab" data-tab="${t.id}">
       <svg viewBox="0 0 24 24">${t.icon}</svg>${t.label}</button>`).join("");
 }
 
 document.addEventListener("click", e => {
-  const el = e.target.closest("[data-act]"); if (!el) return;
+  if (Date.now() - swSup < 350) return;          // the tail of a swipe or a drag is not a tap
+  if (swOpen && !e.target.closest(".swbtn")){     // any tap first closes a row swiped open
+    swOpen = null;
+    document.querySelectorAll(".swr.open").forEach(r => r.classList.remove("open"));
+    return;
+  }
+  const el = e.target.closest("[data-act]");
+  if (!el){   // tapping a value row's label puts the cursor in its field
+    const row = e.target.closest(".li"), inp = row && row.querySelector(".vin");
+    if (inp && !e.target.closest("input,select,textarea")) inp.focus();
+    return;
+  }
   const a = el.dataset.act;
-  const ARMED_ACTS = ["nreset", "delwk", "pdel", "nmdel", "ndel", "xdel", "delex", "nmidel", "xtdel", "gldel", "npresetdel", "delrule", "newchal"];
+  const ARMED_ACTS = ["nreset", "delwk", "pdel", "nmdel", "ndel", "xdel", "delex", "nmidel", "xtdel", "gldel", "npresetdel", "delrule", "endcyc", "npreset"];
   if (armed && !ARMED_ACTS.includes(a)) armed = null;
+
+  // ---------- pages ----------
+  if (a === "back"){ popPage(); return; }
+  if (a === "go"){
+    pushPage({ k: el.dataset.k, id: el.dataset.id, w: el.dataset.w, i: el.dataset.i != null ? +el.dataset.i : undefined });
+    return;
+  }
+  if (a === "ring"){ pushPage(cycleEnded() ? { k: "review" } : { k: "cycle" }); return; }
+  if (a === "swedit"){
+    const [k, id] = el.dataset.k.split(":");
+    swOpen = null;
+    pushPage({ k: k === "wk" ? "wk" : k === "mi" ? "mi" : k === "habit" ? "habit" : "xt", id });
+    return;
+  }
+  if (a === "rowopen"){ rowOpen = rowOpen === el.dataset.r ? null : el.dataset.r; wtAdd = null; render(); return; }
+  if (a === "pmode"){ state.profile.mode = el.dataset.t; save(); render(); return; }
+  if (a === "endcyc"){
+    if (armed !== "endcyc"){ armed = "endcyc"; render(); return; }
+    armed = null;
+    const p = state.profile, de = daysElapsed();
+    if (de <= 1){ startOnb(); return; }             // nothing happened yet: straight to a fresh setup
+    p.lenPlan = p.lenPlan || num(p.regimeDays, 30);
+    p.regimeDays = de - 1;                           // the cycle now ended yesterday
+    p.reviewed = cycleEnd();
+    save();
+    pages = [{ k: "review" }]; rowOpen = null;
+    render(); document.getElementById("scroll").scrollTop = 0;
+    return;
+  }
+  if (a === "rvstart"){ startOnb(); return; }
+  if (a === "onbmode"){ onb.mode = el.dataset.m; render(); return; }
+  if (a === "onblen"){ onb.len = +el.dataset.n; onb.err = null; render(); return; }
+  if (a === "onbback"){
+    if (onb && onb.step > 0){ onb.step--; onb.err = null; render(); }
+    else { onb = null; pages = []; render(); }
+    return;
+  }
+  if (a === "onbnext" || a === "onbstart"){
+    const o = onb; if (!o) return;
+    const bad = v => String(v ?? "").trim() === "" || isNaN(num(v, NaN));
+    o.err = o.step === 1 && bad(o.wNow) ? "Enter your weight"
+      : o.step === 2 && bad(o.wT) ? "Enter a target weight"
+      : o.step === 3 && (bad(o.len) || num(o.len) < 1) ? "Enter the number of days" : null;
+    if (o.err){ render(); return; }
+    if (a === "onbstart"){ startCycle(); return; }
+    o.step++; render(); document.getElementById("scroll").scrollTop = 0; return;
+  }
+  if (a === "fopen"){
+    foodOpen = +el.dataset.i; render();
+    const inp = document.querySelector(`input[data-act="nmif"][data-i="${foodOpen}"]`); if (inp) inp.focus();
+    return;
+  }
+  if (a === "fclose"){ foodOpen = null; render(); return; }
 
   if (a === "gmetric"){ gMetric = el.dataset.t; gAdd = false; gSel = null; gEdit = null; render(); return; }
   if (a === "gpt"){ gSel = gSel === el.dataset.d ? null : el.dataset.d; render(); return; }
@@ -2055,27 +2188,15 @@ document.addEventListener("click", e => {
     return;
   }
 
-  if (a === "tab"){ tab = el.dataset.tab; editing = false; editTargets = false; editN = false; showRules = false; wtAdd = null; wkOpen = null; sheet = null; render(); document.getElementById("scroll").scrollTop = 0; return; }
-  if (a === "rulestoggle"){ showRules = !showRules; render(); return; }
-  if (a === "pick"){ sel = el.dataset.date; editing = false; sheet = null; render(); return; }
-  if (a === "shcancel"){ sheet = null; exOpen = null; render(); return; }
+  if (a === "tab"){ tab = el.dataset.tab; pages = []; onb = null; rowOpen = null; foodOpen = null; swOpen = null; wtAdd = null; sheet = null; render(); document.getElementById("scroll").scrollTop = 0; return; }
+  if (a === "pick"){ sel = el.dataset.date; sheet = null; swOpen = null; render(); return; }
+  if (a === "shcancel"){ sheet = null; render(); return; }
   if (a === "wshift"){ weekOffset += +el.dataset.d; render(); return; }
-  if (a === "edit"){ editing = editing ? false : true; exOpen = null; wkOpen = null; render(); return; }
-  if (a === "wkopen"){
-    if (wkOpen === el.dataset.w){ wkOpen = null; wkHome = null; }
-    else { const w2 = state.workouts.find(x => x.id === el.dataset.w); wkOpen = el.dataset.w; wkHome = w2 ? wkSec(w2) : null; }
-    exOpen = null; render(); return; }
-  if (a === "exopen"){
-    if (exOpen === el.dataset.ex){ exOpen = null; exHome = null; }
-    else { exOpen = el.dataset.ex;
-      const m2 = state.nutrition.menu.find(x => x.id === exOpen);
-      exHome = m2 ? mSec(m2) : null; }
-    render(); return; }
   if (a === "addwk"){
     const nw = { id: uid(), title: "New workout", exercises: [], wtype: "strength", days: [dayIdx(parseIso(sel))] };
     syncWMode(nw);
-    state.workouts.push(nw); wkOpen = nw.id; wkHome = "today"; exOpen = null;
-    save(); render(); return;
+    state.workouts.push(nw);
+    save(); pushPage({ k: "wk", id: nw.id }); return;
   }
   if (a === "wchoose"){
     sheetNew = true;
@@ -2116,12 +2237,8 @@ document.addEventListener("click", e => {
     armed = null;
     state.backup = state.backup.filter(x => x.id !== id);
     state.workouts = state.workouts.filter(x => x.id !== id);
-    if (wkOpen === id) wkOpen = null;
-    if (editing === id) editing = false;
-    save(); render(); return;
+    save(); popIf("wk", id); return;
   }
-  if (a === "edittgt"){ editTargets = !editTargets; render(); return; }
-  if (a === "editn"){ editN = !editN; exOpen = null; xtOpen = null; render(); return; }
   if (a === "ndone"){
     const id = el.dataset.r;
     const l = state.nutrition.logs[sel] || (state.nutrition.logs[sel] = {});
@@ -2188,14 +2305,10 @@ document.addEventListener("click", e => {
     }
     save(); render(); return;
   }
-  if (a === "xtopen"){
-    xtOpen = xtOpen === el.dataset.t ? null : el.dataset.t;
-    exOpen = null; render(); return;
-  }
   if (a === "xtaddnew"){
     const nt = { id: uid(), name: "New type", limit: 3, xper: "week", replaces: "" };
-    state.xtypes.push(nt); xtOpen = nt.id; exOpen = null;
-    save(); render(); return;
+    state.xtypes.push(nt);
+    save(); pushPage({ k: "xt", id: nt.id }); return;
   }
   if (a === "xtdel"){
     const k = "xtdel:" + el.dataset.t;
@@ -2203,8 +2316,7 @@ document.addEventListener("click", e => {
     armed = null;
     state.xtypes = state.xtypes.filter(t => t.id !== el.dataset.t);
     state.nutrition.exclusions = state.nutrition.exclusions.filter(x => x.xt !== el.dataset.t);
-    if (xtOpen === el.dataset.t) xtOpen = null;
-    save(); render(); return;
+    save(); popIf("xt", el.dataset.t); return;
   }
   if (a === "xtper"){
     const t = state.xtypes.find(z => z.id === el.dataset.t); if (!t) return;
@@ -2219,15 +2331,15 @@ document.addEventListener("click", e => {
   if (a === "xadd"){
     const t = state.xtypes.find(z => z.id === el.dataset.t); if (!t) return;
     const nx = { id: uid(), name: "New option", amt: "", cost: 1, xt: t.id };
-    state.nutrition.exclusions.push(nx); exOpen = nx.id;
-    save(); render(); return;
+    state.nutrition.exclusions.push(nx);
+    save(); pushPage({ k: "xo", id: nx.id }); return;
   }
   if (a === "xdel"){
     const k = "xdel:" + (el.dataset.x);
     if (armed !== k){ armed = k; render(); return; }
     armed = null;
     state.nutrition.exclusions = state.nutrition.exclusions.filter(x => x.id !== el.dataset.x);
-    save(); render(); return;
+    save(); popIf("xo", el.dataset.x); return;
   }
   if (a === "xday"){
     const x = state.nutrition.exclusions.find(y => y.id === el.dataset.x); if (!x) return;
@@ -2240,16 +2352,15 @@ document.addEventListener("click", e => {
   }
   if (a === "nmadd"){
     const nm = { id: uid(), mtype: "snack", items: [] };
-    state.nutrition.menu.push(nm); exOpen = nm.id; exHome = "today";
-    save(); render(); return;
+    state.nutrition.menu.push(nm);
+    save(); pushPage({ k: "mi", id: nm.id }); return;
   }
   if (a === "nmdel"){
     const k = "nmdel:" + (el.dataset.m);
     if (armed !== k){ armed = k; render(); return; }
     armed = null;
     state.nutrition.menu = state.nutrition.menu.filter(m => m.id !== el.dataset.m);
-    if (editN === el.dataset.m) editN = false;
-    save(); render(); return;
+    save(); popIf("mi", el.dataset.m); return;
   }
   if (a === "nmchoose"){
     sheetNew = true;
@@ -2276,15 +2387,15 @@ document.addEventListener("click", e => {
   }
   if (a === "naddrule"){
     const nh = { id: uid(), name: "New habit", kind: "check" };
-    state.nutrition.rules.push(nh); exOpen = nh.id;
-    editN = editN || true; save(); render(); return;
+    state.nutrition.rules.push(nh);
+    save(); pushPage({ k: "habit", id: nh.id }); return;
   }
   if (a === "ndel"){
     const k = "ndel:" + (el.dataset.r);
     if (armed !== k){ armed = k; render(); return; }
     armed = null;
     state.nutrition.rules = state.nutrition.rules.filter(r => r.id !== el.dataset.r);
-    save(); render(); return;
+    save(); popIf("habit", el.dataset.r); return;
   }
   if (a === "nreset"){
     if (armed !== "nreset"){ armed = "nreset"; render(); return; }
@@ -2293,20 +2404,22 @@ document.addEventListener("click", e => {
     state.nutrition = { rules: [{ id: "water", name: "Water", kind: "count", target: 5, unit: "glasses" }],
       logs: {}, presets, menu: [], exclusions: [], exlog: {}, mopts: {}, xpicks: {}, xmeal: {}, tlog: {}, xnoslot: {} };
     state.xtypes = [];
-    editN = false;
     save(); render(); return;
   }
   if (a === "nmiadd"){
     const m = findMenu(el.dataset.m); if (!m) return;
     m.items = m.items || []; m.items.push({ name: "New food", amt: "" });
-    save(); render(); return;
+    foodOpen = m.items.length - 1;
+    save(); render();
+    const inp = document.querySelector(`input[data-act="nmif"][data-i="${foodOpen}"]`); if (inp){ inp.focus(); inp.select(); }
+    return;
   }
   if (a === "nmidel"){
     const k = "nmidel:" + (`${el.dataset.m}:${el.dataset.i}`);
     if (armed !== k){ armed = k; render(); return; }
     armed = null;
     const m = findMenu(el.dataset.m); if (!m) return;
-    m.items.splice(+el.dataset.i, 1);
+    m.items.splice(+el.dataset.i, 1); foodOpen = null;
     save(); render(); return;
   }
   if (a === "nmtype"){
@@ -2323,7 +2436,9 @@ document.addEventListener("click", e => {
     if (m.days.length === 7) delete m.days;
     save(); render(); return;
   }
-  if (a === "npreset"){
+  if (a === "npreset"){   // applying replaces the whole nutrition setup: tap twice
+    if (armed !== "npreset:" + el.dataset.id){ armed = "npreset:" + el.dataset.id; render(); return; }
+    armed = null;
     const pr = state.nutrition.presets.find(x => x.id === el.dataset.id); if (!pr) return;
     const n2 = state.nutrition;
     const cloneFood = it => typeof it === "string" ? { name: it, amt: "" } : { name: it.name, amt: it.amt || "" };
@@ -2423,8 +2538,8 @@ document.addEventListener("click", e => {
   if (a === "addex"){
     const w = findWk(el.dataset.w); if (!w) return;
     const nx = { id: uid(), name: "New exercise", sets: 3, reps: 10, weight: 0 };
-    (w.exercises = w.exercises || []).push(nx); syncWMode(w); exOpen = nx.id;
-    save(); render(); return;
+    (w.exercises = w.exercises || []).push(nx); syncWMode(w);
+    save(); pushPage({ k: "ex", w: w.id, id: nx.id }); return;
   }
   if (a === "delex"){
     const k = "delex:" + (el.dataset.ex);
@@ -2433,7 +2548,7 @@ document.addEventListener("click", e => {
     const w = findWk(el.dataset.w); if (!w) return;
     w.exercises = w.exercises.filter(x => x.id !== el.dataset.ex);
     syncWMode(w);
-    save(); render(); return;
+    save(); popIf("ex", el.dataset.ex); return;
   }
   if (a === "addrule"){
     state.rules.push({ id: uid(), scope: "all", metric: "weight", amount: 1, every: 1, cap: "" });
@@ -2444,36 +2559,6 @@ document.addEventListener("click", e => {
     if (armed !== k){ armed = k; render(); return; }
     armed = null;
     state.rules = state.rules.filter(r => r.id !== el.dataset.id);
-    save(); render(); return;
-  }
-  if (a === "newchal"){
-    const p = state.profile;
-    const total0 = Math.max(1, num(p.regimeDays, 90));
-    const eX = parseIso(p.anchor); eX.setDate(eX.getDate() + total0 - 1);
-    if (iso(new Date()) <= iso(eX) && armed !== "newchal"){ armed = "newchal"; render(); return; }
-    armed = null;
-    // archive the finished challenge before restarting: period, day colors, goal results
-    const from = p.anchor;
-    const total = Math.max(1, num(p.regimeDays, 90));
-    const e0 = parseIso(from); e0.setDate(e0.getDate() + total - 1);
-    const y0 = new Date(); y0.setDate(y0.getDate() - 1);
-    const to = iso(e0) < iso(y0) ? iso(e0) : iso(y0);
-    if (from && from <= to){
-      const days = [];
-      for (let d = parseIso(from); iso(d) <= to; d.setDate(d.getDate() + 1)){
-        const f2 = dayFlags(iso(d));
-        const fails = (f2.wPlanned && !f2.wOk ? 1 : 0) + (f2.nTracked && !f2.nOk ? 1 : 0);
-        days.push(fails === 0 ? "g" : fails === 1 ? "o" : "r");
-      }
-      const lastVal = k => { const m = (state.measurements || []).filter(x => x[k] != null && x.date <= to)
-        .sort((a2, b2) => a2.date < b2.date ? -1 : 1).at(-1); return m ? m[k] : null; };
-      state.regimes.push({ from, to, days: days.join(""),
-        w: { start: p.weightStart, end: lastVal("weight") ?? p.weightNow, target: p.weightTarget },
-        f: { start: p.fatStart, end: lastVal("fat") ?? p.fatNow, target: p.fatTarget } });
-      p.weightStart = p.weightNow; p.fatStart = p.fatNow;   // the new challenge starts from where you are now
-    }
-    state.profile.anchor = iso(new Date());
-    editTargets = true;   // land in setup: review length and targets for the new challenge
     save(); render(); return;
   }
 });
@@ -2488,40 +2573,47 @@ document.addEventListener("change", e => {
     if (files.length) Promise.all(files.map(addPhoto)).then(() => render());
     return;
   }
-  if (a === "nrulef"){ const r = state.nutrition.rules.find(x => x.id === el.dataset.r); if (r){ r.name = v; save(); render(); } return; }
-  if (a === "nrtarget"){ const r = state.nutrition.rules.find(x => x.id === el.dataset.r); if (r){ r.target = Math.max(r.kind === "limit" ? 0 : 1, num(v, r.target)); save(); render(); } return; }
-  if (a === "nrunit"){ const r = state.nutrition.rules.find(x => x.id === el.dataset.r); if (r){ r.unit = v; save(); render(); } return; }
-  if (a === "nmif"){ const m = findMenu(el.dataset.m); if (m && m.items && m.items[+el.dataset.i]){ m.items[+el.dataset.i].name = v; save(); render(); } return; }
+  if (a === "nrulef"){ const r = state.nutrition.rules.find(x => x.id === el.dataset.r); if (r){ r.name = v; save(); } return; }
+  if (a === "nrtarget"){ const r = state.nutrition.rules.find(x => x.id === el.dataset.r); if (r){ r.target = Math.max(r.kind === "limit" ? 0 : 1, num(v, r.target)); el.value = r.target; save(); } return; }
+  if (a === "nrunit"){ const r = state.nutrition.rules.find(x => x.id === el.dataset.r); if (r){ r.unit = v; save(); } return; }
+  if (a === "nmif"){ const m = findMenu(el.dataset.m); if (m && m.items && m.items[+el.dataset.i]){ m.items[+el.dataset.i].name = v; save(); } return; }
   if (a === "nmiqty" || a === "nmiunit"){
     const m = findMenu(el.dataset.m); const it = m && m.items && m.items[+el.dataset.i]; if (!it) return;
     const p = parseAmt(it.amt);
     if (a === "nmiqty") p.qty = v; else p.unit = v;
-    it.amt = joinAmt(p); save(); render(); return;
+    it.amt = joinAmt(p); save(); return;
   }
-  if (a === "xf"){ const x = state.nutrition.exclusions.find(y => y.id === el.dataset.x); if (x){ x.name = v; save(); render(); } return; }
-  if (a === "xcost"){ const x = state.nutrition.exclusions.find(y => y.id === el.dataset.x); if (x){ x.cost = Math.max(0, num(v, x.cost ?? 1)); save(); render(); } return; }
-  if (a === "xtname"){ const t = state.xtypes.find(z => z.id === el.dataset.t); if (t){ t.name = v; save(); render(); } return; }
-  if (a === "xtlimit"){ const t = state.xtypes.find(z => z.id === el.dataset.t); if (t){ t.limit = Math.max(0, num(v, t.limit)); save(); render(); } return; }
+  if (a === "xf"){ const x = state.nutrition.exclusions.find(y => y.id === el.dataset.x); if (x){ x.name = v; save(); } return; }
+  if (a === "xcost"){ const x = state.nutrition.exclusions.find(y => y.id === el.dataset.x); if (x){ x.cost = Math.max(0, num(v, x.cost ?? 1)); el.value = x.cost; save(); } return; }
+  if (a === "xtname"){ const t = state.xtypes.find(z => z.id === el.dataset.t); if (t){ t.name = v; save(); } return; }
+  if (a === "xtlimit"){ const t = state.xtypes.find(z => z.id === el.dataset.t); if (t){ t.limit = Math.max(0, num(v, t.limit)); el.value = t.limit; save(); } return; }
   if (a === "xq" || a === "xu"){
     const x = state.nutrition.exclusions.find(y => y.id === el.dataset.x); if (!x) return;
     const p = parseAmt(x.amt);
     if (a === "xq") p.qty = v; else p.unit = v;
-    x.amt = joinAmt(p); save(); render(); return;
+    x.amt = joinAmt(p); save(); return;
   }
-  if (a === "wktitle"){ const w = findWk(el.dataset.w); if (w){ w.title = v; save(); render(); } return; }
-  if (a === "wkmins"){ const w = findWk(el.dataset.w); if (w){ w.mins = num(v, w.mins); save(); render(); } return; }
+  if (a === "wktitle"){ const w = findWk(el.dataset.w); if (w){ w.title = v; save(); } return; }
+  if (a === "wkmins"){ const w = findWk(el.dataset.w); if (w){ w.mins = num(v, w.mins); el.value = w.mins; save(); } return; }
   if (a === "exf"){
     const w = findWk(el.dataset.w); if (!w) return;
     const ex = w.exercises.find(x => x.id === el.dataset.ex); if (!ex) return;
     const f = el.dataset.f;
     ex[f] = f === "name" ? v : num(v, ex[f]);
-    save(); render(); return;
+    if (f !== "name") el.value = ex[f];
+    save(); return;
   }
   if (a === "rulef"){
     const r = state.rules.find(x => x.id === el.dataset.id); if (!r) return;
     const f = el.dataset.f;
     r[f] = (f === "scope" || f === "metric") ? v : (f === "cap" && v.trim() === "" ? "" : num(v, 0));
     save(); render(); return;
+  }
+  if (a === "prof" && el.dataset.f === "regimeDays"){
+    const n2 = Math.round(num(v, NaN));
+    if (!isNaN(n2) && n2 >= 1) state.profile.regimeDays = state.profile.lenPlan = n2;
+    el.value = state.profile.regimeDays;
+    save(); return;
   }
   if (a === "prof"){
     const f = el.dataset.f;
@@ -2538,7 +2630,21 @@ document.addEventListener("change", e => {
       const found = state.measurements.find(m => m.date === date);
       if (found){ found.weight = w; found.fat = ft; } else state.measurements.push({ date, weight: w, fat: ft });
     }
-    save(); render(); return;
+    save(); return;
+  }
+});
+
+// onboarding fields keep the draft as you type; tape measurements fill in body fat
+document.addEventListener("input", e => {
+  const el = e.target.closest('[data-act="onbf"]'); if (!el || !onb) return;
+  const f = el.dataset.f;
+  onb[f] = el.value;
+  if (f === "h" || f === "waist" || f === "neck"){
+    const tb = tapeBF({ heightCm: onb.h, waistCm: onb.waist, neckCm: onb.neck });
+    if (tb.state === "ok"){
+      onb.fNow = tb.bf;
+      const fi = document.querySelector('[data-act="onbf"][data-f="fNow"]'); if (fi) fi.value = tb.bf;
+    }
   }
 });
 
@@ -2590,6 +2696,7 @@ document.addEventListener("pointermove", e => {
 }, { passive: false });
 document.addEventListener("pointerup", () => {
   if (!drag) return;
+  swSup = Date.now();
   drag.row.classList.remove("dragging");
   const ids = [...drag.container.querySelectorAll(":scope > [data-drag-row]")].map(r => r.dataset.id);
   const t = dragListFor(drag.key);
@@ -2606,6 +2713,69 @@ document.addEventListener("pointercancel", () => {
   drag.row.classList.remove("dragging");
   drag = null; render();
 });
+
+/* ---------- day pages: swipe a row left to reveal Edit ---------- */
+let swDrag = null;
+const SW_OPEN = 92;
+document.addEventListener("pointerdown", e => {
+  const f = e.target.closest(".swf");
+  if (!f || e.target.closest("input,select,textarea")) return;
+  const r = f.parentElement;
+  swDrag = { r, f, x0: e.clientX, y0: e.clientY, base: r.classList.contains("open") ? -SW_OPEN : 0, lock: null, cur: null };
+});
+document.addEventListener("pointermove", e => {
+  const d = swDrag; if (!d) return;
+  const dx = e.clientX - d.x0, dy = e.clientY - d.y0;
+  if (!d.lock && (Math.abs(dx) > 8 || Math.abs(dy) > 8)){
+    d.lock = Math.abs(dx) > Math.abs(dy) * 1.2 ? "x" : "y";
+    if (d.lock === "x"){
+      document.querySelectorAll(".swr.open").forEach(o => { if (o !== d.r) o.classList.remove("open"); });
+      d.f.style.transition = "none";
+      d.r.classList.add("drg");
+    }
+  }
+  if (d.lock !== "x") return;
+  let x = d.base + dx;
+  if (x > 0) x = 0;
+  if (x < -SW_OPEN) x = -SW_OPEN + (x + SW_OPEN) * 0.3;
+  x = Math.max(x, -150);
+  d.cur = x;
+  d.f.style.marginRight = (-x) + "px";   // the row narrows from the right, its content stays readable
+  d.f.classList.toggle("lift", x < 0);
+});
+function swEnd(){
+  const d = swDrag; swDrag = null;
+  if (!d || d.lock !== "x") return;
+  swSup = Date.now();
+  d.f.style.transition = ""; d.f.style.marginRight = "";
+  d.f.classList.remove("lift");
+  setTimeout(() => d.r.classList.remove("drg"), 250);   // keep the button visible while the row slides shut
+  const open = (d.cur ?? d.base) < -40;
+  d.r.classList.toggle("open", open);
+  swOpen = open ? d.r.dataset.swipe : null;
+}
+document.addEventListener("pointerup", swEnd);
+document.addEventListener("pointercancel", swEnd);
+
+/* ---------- plan pages: hold a row, then drag it to reorder ---------- */
+let hold = null;
+document.addEventListener("pointerdown", e => {
+  const row = e.target.closest("[data-hold]");
+  if (!row || e.target.closest("input,select,textarea,button")) return;
+  const x0 = e.clientX, y0 = e.clientY;
+  hold = { x0, y0, t: setTimeout(() => {
+    hold = null;
+    drag = { key: row.dataset.hold, row, container: row.parentElement };
+    row.classList.add("dragging");
+  }, 380) };
+});
+document.addEventListener("pointermove", e => {
+  if (hold && (Math.abs(e.clientX - hold.x0) > 8 || Math.abs(e.clientY - hold.y0) > 8)){ clearTimeout(hold.t); hold = null; }
+});
+const endHold = () => { if (hold){ clearTimeout(hold.t); hold = null; } };
+document.addEventListener("pointerup", endHold);
+document.addEventListener("pointercancel", endHold);
+document.addEventListener("touchmove", e => { if (drag) e.preventDefault(); }, { passive: false });
 
 // one-time (v148): seed frozen verdicts so the ring looks as it did before v147 removed
 // history — an item counts on a past day only if it shows any logged activity by that day,
@@ -2631,6 +2801,7 @@ if (!state.verdictSeed1){
   state.verdictSeed1 = true;
 }
 save();
+bootPages();
 render();
 loadPhotos().then(render);   // photos arrive async from IndexedDB, repaint when ready
 // iOS standalone underreports the window height by the status-bar inset (win 793 vs screen 852
