@@ -250,6 +250,17 @@ nav svg{width:25px;height:25px;stroke:currentColor;fill:none;stroke-width:1.8;st
 .lst.meal.hl{box-shadow:inset 0 0 0 1.5px rgba(195,245,60,.5)}
 .sech.hl,.sech.hl .wicon{color:var(--acc)}
 .pk{font-size:15px;line-height:1.55;color:var(--dim);margin-top:4px}
+/* trend logs: rows inside the card, add/edit in place */
+.lrow{display:flex;align-items:center;gap:12px;min-height:50px;font-size:17px;border-top:1px solid var(--hair)}
+.lrow .lv{font-weight:500}
+.lrow.on{background:rgba(195,245,60,.07);margin:0 -18px;padding:0 18px}
+.lacts{display:flex;justify-content:space-between;align-items:center;border-top:1px solid var(--hair)}
+.lbtn{background:none;border:0;border-radius:0;padding:14px 0;font-size:17px;color:var(--dim)}
+.lbtn.acc{color:var(--acc);font-weight:600}
+.lbtn.bad{color:var(--bad)}
+.vdate{background:transparent;border:0;border-radius:0;padding:4px 0;width:auto;min-width:0;flex:none;color:var(--tx);font-size:17px;text-align:right;-webkit-appearance:none;appearance:none}
+.vdate::-webkit-date-and-time-value{text-align:right}
+.vdate:focus{outline:none;border:0;color:var(--acc)}
 .vin:focus{outline:none;border:0;color:var(--acc)}
 .fin{background:var(--card2);border:1px solid var(--line);border-radius:11px;padding:9px 11px;font-size:16px}
 .ttlin{background:transparent;border:0;border-radius:0;padding:0;font:inherit;font-size:30px;font-weight:650;letter-spacing:-.6px;width:100%;color:var(--tx)}
@@ -1183,6 +1194,15 @@ function trendCard(){
     .map(m => ({ date: m.date, v: num(m[gMetric]) }));
   const tRaw = state.profile[isW ? "weightTarget" : "fatTarget"];
   const target = tRaw == null || String(tRaw).trim() === "" ? null : num(tRaw);
+  const unitG = isW ? "kg" : "%";
+  const latest = points.length ? points[points.length - 1].v : num(state.profile[isW ? "weightNow" : "fatNow"], NaN);
+  // add/edit a log in place: Date (the phone's date wheel) and the value with its unit, text actions below
+  const logForm = (idD, idV, date, val, left, right) => `<div class="lform">
+      <div class="lrow"><span class="lk">Date</span><input type="date" class="vdate" id="${idD}" value="${date}"></div>
+      <div class="lrow"><span class="lk">${isW ? "Weight" : "Body fat"}</span><span class="vwrap"><input class="vin" id="${idV}" inputmode="decimal"
+        size="${Math.max(1, String(val === "" ? (isNaN(latest) ? "" : fmt(latest)) : val).length) + 1}" value="${esc(val)}" placeholder="${isNaN(latest) ? "" : fmt(latest)}"><span class="vu">${unitG}</span></span></div>
+      <div class="lacts">${left}${right}</div>
+    </div>`;
   return `<div class="sech"><span class="grow">Trend</span>
       <div class="seg">
         <button class="${isW ? "on" : ""}" data-act="gmetric" data-t="weight">Weight</button>
@@ -1207,34 +1227,15 @@ function trendCard(){
     })() : ""}
     ${points.length ? trendSvg(points, target, color, pFrom, pTo)
       : `<div class="onote" style="margin:0 0 2px">No logs yet</div>`}
-    ${points.length ? `<div style="margin-top:10px">${[...points].reverse().map(p => gEdit === p.date
-      ? `<div style="background:var(--card2);border:1px solid var(--line);border-radius:12px;padding:12px;margin:8px 0">
-          <div class="between">
-            <label style="margin-bottom:0">Edit log</label>
-            <div class="row" style="gap:2px">
-              ${delBtn("gldel", p.date, "")}
-              <button class="okbtn" data-act="glupd" title="Done">${CK}</button>
-            </div>
-          </div>
-          <div class="f2" style="margin-top:10px">
-            <div><label>Date</label><input type="date" id="gedate" value="${p.date}"></div>
-            <div><label>${isW ? "Weight, kg" : "Fat, %"}</label><input inputmode="decimal" id="geval" value="${esc(p.v)}"></div>
-          </div>
-        </div>`
-      : `<div class="hist tap" data-act="gledit" data-d="${p.date}" style="${gSel === p.date ? "background:rgba(195,245,60,.07);margin:0 -18px;padding-left:18px;padding-right:18px" : ""}"><span class="muted">${pdate(p.date)}</span><b>${fmt(p.v)} ${isW ? "kg" : "%"}</b></div>`).join("")}</div>` : ""}
-    ${gAdd ? `<div style="margin-top:12px;background:var(--card2);border:1px solid var(--line);border-radius:12px;padding:12px">
-      <div class="between">
-        <label style="margin-bottom:0">New ${isW ? "weight" : "fat"} log</label>
-        <div class="row" style="gap:2px">
-          <button class="x" data-act="glcancel" title="Cancel">&times;</button>
-          <button class="okbtn" data-act="glsave" title="Save">${CK}</button>
-        </div>
-      </div>
-      <div class="f2" style="margin-top:10px">
-        <div><label>Date</label><input type="date" id="gldate" value="${iso(new Date())}"></div>
-        <div><label>${isW ? "Weight, kg" : "Fat, %"}</label><input inputmode="decimal" id="glval" placeholder="${isW ? "79.2" : "17.4"}"></div>
-      </div>
-    </div>` : `<div class="addrow" data-act="gladd">${svgI(PLUS)}<span>Add log</span></div>`}
+    ${[...points].reverse().map(p => gEdit === p.date
+      ? logForm("gedate", "geval", p.date, p.v,
+          `<button class="lbtn bad" data-act="gldel">${armed === "gldel:" + gEdit ? "Tap again to delete" : "Delete"}</button>`,
+          `<button class="lbtn acc" data-act="glupd">Done</button>`)
+      : `<div class="lrow tap ${gSel === p.date ? "on" : ""}" data-act="gledit" data-d="${p.date}"><span class="lk">${pdate(p.date)}</span><span class="lv">${fmt(p.v)} ${unitG}</span></div>`).join("")}
+    ${gAdd ? logForm("gldate", "glval", iso(new Date()), "",
+        `<button class="lbtn" data-act="glcancel">Cancel</button>`,
+        `<button class="lbtn acc" data-act="glsave">Add</button>`)
+      : `<div class="addrow" data-act="gladd">${svgI(PLUS)}<span>Add log</span></div>`}
   </div>`;
 }
 
@@ -2097,7 +2098,7 @@ document.addEventListener("click", e => {
   if (Date.now() - swSup < 350) return;          // the tail of a drag is not a tap
   const el = e.target.closest("[data-act]");
   if (!el){   // tapping a value row's label puts the cursor in its field
-    const row = e.target.closest(".li"), inp = row && row.querySelector(".vin");
+    const row = e.target.closest(".li, .lrow"), inp = row && row.querySelector(".vin, .vdate");
     if (inp && !e.target.closest("input,select,textarea")) inp.focus();
     return;
   }
