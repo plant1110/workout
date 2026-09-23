@@ -48,7 +48,7 @@ h2{font-size:14px;text-transform:uppercase;letter-spacing:.08em;color:var(--dim)
 .stat > div{flex:1;background:var(--card2);border-radius:13px;padding:12px 11px;min-width:0}
 .stat .k{font-size:12px;color:var(--dim);text-transform:uppercase;letter-spacing:.06em}
 .wicon{display:inline-flex;width:23px;height:23px;flex:none;color:var(--dim)}
-.wicon svg{width:100%;height:100%;stroke:currentColor;fill:none;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
+.wicon svg{width:100%;height:100%;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
 .ibtn{width:45px;height:45px;border-radius:12px;padding:0;display:flex;align-items:center;justify-content:center;color:var(--dim)}
 .ibtn svg{width:23px;height:23px;stroke:currentColor;fill:none;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
 .ibtn.on{border-color:var(--acc);color:var(--acc);background:rgba(195,245,60,.1)}
@@ -118,7 +118,7 @@ nav{flex:none;background:#0d0f13;
 nav .in{max-width:560px;margin:0 auto;display:grid;grid-template-columns:repeat(4,1fr);gap:4px}
 nav button{background:none;border:0;color:var(--dim);font-size:13px;font-weight:600;padding:11px 0;display:grid;gap:4px;justify-items:center}
 nav button.on{color:var(--acc)}
-nav svg{width:25px;height:25px;stroke:currentColor;fill:none;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
+nav svg{width:25px;height:25px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
 .chip{display:inline-block;font-size:11px;padding:3px 8px;border-radius:99px;background:var(--card2);color:var(--dim);border:1px solid var(--line)}
 .hist{display:flex;justify-content:space-between;padding:11px 0;border-bottom:1px solid var(--line);font-size:16px}
 .hist:last-child{border-bottom:0}
@@ -218,20 +218,22 @@ nav svg{width:25px;height:25px;stroke:currentColor;fill:none;stroke-width:1.9;st
 .lv{display:inline-flex;align-items:center;justify-content:flex-end;gap:7px;color:var(--tx);text-align:right;white-space:nowrap}
 .lv.dim{color:var(--dim)}
 .li.acts{color:var(--acc);font-weight:500}
-.ic{width:22px;height:22px;flex:none;stroke:currentColor;fill:none;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
+.ic{width:22px;height:22px;flex:none;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
 .dimi{color:var(--dim);display:flex;flex:none}
 .dt{color:var(--dim);text-decoration:line-through}
-.sech{display:flex;align-items:center;gap:10px;margin:24px 2px 10px;font-size:20px;font-weight:650}
-.grp{font-size:15px;color:var(--dim);margin:22px 4px 8px}
-.cb{width:32px;height:32px;border-radius:99px;border:2px solid #334050;flex:none;display:flex;align-items:center;justify-content:center;color:transparent;font-size:16px;font-weight:700;cursor:pointer;user-select:none;-webkit-user-select:none}
+.sech{display:flex;align-items:center;gap:10px;margin:26px 0 10px;padding:0 16px;font-size:20px;font-weight:650}
+.grp{font-size:15px;color:var(--dim);margin:22px 16px 8px}
+.cb{width:30px;height:30px;border-radius:99px;border:2.5px solid var(--ring);flex:none;display:flex;align-items:center;justify-content:center;color:transparent;cursor:pointer;user-select:none;-webkit-user-select:none}
+.cb svg,.opt .ck svg,.ocard .ok svg{width:62%;height:62%;stroke:currentColor;fill:none;stroke-width:2.8;stroke-linecap:round;stroke-linejoin:round}
+.okbtn svg{width:20px;height:20px;stroke:currentColor;fill:none;stroke-width:2.8;stroke-linecap:round;stroke-linejoin:round}
 .cb.on{background:var(--acc);border-color:var(--acc);color:#0f1400}
 .cb.blue.on{background:#38bdf8;border-color:#38bdf8}
 .danger{display:block;width:100%;background:none;border:0;text-align:center;color:var(--bad);font-size:17px;padding:14px;margin:6px 0 10px}
-.bl{list-style:none;margin:5px 0 0;padding:0}
-.bl li{position:relative;padding-left:15px;font-size:15px;line-height:1.55;color:#c9d0d7}
-.bl li::before{content:"";position:absolute;left:2px;top:.64em;width:5px;height:5px;border-radius:99px;background:#4a5563}
-.bl .am{color:var(--dim);margin-left:6px}
-.bl.dimmed li{color:var(--dim)}
+.bl{list-style:none;margin:6px 0 1px;padding:0}
+.bl li{position:relative;padding-left:14px;font-size:14.5px;line-height:1.5;color:var(--dim)}
+.bl li::before{content:"";position:absolute;left:1px;top:.66em;width:4px;height:4px;border-radius:99px;background:#46505c}
+.bl .am{color:#66717d;margin-left:5px}
+.bl.dimmed li,.bl.dimmed .am{color:#5d6773}
 .vin{background:transparent;border:0;border-radius:0;padding:4px 0;width:96px;text-align:right;color:var(--tx);font-size:17px;flex:none}
 .vin:focus{outline:none;border:0;color:var(--acc)}
 .fin{background:var(--card2);border:1px solid var(--line);border-radius:11px;padding:9px 11px;font-size:16px}
@@ -248,12 +250,17 @@ nav svg{width:25px;height:25px;stroke:currentColor;fill:none;stroke-width:1.9;st
 .swbtn .pl{width:64px;height:36px;border-radius:99px;background:#2c323b;color:var(--tx);display:flex;align-items:center;justify-content:center}
 .swbtn .pl svg{width:19px;height:19px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
 .swf{position:relative;z-index:1;background:var(--card);touch-action:pan-y;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none;transition:margin .22s ease,border-radius .22s,background-color .22s}
-.swr.hdr .swf{background:var(--bg);border-radius:16px}
 .swf.lift,.swr.open .swf{background:var(--card2);border-radius:16px}
 .swr.open .swf{margin-right:92px}
-.whead{display:flex;align-items:center;gap:11px;padding:9px 10px;min-height:52px;font-size:20px;font-weight:650}
-.wsub{font-size:15px;color:var(--dim);font-weight:400;margin-top:1px}
-.wblk + .wblk{margin-top:18px}
+/* a workout card: title row + exercises; the whole card swipes */
+.swr.crd{margin-bottom:14px}
+.swr.crd > .swf{margin-bottom:0}
+.swr.crd > .swf.lift,.swr.crd.open > .swf{background:var(--card);border-radius:20px}
+.li.whd{font-size:18px;font-weight:650;min-height:60px}
+.li.whd .ls{font-weight:400}
+/* one circle family on day pages: checks, counters and section rings share size, stroke and column */
+:root{--ring:#2c3541}
+.rg{flex:none;display:block}
 /* onboarding + results: full-screen pages */
 #app.full{min-height:100%;display:flex;flex-direction:column}
 #app.full main{flex:1;display:flex;flex-direction:column}
@@ -309,6 +316,7 @@ const uid = () => Math.random().toString(36).slice(2,9);
 const num = (v, d=0) => { const n = parseFloat(String(v).replace(",",".")); return isNaN(n) ? d : n; };
 const fmt = n => Number.isInteger(n) ? String(n) : n.toFixed(1);
 const clamp = (n,a,b) => Math.max(a, Math.min(b,n));
+const CK = '<svg viewBox="0 0 24 24"><path d="M5 12l5 5l10 -10" /></svg>';
 const esc = s => String(s).replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
 
 /* ---------- dates ---------- */
@@ -732,9 +740,23 @@ function weekStrip(kind){
   for (let i = 0; i < 7; i++){
     const d = new Date(mon); d.setDate(d.getDate() + i);
     const id = iso(d);
+    let dot = "";
+    const f = dayFlags(id);
+    if (kind === "nutrition"){
+      if (f.nTracked){
+        const done = state.nutrition.rules.filter(r => habitDone(r, id)).length;
+        dot = f.nOk ? "full" : done > 0 ? "part" : "plan";
+      }
+    } else {
+      if (f.wPlanned){
+        const done = exercisesFor(id).map(e => e.id).filter(eid => exDone(id, { id: eid })).length;
+        dot = f.wOk ? "full" : done > 0 ? "part" : "plan";
+      }
+    }
     cells += `<div class="dcell ${id===sel?"sel":""} ${id===todayIso?"istoday":""}" data-act="pick" data-date="${id}">
       <div class="dw">${DAYS[i][0]}</div>
       <div class="dn">${d.getDate()}</div>
+      <div class="dot ${dot}"></div>
     </div>`;
   }
   return `<div class="strip">
@@ -745,14 +767,14 @@ function weekStrip(kind){
 }
 
 const WICONS = {
-  strength: '<path d="M6.5 6.5v11M17.5 6.5v11M3 9.5v5M21 9.5v5M6.5 12h11"/>',
-  cardio:   '<path d="M19.6 12.6 12 20l-7.6-7.4a5 5 0 1 1 7.1-7.1l.5.5.5-.5a5 5 0 1 1 7.1 7.1z"/>',
-  ball:     '<circle cx="12" cy="12" r="9"/><path d="M4.6 6.2a12 12 0 0 1 0 11.6M19.4 6.2a12 12 0 0 0 0 11.6"/>',
-  swim:     '<path d="M2 12c2-2 4-2 6 0s4 2 6 0 4-2 6 0"/><path d="M2 17.5c2-2 4-2 6 0s4 2 6 0 4-2 6 0"/>',
-  bike:     '<circle cx="6" cy="17" r="3.5"/><circle cx="18" cy="17" r="3.5"/><path d="M6 17 9.5 9h5l3.5 8M9.5 9 7.5 5h3"/>',
-  zap:      '<path d="M13 2 4 14h6l-1 8 9-12h-6z"/>',
-  hike:     '<path d="m2.5 19.5 6.5-11 4 6.5 3-4.5 5.5 9z"/>',
-  mobility: '<circle cx="12" cy="5" r="2.2"/><path d="M12 7.5V14M12 14l-4.5 6M12 14l4.5 6M4.5 10.5 12 9l7.5 1.5"/>'
+  strength: '<path d="M2 12h1" /> <path d="M6 8h-2a1 1 0 0 0 -1 1v6a1 1 0 0 0 1 1h2" /> <path d="M6 7v10a1 1 0 0 0 1 1h1a1 1 0 0 0 1 -1v-10a1 1 0 0 0 -1 -1h-1a1 1 0 0 0 -1 1z" /> <path d="M9 12h6" /> <path d="M15 7v10a1 1 0 0 0 1 1h1a1 1 0 0 0 1 -1v-10a1 1 0 0 0 -1 -1h-1a1 1 0 0 0 -1 1z" /> <path d="M18 8h2a1 1 0 0 1 1 1v6a1 1 0 0 1 -1 1h-2" /> <path d="M22 12h-1" />',
+  cardio:   '<path d="M19.5 12.572l-7.5 7.428l-7.5 -7.428a5 5 0 1 1 7.5 -6.566a5 5 0 1 1 7.5 6.572" />',
+  ball:     '<path d="M12 12m-9 0a9 9 0 1 0 18 0a9 9 0 1 0 -18 0" /> <path d="M12 7l4.76 3.45l-1.76 5.55h-6l-1.76 -5.55z" /> <path d="M12 7v-4m3 13l2.5 3m-.74 -8.55l3.74 -1.45m-11.44 7.05l-2.56 2.95m.74 -8.55l-3.74 -1.45" />',
+  swim:     '<path d="M16 9m-1 0a1 1 0 1 0 2 0a1 1 0 1 0 -2 0" /> <path d="M6 11l4 -2l3.5 3l-1.5 2" /> <path d="M3 16.75a2.4 2.4 0 0 0 1 .25a2.4 2.4 0 0 0 2 -1a2.4 2.4 0 0 1 2 -1a2.4 2.4 0 0 1 2 1a2.4 2.4 0 0 0 2 1a2.4 2.4 0 0 0 2 -1a2.4 2.4 0 0 1 2 -1a2.4 2.4 0 0 1 2 1a2.4 2.4 0 0 0 2 1a2.4 2.4 0 0 0 1 -.25" />',
+  bike:     '<path d="M5 18m-3 0a3 3 0 1 0 6 0a3 3 0 1 0 -6 0" /> <path d="M19 18m-3 0a3 3 0 1 0 6 0a3 3 0 1 0 -6 0" /> <path d="M12 19l0 -4l-3 -3l5 -4l2 3l3 0" /> <path d="M17 5m-1 0a1 1 0 1 0 2 0a1 1 0 1 0 -2 0" />',
+  zap:      '<path d="M13 3l0 7l6 0l-8 11l0 -7l-6 0l8 -11" />',
+  hike:     '<path d="M3 20h18l-6.921 -14.612a2.3 2.3 0 0 0 -4.158 0l-6.921 14.612z" /> <path d="M7.5 11l2 2.5l2.5 -2.5l2 3l2.5 -2" />',
+  mobility: '<path d="M16 5m-1 0a1 1 0 1 0 2 0a1 1 0 1 0 -2 0" /> <path d="M5 20l5 -.5l1 -2" /> <path d="M18 20v-5h-5.5l2.5 -6.5l-5.5 1l1.5 2" />'
 };
 const defIcon = w => w.type === "activity" ? "cardio" : "strength";
 const wtypeOfW = w => w.wtype || (w.type === "activity" ? "cardio" : "strength");
@@ -768,7 +790,7 @@ const wtInset = wid => `<div style="margin-top:9px;background:var(--card2);borde
       <label style="margin-bottom:0">New type</label>
       <div class="row" style="gap:2px">
         <button class="x" data-act="wtcancel" title="Cancel">&times;</button>
-        <button class="okbtn" data-act="wtsave" data-w="${wid}" title="Create">&#10003;</button>
+        <button class="okbtn" data-act="wtsave" data-w="${wid}" title="Create">${CK}</button>
       </div>
     </div>
     <input id="wtname" placeholder="Name, e.g. Yoga" value="${esc(wtAddName)}" style="margin-top:8px">
@@ -779,19 +801,29 @@ const wtInset = wid => `<div style="margin-top:9px;background:var(--card2);borde
 
 // small building blocks of the v159 design code
 const svgI = (paths, cls = "ic") => `<svg class="${cls}" viewBox="0 0 24 24">${paths}</svg>`;
-const PLUS = '<path d="M12 5v14M5 12h14"/>';
-const PENCIL = '<path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"/>';
+const PLUS = '<path d="M12 5l0 14" /> <path d="M5 12l14 0" />';
+const PENCIL = '<path d="M4 20h4l10.5 -10.5a2.828 2.828 0 1 0 -4 -4l-10.5 10.5v4" /> <path d="M13.5 6.5l4 4" />';
 // a row that slides left to reveal Edit (opens that one item's page)
-const swRow = (key, inner, cls = "") => `<div class="swr ${cls}" data-swipe="${key}">
+const swRow = (key, inner, cls = "", fcls = "") => `<div class="swr ${cls}" data-swipe="${key}">
     <div class="swa"><button class="swbtn" data-act="swedit" data-k="${key}"><span class="pl"><svg viewBox="0 0 24 24">${PENCIL}</svg></span>Edit</button></div>
-    <div class="swf">${inner}</div></div>`;
+    <div class="swf ${fcls}">${inner}</div></div>`;
 // small progress ring for section heads
 function pring(pct, color = "var(--acc)"){
-  const r = 12, c = 2 * Math.PI * r, p2 = Math.max(0, Math.min(1, pct || 0));
-  return `<svg width="30" height="30" viewBox="0 0 30 30" style="flex:none;display:block">
-    <circle cx="15" cy="15" r="${r}" stroke="#222a34" stroke-width="4" fill="none"/>
-    ${p2 > 0 ? `<circle cx="15" cy="15" r="${r}" stroke="${color}" stroke-width="4" fill="none" stroke-linecap="round"
+  const r = 13.5, c = 2 * Math.PI * r, p2 = Math.max(0, Math.min(1, pct || 0));
+  return `<svg class="rg" width="30" height="30" viewBox="0 0 30 30">
+    <circle cx="15" cy="15" r="${r}" stroke="var(--ring)" stroke-width="2.5" fill="none"/>
+    ${p2 > 0 ? `<circle cx="15" cy="15" r="${r}" stroke="${color}" stroke-width="2.5" fill="none" stroke-linecap="round"
       stroke-dasharray="${c.toFixed(2)}" stroke-dashoffset="${(c * (1 - p2)).toFixed(2)}" transform="rotate(-90 15 15)"/>` : ""}
+  </svg>`;
+}
+// a counter: the same ring with the count inside
+function cring(n, limit, color){
+  const r = 13.5, c = 2 * Math.PI * r, p2 = limit > 0 ? Math.min(n / limit, 1) : 0;
+  return `<svg class="rg" width="30" height="30" viewBox="0 0 30 30">
+    <circle cx="15" cy="15" r="${r}" stroke="var(--ring)" stroke-width="2.5" fill="none"/>
+    ${p2 > 0 ? `<circle cx="15" cy="15" r="${r}" stroke="${color}" stroke-width="2.5" fill="none" stroke-linecap="round"
+      stroke-dasharray="${c.toFixed(2)}" stroke-dashoffset="${(c * (1 - p2)).toFixed(2)}" transform="rotate(-90 15 15)"/>` : ""}
+    <text x="15" y="19.4" text-anchor="middle" style="font-size:12.5px;font-weight:650;fill:var(--tx)">${fmt(n)}</text>
   </svg>`;
 }
 
@@ -799,19 +831,18 @@ function wkCardView(w){
   const eff = effOf(w, sel);
   const hasAlts = state.workouts.some(o => o.id !== w.id);
   const titleAct = hasAlts ? `data-act="wchoose" data-w="${w.id}"` : "";
-  const origin = eff !== w ? `<div class="wsub">${esc(w.title)}</div>` : "";
+  const origin = eff !== w ? `<div class="ls">${esc(w.title)}</div>` : "";
   if (eff.type === "activity"){
     const r = resolve({ id: eff.id, type: "time", mins: eff.mins });
     const on = exDone(sel, { id: eff.id });
     const bump = r.d.mins ? ` <span class="up">&uarr; ${(r.d.mins > 0 ? "+" : "") + fmt(r.d.mins)} min</span>` : "";
-    // a single activity is one row in a card: the row itself is the workout
-    return `<div class="lst">${swRow("wk:" + eff.id, `<div class="li">${wicon(eff)}
+    return swRow("wk:" + eff.id, `<div class="li whd">${wicon(eff)}
         <div class="grow ${hasAlts ? "tap" : ""}" ${titleAct}>
-          <div class="lt ${on ? "dt" : ""}">${esc(eff.title)}</div>${origin ? `<div class="ls">${esc(w.title)}</div>` : ""}
+          <div class="${on ? "dt" : ""}">${esc(eff.title)}</div>${origin}
           <div class="ls">${fmt(r.mins)} min${bump}</div>
         </div>
-        <div class="cb ${on ? "on" : ""}" data-act="exdone" data-ex="${eff.id}">&#10003;</div>
-      </div>`)}</div>`;
+        <div class="cb ${on ? "on" : ""}" data-act="exdone" data-ex="${eff.id}">${CK}</div>
+      </div>`, "crd", "lst");
   }
   const total = (eff.exercises || []).length;
   let done = 0;
@@ -833,22 +864,22 @@ function wkCardView(w){
         <div class="lt ${on ? "dt" : ""}">${esc(ex.name)}</div>
         <div class="ls">${targetTxt}${bump.length ? `<span class="up">&nbsp; &uarr; ${bump.join(", ")}</span>` : ""}</div>
       </div>
-      <div class="cb ${on ? "on" : ""}" data-act="exdone" data-ex="${ex.id}">&#10003;</div>
+      <div class="cb ${on ? "on" : ""}" data-act="exdone" data-ex="${ex.id}">${CK}</div>
     </div>`;
   }).join("");
   const allDone = total > 0 && done === total;
-  return swRow("wk:" + eff.id, `<div class="whead">${wicon(eff)}
+  return swRow("wk:" + eff.id, `<div class="li whd">${wicon(eff)}
       <div class="grow ${hasAlts ? "tap" : ""}" ${titleAct}>
         <div class="${allDone ? "dt" : ""}">${esc(eff.title)}</div>${origin}
       </div>
       ${pring(total ? done / total : 0)}
-    </div>`, "hdr") + (rows ? `<div class="lst">${rows}</div>` : "");
+    </div>${rows}`, "crd", "lst");
 }
 
 function viewWorkout(){
   let html = weekStrip("workout");
   const wks = workoutsFor(sel);
-  html += wks.length ? wks.map(w => `<div class="wblk">${wkCardView(w)}</div>`).join("")
+  html += wks.length ? wks.map(wkCardView).join("")
     : `<div class="lst"><div class="li"><div class="grow lt">Rest day</div><span class="badge rest">Rest</span></div></div>`;
   return html;
 }
@@ -1177,7 +1208,7 @@ function trendCard(){
             <label style="margin-bottom:0">Edit log</label>
             <div class="row" style="gap:2px">
               ${delBtn("gldel", p.date, "")}
-              <button class="okbtn" data-act="glupd" title="Done">&#10003;</button>
+              <button class="okbtn" data-act="glupd" title="Done">${CK}</button>
             </div>
           </div>
           <div class="f2" style="margin-top:10px">
@@ -1191,7 +1222,7 @@ function trendCard(){
         <label style="margin-bottom:0">New ${isW ? "weight" : "fat"} log</label>
         <div class="row" style="gap:2px">
           <button class="x" data-act="glcancel" title="Cancel">&times;</button>
-          <button class="okbtn" data-act="glsave" title="Save">&#10003;</button>
+          <button class="okbtn" data-act="glsave" title="Save">${CK}</button>
         </div>
       </div>
       <div class="f2" style="margin-top:10px">
@@ -1318,14 +1349,12 @@ const pdate = (d, long) => parseIso(d).toLocaleDateString(undefined,
   long ? { weekday: "short", day: "numeric", month: "short", year: "numeric" } : { day: "numeric", month: "short" });
 
 const NICONS = {
-  trend:  '<path d="m3 17 6-6 4 4 8-8"/><path d="M14.5 7H21v6.5"/>',
-  photos: '<rect x="3" y="7" width="18" height="13" rx="2.5"/><path d="M8.5 7 10 4.5h4L15.5 7"/><circle cx="12" cy="13.2" r="3.4"/>',
-  habits: '<circle cx="12" cy="12" r="9"/><path d="m8.5 12.5 2.5 2.5 4.5-5.5"/>',
-  menu:   '<path d="M7 3v7M4.5 3v4a2.5 2.5 0 0 0 5 0V3M7 10v11"/><path d="M17.5 3c-1.8 1.2-2.7 3.2-2.7 5.7 0 2 .9 2.8 2.7 2.8V21"/>',
-  water:  '<path d="M12 3c3.4 4.1 5.8 7.1 5.8 10a5.8 5.8 0 0 1-11.6 0C6.2 10.1 8.6 7.1 12 3z"/>',
-  limits: '<circle cx="12" cy="12" r="9"/><path d="M9 9.5h.01M14.8 8.8h.01M10 14.5h.01M14.3 13.6h.01"/>',
-  flag: '<path d="M6 21V4"/><path d="M6 5h12l-2.5 3.5L18 12H6"/>',
-  presets: '<path d="M6.5 3.5h11v17l-5.5-4-5.5 4z"/>'
+  trend:  '<path d="M3 17l6 -6l4 4l8 -8" /> <path d="M14 7l7 0l0 7" />',
+  photos: '<path d="M5 7h1a2 2 0 0 0 2 -2a1 1 0 0 1 1 -1h6a1 1 0 0 1 1 1a2 2 0 0 0 2 2h1a2 2 0 0 1 2 2v9a2 2 0 0 1 -2 2h-14a2 2 0 0 1 -2 -2v-9a2 2 0 0 1 2 -2" /> <path d="M9 13a3 3 0 1 0 6 0a3 3 0 0 0 -6 0" />',
+  habits: '<path d="M12 12m-9 0a9 9 0 1 0 18 0a9 9 0 1 0 -18 0" /> <path d="M9 12l2 2l4 -4" />',
+  menu:   '<path d="M19 3v12h-5c-.023 -3.681 .184 -7.406 5 -12zm0 12v6h-1v-3m-10 -14v17m-3 -17v3a3 3 0 1 0 6 0v-3" />',
+  limits: '<path d="M12 21.5c-3.04 0 -5.952 -.714 -8.5 -1.983l8.5 -16.517l8.5 16.517a19.09 19.09 0 0 1 -8.5 1.983z" /> <path d="M5.38 15.866a14.94 14.94 0 0 0 6.815 1.634a14.944 14.944 0 0 0 6.502 -1.479" /> <path d="M13 11.01v-.01" /> <path d="M11 14v-.01" />',
+  presets: '<path d="M18 7v14l-6 -4l-6 4v-14a4 4 0 0 1 4 -4h4a4 4 0 0 1 4 4z" />'
 };
 const nicon = k => `<span class="wicon" style="width:21px;height:21px">&#8203;<svg viewBox="0 0 24 24">${NICONS[k]}</svg></span>`;
 const secTitle = (k, label, done) => `<div class="row" style="gap:9px">${nicon(k)}<div style="font-size:19px;font-weight:650;${done ? "color:var(--dim);text-decoration:line-through" : ""}">${label}</div></div>`;
@@ -1490,7 +1519,7 @@ function viewNutrition(){
           <div class="ls" style="${over ? "color:var(--bad)" : ""}">${c} of ${fmt(t)}${h.unit ? ` ${esc(h.unit)}` : ""} ${pw}${over ? " &middot; over limit" : ""}</div>
         </div>
         ${minus("hminus", `data-r="${h.id}"`)}
-        <button class="tap" style="background:none;border:0;padding:0" data-act="hplus" data-r="${h.id}">${xring(c, t, over ? "var(--bad)" : "var(--warm)", 42)}</button>
+        <button class="tap" style="background:none;border:0;padding:0" data-act="hplus" data-r="${h.id}">${cring(c, t, over ? "var(--bad)" : "var(--warm)")}</button>
       </div>`;
     }
     if (h.kind === "count"){
@@ -1501,12 +1530,12 @@ function viewNutrition(){
           <div class="ls">${c} of ${fmt(t)}${h.unit ? ` ${esc(h.unit)}` : ""}</div>
         </div>
         ${minus("hminus", `data-r="${h.id}"`)}
-        <button class="tap" style="background:none;border:0;padding:0" data-act="hplus" data-r="${h.id}">${xring(c, t, "#38bdf8", 42)}</button>
+        <button class="tap" style="background:none;border:0;padding:0" data-act="hplus" data-r="${h.id}">${cring(c, t, "#38bdf8")}</button>
       </div>`;
     }
     return `<div class="li tap" data-act="ndone" data-r="${h.id}">
       <div class="grow lt ${l[h.id] ? "dt" : ""}">${esc(h.name)}</div>
-      <div class="cb blue ${l[h.id] ? "on" : ""}">&#10003;</div>
+      <div class="cb blue ${l[h.id] ? "on" : ""}">${CK}</div>
     </div>`;
   };
   html += `<div class="sech">${nicon("habits")}<span class="grow">Habits</span>${rules.length ? pring(hdone / rules.length, "#38bdf8") : ""}</div>`;
@@ -1531,7 +1560,7 @@ function viewNutrition(){
       <div class="grow tap" data-act="${canChoose ? "nmchoose" : "ndone"}" data-m="${m.id}" data-r="${m.id}">
         <div class="lt ${done ? "dt" : ""}">${mLabel(m)}</div>${bl}
       </div>
-      <div class="cb ${done ? "on" : ""}" data-act="ndone" data-r="${m.id}">&#10003;</div>
+      <div class="cb ${done ? "on" : ""}" data-act="ndone" data-r="${m.id}">${CK}</div>
     </div>`);
   };
   html += `<div class="sech">${nicon("menu")}<span class="grow">Menu</span>${menu.length ? pring(mdone / menu.length) : ""}</div>`;
@@ -1556,7 +1585,7 @@ function viewNutrition(){
         </div>
         <div class="row" style="gap:2px;align-self:center">
           ${minus("xtminus", `data-t="${t.t}"`)}
-          <button class="tap" style="background:none;border:0;padding:0" data-act="xtplus" data-t="${t.t}">${xring(pts, lim, over ? "var(--bad)" : "var(--warm)", 42)}</button>
+          <button class="tap" style="background:none;border:0;padding:0" data-act="xtplus" data-t="${t.t}">${cring(pts, lim, over ? "var(--bad)" : "var(--warm)")}</button>
         </div>
       </div>`);
     };
@@ -1571,10 +1600,10 @@ function viewNutrition(){
 }
 
 /* ---------- pages: one item or one group, pushed over the tab ---------- */
-const BACK_SVG = '<path d="M15 5l-7 7 7 7"/>';
+const BACK_SVG = '<path d="M15 6l-6 6l6 6" />';
 const li = (inner, attrs = "", cls = "") => `<div class="li ${cls}" ${attrs}>${inner}</div>`;
 const addLi = (act, label, data = "") => `<div class="li acts tap" data-act="${act}" ${data}>${svgI(PLUS)}<span>${label}</span></div>`;
-const editAllLi = () => `<div class="lst"><div class="li acts tap" data-act="go" data-k="cycle">${svgI('<path d="M4 6h16M4 12h16M4 18h10"/>')}<span>Edit everything</span></div></div>`;
+const editAllLi = () => `<div class="lst"><div class="li acts tap" data-act="go" data-k="cycle">${svgI('<path d="M13 5h8" /> <path d="M13 9h5" /> <path d="M13 15h8" /> <path d="M13 19h5" /> <path d="M3 4m0 1a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v4a1 1 0 0 1 -1 1h-4a1 1 0 0 1 -1 -1z" /> <path d="M3 14m0 1a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v4a1 1 0 0 1 -1 1h-4a1 1 0 0 1 -1 -1z" />')}<span>Edit everything</span></div></div>`;
 // a value row that expands in place to show its control
 const xrow = (key, label, value, control) => rowOpen === key
   ? `<div class="li col"><div class="row tap" data-act="rowopen" data-r="${key}"><span class="lk">${label}</span><span class="lv">${value}</span></div>${control}</div>`
@@ -1651,7 +1680,7 @@ function pageReview(pg){
   const brow = (label, g, unit, warm, first) => g && g.end != null && g.end !== "" ? `
     <div class="brow" ${first ? "" : 'style="margin-top:18px"'}><span class="bgoal">${label}</span><span><span class="bnum">${fmt(num(g.end))}</span><span class="bgoal">${g.target != null && g.target !== "" ? ` &rarr; ${fmt(num(g.target))}` : ""} ${unit}</span></span></div>
     <div class="bar2 ${warm ? "warm" : ""}"><i style="width:${(frac(g) * 100).toFixed(0)}%"></i></div>` : "";
-  return `<div class="xclose"><button data-act="back" aria-label="Close"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></svg></button></div>
+  return `<div class="xclose"><button data-act="back" aria-label="Close"><svg viewBox="0 0 24 24"><path d="M18 6l-12 12" /> <path d="M6 6l12 12" /></svg></button></div>
     <h1>Cycle ${no} complete</h1>
     <div class="pgsub">${dRange(rg.from, rg.to)}</div>
     <div style="position:relative;width:196px;height:196px;margin:24px auto 4px">${segRing(codes, 196, 7)}
@@ -1662,9 +1691,9 @@ function pageReview(pg){
 }
 
 // ---------- new cycle: onboarding, one question per screen ----------
-const ICO_DOWN = '<path d="m3 7 6 6 4-4 8 8"/><path d="M21 10.5V17h-6.5"/>';
-const ICO_FLAT = '<path d="M4 12h16"/>';
-const ICO_UP = '<path d="m3 17 6-6 4 4 8-8"/><path d="M14.5 7H21v6.5"/>';
+const ICO_DOWN = '<path d="M3 7l6 6l4 -4l8 8" /> <path d="M21 10l0 7l-7 0" />';
+const ICO_FLAT = '<path d="M5 12l14 0" />';
+const ICO_UP = '<path d="M3 17l6 -6l4 4l8 -8" /> <path d="M14 7l7 0l0 7" />';
 const onbIn = (f, v, mode = "decimal") => `<input class="vin" inputmode="${mode}" data-act="onbf" data-f="${f}" value="${esc(v ?? "")}">`;
 function startOnb(quiet){
   const p = state.profile;
@@ -1680,7 +1709,7 @@ function pageOnb(){
   const err = o.err ? `<div class="onote" style="color:var(--bad)">${o.err}</div>` : "";
   let body;
   if (o.step === 0){
-    const opt = (m, icon) => `<div class="ocard ${o.mode === m ? "on" : ""}" data-act="onbmode" data-m="${m}"><svg viewBox="0 0 24 24">${icon}</svg>${modeLbl(m)}${o.mode === m ? `<span class="ok">&#10003;</span>` : ""}</div>`;
+    const opt = (m, icon) => `<div class="ocard ${o.mode === m ? "on" : ""}" data-act="onbmode" data-m="${m}"><svg viewBox="0 0 24 24">${icon}</svg>${modeLbl(m)}${o.mode === m ? `<span class="ok">${CK}</span>` : ""}</div>`;
     body = `<div class="oq">What's the goal of this cycle?</div>${opt("cut", ICO_DOWN)}${opt("maintain", ICO_FLAT)}${opt("bulk", ICO_UP)}`;
   } else if (o.step === 1){
     const tb = tapeBF({ heightCm: o.h, waistCm: o.waist, neckCm: o.neck });
@@ -1698,7 +1727,7 @@ function pageOnb(){
       ${err || (!isNaN(dW) ? `<div class="onote">${dW === 0 ? "Hold your weight" : `${dW < 0 ? "&minus;" : "+"}${fmt(Math.abs(dW))} kg`} in ${fmt(num(o.len, 30))} days</div>` : "")}`;
   } else {
     const end = startOfDay(new Date()); end.setDate(end.getDate() + Math.max(1, Math.round(num(o.len, 30))) - 1);
-    const opt = n => `<div class="ocard ${num(o.len) === n ? "on" : ""}" data-act="onblen" data-n="${n}">${n} days${num(o.len) === n ? `<span class="ok">&#10003;</span>` : ""}</div>`;
+    const opt = n => `<div class="ocard ${num(o.len) === n ? "on" : ""}" data-act="onblen" data-n="${n}">${n} days${num(o.len) === n ? `<span class="ok">${CK}</span>` : ""}</div>`;
     body = `<div class="oq">How long?</div>${opt(30)}${opt(60)}${opt(90)}
       <div class="lst" style="margin-top:4px">${inrow("Custom", onbIn("len", o.len, "numeric"), "days")}</div>
       ${err || `<div class="onote">Ends ${pdate(iso(end))}</div>`}`;
@@ -1809,7 +1838,7 @@ function pageMi(pg){
         <select class="fin" style="width:84px" data-act="nmiunit" ${data}>${units.map(u => `<option value="${esc(u)}" ${u === p.unit ? "selected" : ""}>${esc(u)}</option>`).join("")}</select>
         <span class="grow"></span>
         ${delBtn("nmidel", `${m.id}:${i}`, data)}
-        <button class="okbtn" data-act="fclose" title="Done">&#10003;</button>
+        <button class="okbtn" data-act="fclose" title="Done">${CK}</button>
       </div>
     </div>`;
   }).join("");
@@ -1936,10 +1965,10 @@ function bootPages(){
 
 /* ---------- shell ---------- */
 const TABS = [
-  { id:"home",      label:"Home",      icon:'<path d="M3 11 12 3l9 8"/><path d="M5 10v10h14V10"/>' },
-  { id:"workout",   label:"Workout",   icon:'<path d="M6.5 6.5v11M17.5 6.5v11M3 9.5v5M21 9.5v5M6.5 12h11"/>' },
-  { id:"nutrition", label:"Nutrition", icon:'<path d="M15 3c-1.8 0-3 1.4-3 3"/><path d="M12 6c-4-1.8-8 1-8 6 0 4 3 9 6 9 1 0 1.3-.6 2-.6s1 .6 2 .6c3 0 6-5 6-9 0-5-4-7.8-8-6z"/>' },
-  { id:"photos",    label:"Progress",  icon:'<path d="m3 17 6-6 4 4 8-8"/><path d="M14.5 7H21v6.5"/>' }
+  { id:"home",      label:"Home",      icon:'<path d="M5 12l-2 0l9 -9l9 9l-2 0" /> <path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-7" /> <path d="M9 21v-6a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v6" />' },
+  { id:"workout",   label:"Workout",   icon:'<path d="M2 12h1" /> <path d="M6 8h-2a1 1 0 0 0 -1 1v6a1 1 0 0 0 1 1h2" /> <path d="M6 7v10a1 1 0 0 0 1 1h1a1 1 0 0 0 1 -1v-10a1 1 0 0 0 -1 -1h-1a1 1 0 0 0 -1 1z" /> <path d="M9 12h6" /> <path d="M15 7v10a1 1 0 0 0 1 1h1a1 1 0 0 0 1 -1v-10a1 1 0 0 0 -1 -1h-1a1 1 0 0 0 -1 1z" /> <path d="M18 8h2a1 1 0 0 1 1 1v6a1 1 0 0 1 -1 1h-2" /> <path d="M22 12h-1" />' },
+  { id:"nutrition", label:"Nutrition", icon:'<path d="M4 11.319c0 3.102 .444 5.319 2.222 7.978c1.351 1.797 3.156 2.247 5.08 .988c.426 -.268 .97 -.268 1.397 0c1.923 1.26 3.728 .809 5.079 -.988c1.778 -2.66 2.222 -4.876 2.222 -7.977c0 -2.661 -1.99 -5.32 -4.444 -5.32c-1.267 0 -2.41 .693 -3.22 1.44a.5 .5 0 0 1 -.672 0c-.809 -.746 -1.953 -1.44 -3.22 -1.44c-2.454 0 -4.444 2.66 -4.444 5.319" /> <path d="M7 12c0 -1.47 .454 -2.34 1.5 -3" /> <path d="M12 7c0 -1.2 .867 -4 3 -4" />' },
+  { id:"photos",    label:"Progress",  icon:'<path d="M3 17l6 -6l4 4l8 -8" /> <path d="M14 7l7 0l0 7" />' }
 ];
 const VIEWS = { home:viewHome, workout:viewWorkout, nutrition:viewNutrition, photos:viewPhotos };
 const HEAD = {
@@ -1986,7 +2015,7 @@ function render(){
       const itemsLbl = list => (list || []).map(amtLabel).join(" &middot; ");
       const optRow = (id, label, sub, on) => `<div class="opt ${on ? "on" : ""} tap" data-act="pickopt" data-id="${id}">
           <div class="grow"><div class="oname">${label}</div>${sub ? `<div class="target" style="margin-top:2px">${sub}</div>` : ""}</div>
-          <div class="ck">&#10003;</div>
+          <div class="ck">${CK}</div>
         </div>`;
       const own = optRow("", itemsLbl(m.items) || mLabel(m), "", cur === "");
       // other menu items of the same type (swap the whole slot, e.g. Wednesday's lunch on a Tuesday)
@@ -2023,7 +2052,7 @@ function render(){
         if (showType) summ = `${esc(cap1(wtypeOfW(o)))} &middot; ${summ}`;
         return `<div class="opt ${curId === o.id ? "on" : ""} tap" data-act="wpickopt" data-id="${o.id}">
           <div class="grow"><div class="oname">${esc(o.title)}</div><div class="target" style="margin-top:2px">${summ}</div></div>
-          <div class="ck">&#10003;</div>
+          <div class="ck">${CK}</div>
         </div>`;
       };
       const others = state.workouts.filter(o => o.id !== w.id && wtypeOfW(o) === wtypeOfW(w));
