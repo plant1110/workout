@@ -2637,19 +2637,6 @@ loadPhotos().then(render);   // photos arrive async from IndexedDB, repaint when
 // on iPhone 15 Pro) — in that container only 100vh resolves to the full glass, so use it there
 if (navigator.standalone) document.body.style.height = "100vh";
 
-/* TEMP DIAG — remove after the nav-height bug is confirmed fixed */
-try {
-  const pr = document.createElement("div");
-  pr.style.cssText = "position:absolute;visibility:hidden;padding-top:env(safe-area-inset-top);padding-bottom:env(safe-area-inset-bottom)";
-  document.body.appendChild(pr);
-  const cs = getComputedStyle(pr);
-  const dg = document.createElement("div");
-  dg.style.cssText = "flex:none;text-align:center;font-size:10px;color:#57647a;padding:2px 0;background:#0d0f13";
-  const upd = () => dg.textContent = `win ${innerWidth}x${innerHeight} | screen ${screen.width}x${screen.height} | envT ${cs.paddingTop} envB ${cs.paddingBottom} | body ${Math.round(document.body.getBoundingClientRect().height)} | standalone ${!!navigator.standalone}`;
-  upd(); setInterval(upd, 1500);
-  document.body.appendChild(dg);
-} catch(e) {}
-
 // installable app: register the service worker when served over http(s) with sw.js alongside
 if ("serviceWorker" in navigator && location.protocol.startsWith("http"))
   navigator.serviceWorker.register("sw.js").catch(() => {});
