@@ -22,7 +22,7 @@
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 html{-webkit-text-size-adjust:100%}
 html,body{margin:0;padding:0;height:100%;overflow:hidden;overscroll-behavior-y:none}
-body{position:relative;display:flex;flex-direction:column}
+body{position:relative;display:flex;flex-direction:column;height:100dvh}
 #scroll{flex:1;min-height:0;overflow-y:auto;-webkit-overflow-scrolling:touch;padding-bottom:18px}
 body{
   background:var(--bg); color:var(--tx);
@@ -2633,6 +2633,19 @@ if (!state.verdictSeed1){
 save();
 render();
 loadPhotos().then(render);   // photos arrive async from IndexedDB, repaint when ready
+/* TEMP DIAG — remove after the nav-height bug is confirmed fixed */
+try {
+  const pr = document.createElement("div");
+  pr.style.cssText = "position:absolute;visibility:hidden;padding-top:env(safe-area-inset-top);padding-bottom:env(safe-area-inset-bottom)";
+  document.body.appendChild(pr);
+  const cs = getComputedStyle(pr);
+  const dg = document.createElement("div");
+  dg.style.cssText = "flex:none;text-align:center;font-size:10px;color:#57647a;padding:2px 0;background:#0d0f13";
+  const upd = () => dg.textContent = `win ${innerWidth}x${innerHeight} | screen ${screen.width}x${screen.height} | envT ${cs.paddingTop} envB ${cs.paddingBottom} | body ${Math.round(document.body.getBoundingClientRect().height)} | standalone ${!!navigator.standalone}`;
+  upd(); setInterval(upd, 1500);
+  document.body.appendChild(dg);
+} catch(e) {}
+
 // installable app: register the service worker when served over http(s) with sw.js alongside
 if ("serviceWorker" in navigator && location.protocol.startsWith("http"))
   navigator.serviceWorker.register("sw.js").catch(() => {});
