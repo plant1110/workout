@@ -370,6 +370,7 @@ if (!state.xtypes) state.xtypes = [];                 // cheat TYPES carry the b
 if (!state.nutrition.tlog) state.nutrition.tlog = {};  // { date: { typeId: [{x, label, cost, slot?, ns?}] } } — the one cheat log
 if (!state.nutrition.xnoslot) state.nutrition.xnoslot = {};   // per-day count of cheat uses with no free menu slot (voids the day)
 if (!state.verdicts) state.verdicts = {};   // frozen day results: once a day has ended its color is FINAL
+if (!state.regimes) state.regimes = [];      // finished challenges: {from, to, days:"gor...", w:{start,end,target}, f:{...}}
 if (!state.wopts) state.wopts = {};
 const normFood = it => typeof it === "string" ? { name: it, amt: "" } : it;
 state.nutrition.menu.forEach(m => {
@@ -1278,6 +1279,23 @@ function viewPhotos(){
   html += `<button class="addbtn" data-act="paddphoto" style="margin-top:16px">+ Add photo</button>
     <input type="file" accept="image/*" multiple data-act="pfile" style="display:none">`;
   html += trendCard();
+  if ((state.regimes || []).length){
+    const gv = v => v == null ? "&mdash;" : fmt(num(v, 0));
+    const goal = (label, g, unit) => (g && (g.start != null || g.end != null))
+      ? `<div class="tiny" style="margin-top:5px">${label} ${gv(g.start)} &rarr; <b style="color:var(--tx)">${gv(g.end)}</b>${unit} &middot; target ${gv(g.target)}${unit}${
+          g.target != null && g.end != null && (num(g.start, 0) >= num(g.target, 0) ? num(g.end, 9e9) <= num(g.target, 0) : num(g.end, -9e9) >= num(g.target, 0))
+            ? ` <span style="color:var(--acc)">&#10003;</span>` : ""}</div>`
+      : "";
+    html += `<div class="card">
+      <div style="font-weight:650">Past challenges</div>
+      ${state.regimes.slice().reverse().map(rg => `<div style="margin-top:14px">
+        <div class="tiny" style="margin-bottom:6px">${pdate(rg.from)} &ndash; ${pdate(rg.to, true).replace(/^[^,]*,\s*/, "")} &middot; ${rg.days.length} days</div>
+        <div class="row" style="gap:2px">${[...rg.days].map(c2 =>
+          `<div style="flex:1;height:8px;border-radius:2px;background:${c2 === "g" ? "var(--acc)" : c2 === "o" ? "var(--warm)" : "var(--bad)"}"></div>`).join("")}</div>
+        ${goal("Weight", rg.w, " kg")}${goal("Fat", rg.f, "%")}
+      </div>`).join("")}
+    </div>`;
+  }
   return html;
 }
 
@@ -2402,6 +2420,27 @@ document.addEventListener("click", e => {
     save(); render(); return;
   }
   if (a === "anchor"){
+    // archive the finished challenge before restarting: period, day colors, goal results
+    const p = state.profile;
+    const from = p.anchor;
+    const total = Math.max(1, num(p.regimeDays, 90));
+    const e0 = parseIso(from); e0.setDate(e0.getDate() + total - 1);
+    const y0 = new Date(); y0.setDate(y0.getDate() - 1);
+    const to = iso(e0) < iso(y0) ? iso(e0) : iso(y0);
+    if (from && from <= to){
+      const days = [];
+      for (let d = parseIso(from); iso(d) <= to; d.setDate(d.getDate() + 1)){
+        const f2 = dayFlags(iso(d));
+        const fails = (f2.wPlanned && !f2.wOk ? 1 : 0) + (f2.nTracked && !f2.nOk ? 1 : 0);
+        days.push(fails === 0 ? "g" : fails === 1 ? "o" : "r");
+      }
+      const lastVal = k => { const m = (state.measurements || []).filter(x => x[k] != null && x.date <= to)
+        .sort((a2, b2) => a2.date < b2.date ? -1 : 1).at(-1); return m ? m[k] : null; };
+      state.regimes.push({ from, to, days: days.join(""),
+        w: { start: p.weightStart, end: lastVal("weight") ?? p.weightNow, target: p.weightTarget },
+        f: { start: p.fatStart, end: lastVal("fat") ?? p.fatNow, target: p.fatTarget } });
+      p.weightStart = p.weightNow; p.fatStart = p.fatNow;   // the new challenge starts from where you are now
+    }
     state.profile.anchor = iso(new Date()); save(); render(); return;
   }
 });
