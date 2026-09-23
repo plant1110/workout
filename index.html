@@ -237,9 +237,6 @@ nav svg{width:25px;height:25px;stroke:currentColor;fill:none;stroke-width:1.8;st
 .vin{background:transparent;border:0;border-radius:0;padding:4px 0;width:auto;text-align:right;color:var(--tx);font-size:17px;flex:none}
 .vwrap{display:inline-flex;align-items:baseline;gap:5px;flex:none}
 .vu{color:var(--dim)}
-.li.psel{position:relative}
-.vsel{position:absolute;inset:0;width:100%;height:100%;opacity:0;font-size:17px;cursor:pointer;-webkit-appearance:none;appearance:none}
-.li.psel:focus-within .lv{color:var(--acc)}
 /* menu: one card per meal, the meal row centered like every row, its foods listed under it */
 .lst.meal{margin-bottom:10px}
 .meal .li.mh{min-height:56px}
@@ -247,9 +244,34 @@ nav svg{width:25px;height:25px;stroke:currentColor;fill:none;stroke-width:1.8;st
 .fi{display:flex;justify-content:space-between;gap:14px;font-size:15px;line-height:1.75;color:var(--dim)}
 .fi .fa{color:#6f7a86;white-space:nowrap}
 .fl.done .fi,.fl.done .fa{color:#566170}
-.lst.meal.hl{box-shadow:inset 0 0 0 1.5px rgba(195,245,60,.5)}
-.sech.hl,.sech.hl .wicon{color:var(--acc)}
 .pk{font-size:15px;line-height:1.55;color:var(--dim);margin-top:4px}
+/* value sheet (Apple style): Cancel / Done pills, rows, a wheel at the bottom */
+.vs{position:absolute;left:0;right:0;bottom:0;z-index:51;max-width:560px;margin:0 auto;background:#1b1e24;border-radius:30px 30px 0 0;
+  max-height:94%;overflow-y:auto;padding:14px 16px calc(14px + env(safe-area-inset-bottom));animation:sheetup .22s ease}
+.vs.noanim{animation:none}
+.vhead{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px}
+.pill{background:#2b3038;border:0;border-radius:99px;padding:12px 20px;font-size:17px;font-weight:500;color:var(--tx)}
+.pill.acc{background:var(--acc);color:#0f1400;font-weight:650}
+.vtitle{font-size:24px;font-weight:700;letter-spacing:-.4px;margin:0 4px 16px}
+.vs .lst{background:#262a31}
+.vs .lst > * + *{border-top-color:#30353d}
+.vs .lk{color:var(--tx)}
+.vs .lv{color:var(--dim)}
+.vs .lv.on{color:var(--acc)}
+.vtxt{flex:1;min-width:0;background:transparent;border:0;border-radius:0;padding:4px 0;text-align:right;font-size:17px;color:var(--tx)}
+.vtxt:focus{outline:none;border:0}
+.wheel{position:relative;display:flex;align-items:stretch;height:200px;margin:6px 0 4px;background:#262a31;border-radius:20px;overflow:hidden}
+.wband{position:absolute;left:8px;right:8px;top:80px;height:40px;background:#343a43;border-radius:11px;pointer-events:none}
+.wcol{position:relative;flex:1;min-width:0;height:200px;overflow-y:scroll;scroll-snap-type:y mandatory;-webkit-overflow-scrolling:touch;scrollbar-width:none;
+  -webkit-mask-image:linear-gradient(transparent,#000 32%,#000 68%,transparent);mask-image:linear-gradient(transparent,#000 32%,#000 68%,transparent)}
+.wcol::-webkit-scrollbar{display:none}
+.wpad{height:80px}
+.witem{height:40px;line-height:40px;scroll-snap-align:center;text-align:center;font-size:22px;color:#737c88;white-space:nowrap;cursor:pointer;user-select:none;-webkit-user-select:none}
+.witem.on{color:var(--tx)}
+.wcol.wr .witem{text-align:right;padding-right:1px}
+.wcol.wl .witem{text-align:left;padding-left:1px}
+.wcol.wu .witem{text-align:left;padding-left:9px}
+.wunit{position:relative;flex:none;align-self:center;font-size:20px;color:var(--dim);padding:0 22px 0 6px}
 /* trend logs: rows inside the card, add/edit in place */
 .lrow{display:flex;align-items:center;gap:12px;min-height:50px;font-size:17px;border-top:1px solid var(--hair)}
 .lrow .lv{font-weight:500}
@@ -1195,14 +1217,6 @@ function trendCard(){
   const tRaw = state.profile[isW ? "weightTarget" : "fatTarget"];
   const target = tRaw == null || String(tRaw).trim() === "" ? null : num(tRaw);
   const unitG = isW ? "kg" : "%";
-  const latest = points.length ? points[points.length - 1].v : num(state.profile[isW ? "weightNow" : "fatNow"], NaN);
-  // add/edit a log in place: Date (the phone's date wheel) and the value with its unit, text actions below
-  const logForm = (idD, idV, date, val, left, right) => `<div class="lform">
-      <div class="lrow"><span class="lk">Date</span><input type="date" class="vdate" id="${idD}" value="${date}"></div>
-      <div class="lrow"><span class="lk">${isW ? "Weight" : "Body fat"}</span><span class="vwrap"><input class="vin" id="${idV}" inputmode="decimal"
-        size="${Math.max(1, String(val === "" ? (isNaN(latest) ? "" : fmt(latest)) : val).length) + 1}" value="${esc(val)}" placeholder="${isNaN(latest) ? "" : fmt(latest)}"><span class="vu">${unitG}</span></span></div>
-      <div class="lacts">${left}${right}</div>
-    </div>`;
   return `<div class="sech"><span class="grow">Trend</span>
       <div class="seg">
         <button class="${isW ? "on" : ""}" data-act="gmetric" data-t="weight">Weight</button>
@@ -1227,15 +1241,8 @@ function trendCard(){
     })() : ""}
     ${points.length ? trendSvg(points, target, color, pFrom, pTo)
       : `<div class="onote" style="margin:0 0 2px">No logs yet</div>`}
-    ${[...points].reverse().map(p => gEdit === p.date
-      ? logForm("gedate", "geval", p.date, p.v,
-          `<button class="lbtn bad" data-act="gldel">${armed === "gldel:" + gEdit ? "Tap again to delete" : "Delete"}</button>`,
-          `<button class="lbtn acc" data-act="glupd">Done</button>`)
-      : `<div class="lrow tap ${gSel === p.date ? "on" : ""}" data-act="gledit" data-d="${p.date}"><span class="lk">${pdate(p.date)}</span><span class="lv">${fmt(p.v)} ${unitG}</span></div>`).join("")}
-    ${gAdd ? logForm("gldate", "glval", iso(new Date()), "",
-        `<button class="lbtn" data-act="glcancel">Cancel</button>`,
-        `<button class="lbtn acc" data-act="glsave">Add</button>`)
-      : `<div class="addrow" data-act="gladd">${svgI(PLUS)}<span>Add log</span></div>`}
+    ${[...points].reverse().map(p => `<div class="lrow tap ${gSel === p.date ? "on" : ""}" data-act="vopen" data-g="log" data-i="1" data-d="${p.date}"><span class="lk">${pdate(p.date)}</span><span class="lv">${fmt(p.v)} ${unitG}</span></div>`).join("")}
+    <div class="addrow" data-act="vopen" data-g="log" data-i="1">${svgI(PLUS)}<span>Add log</span></div>
   </div>`;
 }
 
@@ -1550,9 +1557,6 @@ function viewNutrition(){
 
   // menu
   const mopts = state.nutrition.mopts[sel] || {};
-  // bulk and maintain count on eating the whole menu: a finished menu lights up
-  const menuDone = menu.length > 0 && mdone >= menu.length;
-  const hl = menuDone && (state.profile.mode === "bulk" || state.profile.mode === "maintain");
   // one card per meal: the meal row (name + check), its foods listed underneath
   const mcard = m => {
     const link = (state.nutrition.xmeal[sel] || {})[m.id];
@@ -1561,7 +1565,7 @@ function viewNutrition(){
     const foods = link ? [{ name: link.label, amt: "" }] : chosenObj ? (chosenObj.items || []) : (m.items || []);
     const done = !!l[m.id];
     const canChoose = state.nutrition.menu.some(o => o.id !== m.id && mtypeOf(o) === mtypeOf(m)) || state.nutrition.exclusions.length > 0;
-    return `<div class="lst meal ${hl ? "hl" : ""}">
+    return `<div class="lst meal">
       <div class="li mh">
         <div class="grow tap lt ${done ? "dt" : ""}" data-act="${canChoose ? "nmchoose" : "ndone"}" data-m="${m.id}" data-r="${m.id}">${mLabel(m)}</div>
         <div class="cb ${done ? "on" : ""}" data-act="ndone" data-r="${m.id}">${CK}</div>
@@ -1570,7 +1574,7 @@ function viewNutrition(){
         `<div class="fi"><span>${esc(it.name)}</span><span class="fa">${esc(it.amt || "")}</span></div>`).join("")}</div>` : ""}
     </div>`;
   };
-  html += `<div class="sech ${hl ? "hl" : ""}">${nicon("menu")}<span class="grow">Menu</span></div>`;
+  html += `<div class="sech">${nicon("menu")}<span class="grow">Menu</span></div>`;
   html += menu.length ? menu.map(mcard).join("")
     : `<div class="lst"><div class="li"><span class="grow" style="color:var(--dim)">No menu for this day</span></div></div>`;
 
@@ -1617,13 +1621,6 @@ const inrow = (label, input, unit) => {
   const len = Math.max(1, ((vm && vm[1]) || (pm && pm[1]) || "").length) + 1;   // the field is as wide as its value
   return `<div class="li"><span class="lk">${label}</span><span class="vwrap">${input.replace('class="vin"', `class="vin" size="${len}"`)}${unit ? `<span class="vu">${unit}</span>` : ""}</span></div>`;
 };
-// a choice row: tapping it opens the phone's own picker (the iOS wheel), like Apple's settings
-const selRow = (label, act, data, cur, opts, shown) => {
-  const lbl = shown || (opts.find(o => o[0] === cur) || opts[0] || ["", ""])[1];
-  return `<div class="li psel"><span class="lk">${label}</span><span class="lv">${lbl}</span>
-    <select class="vsel" data-act="${act}" ${data}>${opts.map(([k, lb]) =>
-      `<option value="${esc(k)}" ${k === cur ? "selected" : ""}>${lb}</option>`).join("")}</select></div>`;
-};
 const segCtl = (opts, cur, act, data) => `<div class="seg" style="align-self:flex-start">${opts.map(([k, lb]) =>
   `<button class="${cur === k ? "on" : ""}" data-act="${act}" ${data} data-t="${k}">${lb}</button>`).join("")}</div>`;
 const dayChips = (days, act, data) => `<div class="dchips">${DAYS.map((d, i) =>
@@ -1660,10 +1657,10 @@ function pageCycle(){
   const planRow = (k, icon, label) => li(`<span class="dimi">${svgI(icon)}</span><span class="grow">${label}</span>`, `data-act="go" data-k="${k}"`, "tap");
   return `${backLink()}<h1>${esc(modeLbl(p.mode))}</h1><div class="pgsub">${dRange(p.anchor, cycleEnd())}</div>
     <div class="lst" style="margin-top:18px">
-      ${selRow("Goal", "pmode", "", p.mode, [["cut", "Cut"], ["maintain", "Maintain"], ["bulk", "Bulk"]])}
-      ${inrow("Length", `<input class="vin" inputmode="numeric" data-act="prof" data-f="regimeDays" value="${esc(total)}">`, "days")}
-      ${inrow("Target weight", `<input class="vin" inputmode="decimal" data-act="prof" data-f="weightTarget" value="${esc(p.weightTarget ?? "")}">`, "kg")}
-      ${inrow("Target body fat", `<input class="vin" inputmode="decimal" data-act="prof" data-f="fatTarget" value="${esc(p.fatTarget ?? "")}">`, "%")}
+      ${vrow("cycle", 0, "Goal", esc(modeLbl(p.mode)))}
+      ${vrow("cycle", 1, "Length", `${total} days`)}
+      ${vrow("cycle", 2, "Target weight", vEmpty(p.weightTarget) ? NOTSET : `${fmt(num(p.weightTarget))} kg`)}
+      ${vrow("cycle", 3, "Target body fat", vEmpty(p.fatTarget) ? NOTSET : `${fmt(num(p.fatTarget))} %`)}
     </div>
     <div class="sech">Plan</div>
     <div class="lst">
@@ -1728,22 +1725,22 @@ function pageOnb(){
   } else if (o.step === 1){
     const tb = tapeBF({ heightCm: o.h, waistCm: o.waist, neckCm: o.neck });
     body = `<div class="oq">Where are you now?</div>
-      <div class="lst">${inrow("Weight", onbIn("wNow", o.wNow), "kg")}${inrow("Body fat", onbIn("fNow", o.fNow), "%")}</div>
+      <div class="lst">${vrow("onb1", 0, "Weight", vEmpty(o.wNow) ? NOTSET : `${fmt(num(o.wNow))} kg`)}${vrow("onb1", 1, "Body fat", vEmpty(o.fNow) ? NOTSET : `${fmt(num(o.fNow))} %`)}</div>
       ${err}
       <div class="grp">Or measure body fat with tape</div>
-      <div class="lst">${inrow("Height", onbIn("h", o.h), "cm")}${inrow("Waist", onbIn("waist", o.waist), "cm")}${inrow("Neck", onbIn("neck", o.neck), "cm")}</div>
+      <div class="lst">${[["h", "Height"], ["waist", "Waist"], ["neck", "Neck"]].map(([k, lb], j) => vrow("onb1", j + 2, lb, vEmpty(o[k]) ? NOTSET : `${fmt(num(o[k]))} cm`)).join("")}</div>
       ${tb.state === "bad" ? `<div class="onote" style="color:var(--bad)">Waist must be larger than neck</div>`
         : tb.state === "off" ? `<div class="onote" style="color:var(--warm)">${fmt(tb.bf)}% looks off, measure again</div>` : ""}`;
   } else if (o.step === 2){
     const dW = Math.round((num(o.wT, NaN) - num(o.wNow, NaN)) * 10) / 10;
     body = `<div class="oq">Your targets</div>
-      <div class="lst">${inrow("Target weight", onbIn("wT", o.wT), "kg")}${inrow("Target body fat", onbIn("fT", o.fT), "%")}</div>
+      <div class="lst">${vrow("onb2", 0, "Target weight", vEmpty(o.wT) ? NOTSET : `${fmt(num(o.wT))} kg`)}${vrow("onb2", 1, "Target body fat", vEmpty(o.fT) ? NOTSET : `${fmt(num(o.fT))} %`)}</div>
       ${err || (!isNaN(dW) ? `<div class="onote">${dW === 0 ? "Hold your weight" : `${dW < 0 ? "&minus;" : "+"}${fmt(Math.abs(dW))} kg`} in ${fmt(num(o.len, 30))} days</div>` : "")}`;
   } else {
     const end = startOfDay(new Date()); end.setDate(end.getDate() + Math.max(1, Math.round(num(o.len, 30))) - 1);
     const opt = n => `<div class="ocard ${num(o.len) === n ? "on" : ""}" data-act="onblen" data-n="${n}">${n} days${num(o.len) === n ? `<span class="ok">${CK}</span>` : ""}</div>`;
     body = `<div class="oq">How long?</div>${opt(30)}${opt(60)}${opt(90)}
-      <div class="lst" style="margin-top:4px">${inrow("Custom", onbIn("len", o.len, "numeric"), "days")}</div>
+      <div class="lst" style="margin-top:4px">${vrow("onb3", 0, "Custom", `${fmt(num(o.len, 30))} days`)}</div>
       ${err || `<div class="onote">Ends ${pdate(iso(end))}</div>`}`;
   }
   const last = o.step === 3;
@@ -1795,10 +1792,10 @@ function pageWk(pg){
 
   return `${backLink()}<input class="ttlin" data-act="wktitle" data-w="${w.id}" value="${esc(w.title)}">
     <div class="lst" style="margin-top:16px">
-      ${selRow("Type", "wkwtype", `data-w="${w.id}"`, wtypeOfW(w), [...state.wtypes.map(t => [t.name, esc(cap1(t.name))]), ["__new", "New type&hellip;"]], `${wicon(w)}${esc(cap1(wtypeOfW(w)))}`)}
+      ${vrow("wktype", 0, "Type", `${wicon(w)}${esc(cap1(wtypeOfW(w)))}`, `data-w="${w.id}"`)}
       ${wtAdd === w.id ? `<div class="li col">${wtInset(w.id)}</div>` : ""}
       ${xrow("wdays", "Days", daysShort(w.days) || "Not scheduled", dayChips(w.days || [], "wkday", `data-w="${w.id}"`))}
-      ${isAct ? inrow("Duration", `<input class="vin" inputmode="numeric" data-act="wkmins" data-w="${w.id}" value="${esc(w.mins ?? 60)}">`, "min") : ""}
+      ${isAct ? vrow("wkdur", 0, "Duration", `${fmt(num(w.mins, 60))} min`, `data-w="${w.id}"`) : ""}
     </div>
     <div class="sech">Exercises</div>
     <div class="lst">
@@ -1815,11 +1812,12 @@ function pageEx(pg){
   if (!ex) return backLink();
   const time = ex.type === "time";
   const data = `data-w="${w.id}" data-ex="${ex.id}"`;
-  const f = (field, label, unit, mode) => inrow(label, `<input class="vin" inputmode="${mode}" data-act="exf" ${data} data-f="${field}" value="${esc(ex[field] ?? "")}">`, unit);
+  const vd = `data-w="${w.id}" data-id="${ex.id}"`;
+  const f = (i, field, label, unit) => vrow("exnum", i, label, `${fmt(num(ex[field], 0))}${unit ? " " + unit : ""}`, vd);
   return `${backLink()}<input class="ttlin" data-act="exf" ${data} data-f="name" value="${esc(ex.name)}">
     <div class="lst" style="margin-top:16px">
-      ${selRow("Tracking", "extype", data, time ? "time" : "str", [["str", "Sets &times; reps"], ["time", "Minutes"]])}
-      ${time ? f("mins", "Minutes", "", "numeric") : f("sets", "Sets", "", "numeric") + f("reps", "Reps", "", "numeric") + f("weight", "Weight", "kg", "decimal")}
+      ${vrow("extrack", 0, "Tracking", time ? "Minutes" : "Sets &times; reps", vd)}
+      ${time ? f(0, "mins", "Minutes", "min") : f(0, "sets", "Sets", "") + f(1, "reps", "Reps", "") + f(2, "weight", "Weight", "kg")}
     </div>
     ${delLink("delex", ex.id, data, "Delete exercise")}`;
 }
@@ -1836,30 +1834,15 @@ function pageMenu(){
 function pageMi(pg){
   const m = findMenu(pg.id); if (!m) return backLink();
   const days = m.days || [1, 2, 3, 4, 5, 6, 7];
-  const foods = (m.items || []).map((it, i) => {
-    const data = `data-m="${m.id}" data-i="${i}"`;
-    if (foodOpen !== i) return li(`<span class="grow">${esc(it.name)}</span><span class="lv dim">${esc(it.amt || "")}</span>`,
-      `data-act="fopen" data-i="${i}" data-drag-row data-id="${i}" data-hold="mfoods:${m.id}"`, "tap");
-    const p = parseAmt(it.amt);
-    const units = [...UNITS]; if (p.unit && !units.includes(p.unit)) units.push(p.unit);
-    return `<div class="li col" style="gap:10px">
-      <input class="fin" data-act="nmif" ${data} value="${esc(it.name)}">
-      <div class="row" style="gap:8px">
-        <input class="fin" style="width:78px;text-align:center" inputmode="decimal" placeholder="200" data-act="nmiqty" ${data} value="${esc(p.qty)}">
-        <select class="fin" style="width:84px" data-act="nmiunit" ${data}>${units.map(u => `<option value="${esc(u)}" ${u === p.unit ? "selected" : ""}>${esc(u)}</option>`).join("")}</select>
-        <span class="grow"></span>
-        ${delBtn("nmidel", `${m.id}:${i}`, data)}
-        <button class="okbtn" data-act="fclose" title="Done">${CK}</button>
-      </div>
-    </div>`;
-  }).join("");
+  const foods = (m.items || []).map((it, i) => li(`<span class="grow">${esc(it.name)}</span><span class="lv dim">${esc(it.amt || "")}</span>`,
+    `data-act="vopen" data-g="food" data-i="1" data-m="${m.id}" data-fi="${i}" data-drag-row data-id="${i}" data-hold="mfoods:${m.id}"`, "tap")).join("");
   return `${backLink()}<h1>${mLabel(m)}</h1>
     <div class="lst" style="margin-top:16px">
-      ${selRow("Type", "nmtype", `data-m="${m.id}"`, mtypeOf(m), MTYPES.map(t => [t, cap1(t)]))}
+      ${vrow("mtype", 0, "Type", mLabel(m), `data-m="${m.id}"`)}
       ${xrow("mdays", "Days", daysShort(m.days) || "Not scheduled", dayChips(days, "nmday", `data-m="${m.id}"`))}
     </div>
     <div class="sech">Foods</div>
-    <div class="lst">${foods}${addLi("nmiadd", "Add food", `data-m="${m.id}"`)}</div>
+    <div class="lst">${foods}${addLi("vopen", "Add food", `data-g="food" data-i="0" data-m="${m.id}"`)}</div>
     ${editAllLi()}
     ${delLink("nmdel", m.id, `data-m="${m.id}"`, `Delete ${mLabel(m).toLowerCase()}`)}`;
 }
@@ -1876,12 +1859,12 @@ function pageHabit(pg){
   const r = state.nutrition.rules.find(x => x.id === pg.id); if (!r) return backLink();
   const kind = r.kind || "check";
   const data = `data-r="${r.id}"`;
-  const tIn = `<input class="vin" inputmode="numeric" data-act="nrtarget" ${data} value="${esc(r.target ?? 1)}">`;
+  const vd = `data-id="${r.id}"`;
+  const tTxt = `${fmt(num(r.target, kind === "limit" ? 1 : 5))}${r.unit ? " " + esc(r.unit) : ""}`;
   const uIn = inrow("Unit", `<input class="vin" data-act="nrunit" ${data} value="${esc(r.unit || "")}" placeholder="optional">`);
-  let rows = selRow("Kind", "nrkind", data, kind, [["check", "Checkbox"], ["count", "Counter"], ["limit", "Limit"]]);
-  if (kind === "count") rows += inrow("Target per day", tIn) + uIn;
-  if (kind === "limit") rows += inrow("Limit", tIn)
-    + selRow("Per", "nrper", data, r.xper || "day", [["day", "Day"], ["week", "Week"], ["month", "Month"]]) + uIn;
+  let rows = vrow("hkind", 0, "Kind", { check: "Checkbox", count: "Counter", limit: "Limit" }[kind], vd);
+  if (kind === "count") rows += vrow("hnum", 0, "Target per day", tTxt, vd) + uIn;
+  if (kind === "limit") rows += vrow("hnum", 0, "Limit", tTxt, vd) + vrow("hnum", 1, "Per", cap1(r.xper || "day"), vd) + uIn;
   return `${backLink()}<input class="ttlin" data-act="nrulef" ${data} value="${esc(r.name)}">
     <div class="lst" style="margin-top:16px">${rows}</div>
     ${editAllLi()}
@@ -1901,9 +1884,9 @@ function pageXt(pg){
   const per = t.xper || "week", rp = t.replaces || "";
   return `${backLink()}<input class="ttlin" data-act="xtname" data-t="${t.id}" value="${esc(t.name)}">
     <div class="lst" style="margin-top:16px">
-      ${inrow("Points", `<input class="vin" inputmode="decimal" data-act="xtlimit" data-t="${t.id}" value="${esc(t.limit ?? 3)}">`)}
-      ${selRow("Per", "xtper", `data-t="${t.id}"`, per, [["day", "Day"], ["week", "Week"], ["month", "Month"]])}
-      ${selRow("Replaces", "xtrep", `data-t="${t.id}"`, rp, [["meal", "Meal"], ["snack", "Snack"], ["", "Nothing"]])}
+      ${vrow("xt", 0, "Points", `${fmt(num(t.limit, 3))} pts`, `data-id="${t.id}"`)}
+      ${vrow("xt", 1, "Per", cap1(per), `data-id="${t.id}"`)}
+      ${vrow("xt", 2, "Replaces", rp ? cap1(rp) : "Nothing", `data-id="${t.id}"`)}
     </div>
     <div class="sech">Options</div>
     <div class="lst">${opts.map(x => li(`<span class="grow">${amtLabel(x)}</span><span class="lv dim">${fmt(num(x.cost, 1))} pt${num(x.cost, 1) === 1 ? "" : "s"}</span>`,
@@ -1914,15 +1897,11 @@ function pageXt(pg){
 
 function pageXo(pg){
   const x = state.nutrition.exclusions.find(y => y.id === pg.id); if (!x) return backLink();
-  const p2 = parseAmt(x.amt);
-  const units = [...UNITS, ...(p2.unit && !UNITS.includes(p2.unit) ? [p2.unit] : [])];
   const data = `data-x="${x.id}"`;
   return `${backLink()}<input class="ttlin" data-act="xf" ${data} value="${esc(x.name)}">
     <div class="lst" style="margin-top:16px">
-      <div class="li"><span class="lk">Serving</span>
-        <input class="vin" size="${Math.max(3, String(p2.qty).length) + 1}" inputmode="decimal" placeholder="500" data-act="xq" ${data} value="${esc(p2.qty)}">
-        <select class="fin" style="width:78px;flex:none;padding:6px 8px" data-act="xu" ${data}>${units.map(u => `<option value="${esc(u)}" ${u === p2.unit ? "selected" : ""}>${esc(u)}</option>`).join("")}</select></div>
-      ${inrow("Points", `<input class="vin" inputmode="decimal" data-act="xcost" ${data} value="${esc(x.cost ?? 1)}">`)}
+      ${vrow("xo", 0, "Serving", x.amt ? esc(x.amt) : NOTSET, `data-id="${x.id}"`)}
+      ${vrow("xo", 1, "Points", `${fmt(num(x.cost, 1))} pts`, `data-id="${x.id}"`)}
       ${xrow("xdays", "Planned on", daysShort(x.days) || "Chooser only", dayChips(x.days || [1, 2, 3, 4, 5, 6, 7], "xday", data))}
     </div>
     ${delLink("xdel", x.id, data, "Delete option")}`;
@@ -1971,6 +1950,223 @@ function bootPages(){
   if (cycleEnded() && p.reviewed !== cycleEnd()){ p.reviewed = cycleEnd(); pages = [{ k: "review" }]; save(); }
 }
 
+/* ---------- value sheet: every number, choice and date is picked on a wheel (Apple style) ---------- */
+const WH = 40;                                   // wheel row height
+const MONTHS = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+const AMT_QTYS = [0, 0.25, 0.5, 0.75, 1, 1.5, 2, 2.5, 3, 4, 5, 6, 7, 8, 9, 10, 12, 15, 20, 25, 30, 35, 40, 45, 50, 60, 70, 75,
+  80, 90, 100, 110, 120, 125, 130, 140, 150, 160, 170, 175, 180, 190, 200, 220, 225, 250, 275, 300, 330, 350, 400, 450, 500,
+  600, 700, 750, 800, 900, 1000, 1250, 1500, 2000];
+const NOTSET = `<span style="color:var(--dim)">Not set</span>`;
+const F = {
+  num: (label, get, set, o) => ({ t: "num", label, get, set, ...o }),   // o: {min, max, dec, unit, def}
+  choice: (label, get, set, opts) => ({ t: "choice", label, get, set, opts }),
+  date: (label, get, set) => ({ t: "date", label, get, set }),
+  amt: (label, get, set) => ({ t: "amt", label, get, set }),
+  text: (label, get, set, ph) => ({ t: "text", label, get, set, ph })
+};
+const vEmpty = v => v == null || v === "" || (typeof v === "number" && isNaN(v));
+function vDisp(f, v){
+  if (f.t === "choice"){ const o = f.opts.find(x => x[0] === v); return o ? o[1] : NOTSET; }
+  if (f.t === "amt") return v ? esc(v) : NOTSET;
+  if (f.t === "text") return esc(v || "");
+  if (vEmpty(v)) return NOTSET;
+  if (f.t === "date") return parseIso(v).toLocaleDateString(undefined, { day: "numeric", month: "short", year: "numeric" });
+  return `${fmt(num(v))}${f.unit ? " " + f.unit : ""}`;
+}
+function wheelCols(f, v){
+  if (f.t === "choice") return [{ items: f.opts.map(o => o[1]), idx: Math.max(0, f.opts.findIndex(o => o[0] === v)) }];
+  if (f.t === "num"){
+    const ints = []; for (let x = f.min; x <= f.max; x++) ints.push(x);
+    let n = num(v, NaN); if (isNaN(n)) n = f.def != null ? f.def : f.min;
+    n = clamp(n, f.min, f.max + 0.9);
+    const ip = Math.floor(n + 1e-9), dp = Math.round((n - ip) * 10);
+    const cols = [{ items: ints.map(String), idx: clamp(ints.indexOf(ip), 0, ints.length - 1), cls: f.dec ? "wr" : "" }];
+    if (f.dec) cols.push({ items: [...Array(10).keys()].map(k => "." + k), idx: clamp(dp, 0, 9), cls: "wl" });
+    return cols;
+  }
+  if (f.t === "date"){
+    const d = parseIso(v || iso(new Date())), y0 = new Date().getFullYear();
+    const years = [y0 - 3, y0 - 2, y0 - 1, y0, y0 + 1];
+    return [{ items: [...Array(31).keys()].map(k => String(k + 1)), idx: d.getDate() - 1 },
+      { items: MONTHS, idx: d.getMonth() },
+      { items: years.map(String), idx: Math.max(0, years.indexOf(d.getFullYear())) }];
+  }
+  // amt: how much + unit
+  const p = parseAmt(v), q = num(p.qty, NaN);
+  const qs = AMT_QTYS.slice(); if (!isNaN(q) && !qs.includes(q)){ qs.push(q); qs.sort((a, b) => a - b); }
+  const units = [...UNITS]; if (p.unit && !units.includes(p.unit)) units.push(p.unit);
+  return [{ items: qs.map(x => x ? String(x) : "&ndash;"), vals: qs, idx: Math.max(0, qs.indexOf(isNaN(q) ? 100 : q)), cls: "wr" },
+    { items: units, vals: units, idx: Math.max(0, units.indexOf(p.unit || "g")), cls: "wu" }];
+}
+function wheelVal(f, idxs, cols){
+  if (f.t === "choice") return f.opts[idxs[0]][0];
+  if (f.t === "num") return Math.round((num(cols[0].items[idxs[0]]) + (f.dec ? idxs[1] / 10 : 0)) * 10) / 10;
+  if (f.t === "date"){
+    const y = +cols[2].items[idxs[2]], m = idxs[1], last = new Date(y, m + 1, 0).getDate();
+    return iso(new Date(y, m, Math.min(idxs[0] + 1, last)));
+  }
+  const q = cols[0].vals[idxs[0]];
+  return q ? `${q} ${cols[1].vals[idxs[1]]}` : "";
+}
+function vSheetHTML(){
+  const sh = sheet, f = sh.fields[sh.active];
+  const cols = f && f.t !== "text" ? wheelCols(f, sh.vals[sh.active]) : null;
+  sh.cols = cols;
+  if (cols && vEmpty(sh.vals[sh.active])) sh.vals[sh.active] = wheelVal(f, cols.map(c => c.idx), cols);   // opening a picker sets what it shows
+  const rows = sh.fields.map((fd, i) => fd.t === "text"
+    ? `<div class="li"><span class="lk">${fd.label}</span><input class="vtxt" data-act="vtext" data-i="${i}" value="${esc(sh.vals[i] ?? "")}" placeholder="${esc(fd.ph || "")}"></div>`
+    : `<div class="li tap" data-act="vfield" data-i="${i}"><span class="lk">${fd.label}</span><span class="lv ${i === sh.active ? "on" : ""}" data-v="${i}">${vDisp(fd, sh.vals[i])}</span></div>`).join("");
+  return `<div class="overlay" data-act="vcancel"></div>
+    <div class="vs${sheetNew ? "" : " noanim"}">
+      <div class="vhead"><button class="pill" data-act="vcancel">Cancel</button><button class="pill acc" data-act="vdone">Done</button></div>
+      <div class="vtitle">${esc(sh.title)}</div>
+      <div class="lst">${rows}</div>
+      ${sh.del ? `<button class="danger" data-act="vdel">${armed === "vdel" ? "Tap again to delete" : sh.del.label}</button>` : ""}
+      ${cols ? `<div class="wheel"><div class="wband"></div>${cols.map((c, ci) => `<div class="wcol ${c.cls || ""}" data-c="${ci}"><div class="wpad"></div>${c.items.map((it, k) =>
+        `<div class="witem ${k === c.idx ? "on" : ""}" data-act="witem" data-k="${k}">${it}</div>`).join("")}<div class="wpad"></div></div>`).join("")}${f.t === "num" && f.unit ? `<div class="wunit">${f.unit}</div>` : ""}</div>` : ""}
+    </div>`;
+}
+function wheelSettle(){
+  const sh = sheet; if (!sh || sh.kind !== "vals" || !sh.cols) return;
+  const cols = [...document.querySelectorAll(".vs .wcol")]; if (!cols.length) return;
+  const idxs = cols.map((c, ci) => clamp(Math.round(c.scrollTop / WH), 0, sh.cols[ci].items.length - 1));
+  const f = sh.fields[sh.active];
+  sh.vals[sh.active] = wheelVal(f, idxs, sh.cols);
+  sh.cols.forEach((c, ci) => c.idx = idxs[ci]);   // a repaint starts where the wheel stopped
+  const lv = document.querySelector(`.vs .lv[data-v="${sh.active}"]`);
+  if (lv) lv.innerHTML = vDisp(f, sh.vals[sh.active]);
+}
+function initWheels(){
+  const sh = sheet; if (!sh || sh.kind !== "vals" || !sh.cols) return;
+  [...document.querySelectorAll(".vs .wcol")].forEach((col, ci) => {
+    col.scrollTop = sh.cols[ci].idx * WH;
+    let t = null;
+    col.addEventListener("scroll", () => {
+      const k = Math.round(col.scrollTop / WH);
+      col.querySelectorAll(".witem.on").forEach(it => it.classList.remove("on"));
+      const it = col.children[k + 1]; if (it) it.classList.add("on");
+      clearTimeout(t); t = setTimeout(wheelSettle, 80);
+    }, { passive: true });
+  });
+}
+function openVals(spec, active){
+  sheet = { kind: "vals", title: spec.title, fields: spec.fields, vals: spec.fields.map(f => f.get()),
+    active: active != null ? active : (spec.active || 0), commit: spec.commit, del: spec.del };
+  sheetNew = true; armed = null;
+  render();
+  const f = sheet.fields[sheet.active];
+  if (f && f.t === "text"){ const inp = document.querySelector(`.vs input[data-i="${sheet.active}"]`); if (inp) inp.focus(); }
+}
+// which rows a sheet shows, where their values come from and where they go
+function groupSpec(g, d){
+  const p = state.profile;
+  const W = { min: 30, max: 200, dec: 1, unit: "kg", def: 70 };
+  const FAT = { min: 3, max: 50, dec: 1, unit: "%", def: 15 };
+  const PER = [["day", "Day"], ["week", "Week"], ["month", "Month"]];
+  if (g === "cycle") return { title: "Goal and targets", fields: [
+    F.choice("Goal", () => p.mode, v => { p.mode = v; }, [["cut", "Cut"], ["maintain", "Maintain"], ["bulk", "Bulk"]]),
+    F.num("Length", () => num(p.regimeDays, 30), v => { p.regimeDays = p.lenPlan = Math.max(1, Math.round(v)); }, { min: 1, max: 365, unit: "days" }),
+    F.num("Target weight", () => p.weightTarget, v => { p.weightTarget = v; }, W),
+    F.num("Target body fat", () => p.fatTarget, v => { p.fatTarget = v; }, FAT)] };
+  if (g === "log"){
+    const isW = gMetric === "weight", k = isW ? "weight" : "fat", other = isW ? "fat" : "weight";
+    const old = d.d ? state.measurements.find(x => x.date === d.d) : null;
+    const logs = (state.measurements || []).filter(x => x[k] != null && !isNaN(num(x[k], NaN))).sort((a, b) => a.date < b.date ? -1 : 1);
+    const latest = logs.length ? num(logs[logs.length - 1][k]) : num(p[isW ? "weightNow" : "fatNow"], NaN);
+    const dropIfEmpty = m => { if (m[other] == null) state.measurements = state.measurements.filter(x => x !== m); };
+    return {
+      title: old ? (isW ? "Weight log" : "Body fat log") : (isW ? "New weight log" : "New body fat log"),
+      fields: [F.date("Date", () => old ? old.date : iso(new Date()), null), F.num(isW ? "Weight" : "Body fat", () => old ? num(old[k]) : latest, null, isW ? W : FAT)],
+      commit: ([nd, nv]) => {
+        if (!nd || vEmpty(nv)) return false;
+        if (old && nd === old.date) old[k] = nv;
+        else {
+          if (old){ delete old[k]; dropIfEmpty(old); }   // only this metric moves; never fabricate the other one
+          let m = state.measurements.find(x => x.date === nd);
+          if (!m){ m = { date: nd }; state.measurements.push(m); }
+          m[k] = nv;
+        }
+        syncNow(); gSel = null;
+      },
+      del: old ? { label: "Delete log", run: () => { delete old[k]; dropIfEmpty(old); syncNow(); gSel = null; } } : null };
+  }
+  if (g === "onb1"){
+    const tape0 = [onb.h, onb.waist, onb.neck].map(String).join("|");
+    return { title: "Where you are now", fields: [
+      F.num("Weight", () => onb.wNow, v => { onb.wNow = v; }, W),
+      F.num("Body fat", () => onb.fNow, v => { onb.fNow = v; }, FAT),
+      F.num("Height", () => onb.h, v => { onb.h = v; }, { min: 120, max: 220, unit: "cm", def: 175 }),
+      F.num("Waist", () => onb.waist, v => { onb.waist = v; }, { min: 50, max: 150, dec: 1, unit: "cm", def: 80 }),
+      F.num("Neck", () => onb.neck, v => { onb.neck = v; }, { min: 25, max: 60, dec: 1, unit: "cm", def: 38 })],
+      commit: () => {   // new tape measurements fill in body fat
+        if ([onb.h, onb.waist, onb.neck].map(String).join("|") !== tape0){
+          const tb = tapeBF({ heightCm: onb.h, waistCm: onb.waist, neckCm: onb.neck });
+          if (tb.state === "ok") onb.fNow = tb.bf;
+        }
+        onb.err = null;
+      } };
+  }
+  if (g === "onb2") return { title: "Your targets", fields: [
+    F.num("Target weight", () => onb.wT, v => { onb.wT = v; }, W),
+    F.num("Target body fat", () => onb.fT, v => { onb.fT = v; }, FAT)], commit: () => { onb.err = null; } };
+  if (g === "onb3") return { title: "Length", fields: [
+    F.num("Length", () => num(onb.len, 30), v => { onb.len = v; }, { min: 1, max: 365, unit: "days" })], commit: () => { onb.err = null; } };
+  const w = d.w ? findWk(d.w) : null;
+  const ex = w && d.id ? (w.exercises || []).find(x => x.id === d.id) : null;
+  if (g === "extrack" && ex) return { title: ex.name, fields: [
+    F.choice("Tracking", () => ex.type === "time" ? "time" : "str", v => {
+      if (v === "time"){ ex.type = "time"; if (ex.mins == null) ex.mins = 30; }
+      else { delete ex.type; if (ex.sets == null) ex.sets = 3; if (ex.reps == null) ex.reps = 10; if (ex.weight == null) ex.weight = 0; }
+    }, [["str", "Sets &times; reps"], ["time", "Minutes"]])] };
+  if (g === "exnum" && ex) return { title: ex.name, fields: ex.type === "time"
+    ? [F.num("Minutes", () => num(ex.mins, 30), v => { ex.mins = v; }, { min: 1, max: 300, unit: "min" })]
+    : [F.num("Sets", () => num(ex.sets, 3), v => { ex.sets = v; }, { min: 1, max: 20 }),
+       F.num("Reps", () => num(ex.reps, 10), v => { ex.reps = v; }, { min: 1, max: 200 }),
+       F.num("Weight", () => num(ex.weight, 0), v => { ex.weight = v; }, { min: 0, max: 300, dec: 1, unit: "kg" })] };
+  if (g === "wktype" && w) return { title: w.title, fields: [
+    F.choice("Type", () => wtypeOfW(w), v => { if (v === "__new"){ wtAdd = w.id; wtAddIcon = null; wtAddName = ""; } else w.wtype = v; },
+      [...state.wtypes.map(t => [t.name, esc(cap1(t.name))]), ["__new", "New type&hellip;"]])] };
+  if (g === "wkdur" && w) return { title: w.title, fields: [
+    F.num("Duration", () => num(w.mins, 60), v => { w.mins = v; }, { min: 5, max: 300, unit: "min" })] };
+  const m = d.m ? findMenu(d.m) : null;
+  if (g === "mtype" && m) return { title: mLabel(m), fields: [
+    F.choice("Type", () => mtypeOf(m), v => { m.mtype = v; }, MTYPES.map(t => [t, cap1(t)]))] };
+  if (g === "food" && m){
+    const i = d.fi != null && d.fi !== "" ? +d.fi : null, it = i != null ? (m.items || [])[i] : null;
+    return { title: it ? "Food" : "New food", fields: [F.text("Name", () => it ? it.name : "", null, "Oatmeal"), F.amt("Amount", () => it ? it.amt : "", null)],
+      commit: ([name, amt]) => {
+        const nm = String(name || "").trim(); if (!nm) return false;
+        if (it){ it.name = nm; it.amt = amt || ""; } else (m.items = m.items || []).push({ name: nm, amt: amt || "" });
+      },
+      del: it ? { label: "Delete food", run: () => { m.items.splice(i, 1); } } : null };
+  }
+  const r = d.id ? state.nutrition.rules.find(x => x.id === d.id) : null;
+  if (g === "hkind" && r) return { title: r.name, fields: [
+    F.choice("Kind", () => r.kind || "check", v => {
+      if (v === "count"){ r.kind = "count"; if (r.target == null) r.target = 5; }
+      else if (v === "limit"){ r.kind = "limit"; if (r.target == null) r.target = 1; }
+      else r.kind = "check";
+    }, [["check", "Checkbox"], ["count", "Counter"], ["limit", "Limit"]])] };
+  if (g === "hnum" && r){
+    const lim = r.kind === "limit";
+    const tF = F.num(lim ? "Limit" : "Target per day", () => num(r.target, lim ? 1 : 5), v => { r.target = Math.max(lim ? 0 : 1, Math.round(v)); },
+      { min: lim ? 0 : 1, max: 100, unit: r.unit || "" });
+    return { title: r.name, fields: lim ? [tF, F.choice("Per", () => r.xper || "day", v => { r.xper = v; }, PER)] : [tF] };
+  }
+  const t = d.id ? state.xtypes.find(x => x.id === d.id) : null;
+  if (g === "xt" && t) return { title: t.name, fields: [
+    F.num("Points", () => num(t.limit, 3), v => { t.limit = v; }, { min: 0, max: 50, dec: 1, unit: "pts" }),
+    F.choice("Per", () => t.xper || "week", v => { t.xper = v; }, PER),
+    F.choice("Replaces", () => t.replaces || "", v => { t.replaces = v; }, [["meal", "Meal"], ["snack", "Snack"], ["", "Nothing"]])] };
+  const x = d.id ? state.nutrition.exclusions.find(y => y.id === d.id) : null;
+  if (g === "xo" && x) return { title: x.name, fields: [
+    F.amt("Serving", () => x.amt || "", v => { x.amt = v; }),
+    F.num("Points", () => num(x.cost, 1), v => { x.cost = v; }, { min: 0, max: 20, dec: 1, unit: "pts" })] };
+  return null;
+}
+// a page row that opens the value sheet at that row
+const vrow = (g, i, label, value, data = "") => `<div class="li tap" data-act="vopen" data-g="${g}" data-i="${i}" ${data}><span class="lk">${label}</span><span class="lv">${value}</span></div>`;
+
 /* ---------- shell ---------- */
 const TABS = [
   { id:"home",      label:"Home",      icon:'<path d="M5 12l-2 0l9 -9l9 9l-2 0" /> <path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-7" /> <path d="M9 21v-6a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v6" />' },
@@ -2014,7 +2210,12 @@ function render(){
     pcar1.onscroll();
   }
   const sroot = document.getElementById("sheetRoot");
-  if (sheet){
+  if (sheet && sheet.kind === "vals"){
+    sroot.innerHTML = vSheetHTML();
+    document.body.style.overflow = "hidden";
+    sheetNew = false;
+    initWheels();
+  } else if (sheet){
     let title = "", content = "", foot = `<button data-act="shcancel">Close</button>`;
     if (sheet.kind === "pick"){
       const m = state.nutrition.menu.find(x => x.id === sheet.mid) || { name: "", alts: [] };
@@ -2104,8 +2305,32 @@ document.addEventListener("click", e => {
   }
   if (el.tagName === "SELECT" || el.tagName === "INPUT") return;   // fields act on change, not on tap
   const a = el.dataset.act;
-  const ARMED_ACTS = ["nreset", "delwk", "pdel", "nmdel", "ndel", "xdel", "delex", "nmidel", "xtdel", "gldel", "npresetdel", "delrule", "endcyc", "npreset"];
+  const ARMED_ACTS = ["nreset", "delwk", "pdel", "nmdel", "ndel", "xdel", "delex", "nmidel", "xtdel", "gldel", "npresetdel", "delrule", "endcyc", "npreset", "vdel"];
   if (armed && !ARMED_ACTS.includes(a)) armed = null;
+
+  // ---------- value sheet ----------
+  if (a === "vopen"){ const spec = groupSpec(el.dataset.g, el.dataset); if (spec) openVals(spec, el.dataset.i != null ? +el.dataset.i : null); return; }
+  if (a === "vfield"){
+    if (!sheet || sheet.kind !== "vals") return;
+    wheelSettle();
+    sheet.active = +el.dataset.i; render(); return;
+  }
+  if (a === "witem"){ const col = el.parentElement; col.scrollTo({ top: +el.dataset.k * WH, behavior: "smooth" }); return; }
+  if (a === "vcancel"){ sheet = null; render(); return; }
+  if (a === "vdone"){
+    const sh = sheet; if (!sh || sh.kind !== "vals") return;
+    wheelSettle();
+    if (document.activeElement && document.activeElement.blur) document.activeElement.blur();
+    sh.fields.forEach((f, i) => { if (f.set) f.set(sh.vals[i]); });
+    if (sh.commit && sh.commit(sh.vals) === false) return;
+    sheet = null; save(); render(); return;
+  }
+  if (a === "vdel"){
+    if (armed !== "vdel"){ armed = "vdel"; render(); return; }
+    armed = null;
+    const sh = sheet; if (sh && sh.del) sh.del.run();
+    sheet = null; save(); render(); return;
+  }
 
   // ---------- pages ----------
   if (a === "back"){ popPage(); return; }
@@ -2691,6 +2916,7 @@ document.addEventListener("change", e => {
 document.addEventListener("input", e => {
   const t = e.target;
   if (t.classList && t.classList.contains("vin")) t.size = Math.max(1, (t.value || t.placeholder || "").length) + 1;
+  if (t.dataset && t.dataset.act === "vtext" && sheet && sheet.kind === "vals") sheet.vals[+t.dataset.i] = t.value;
 });
 // onboarding fields keep the draft as you type; tape measurements fill in body fat
 document.addEventListener("input", e => {
