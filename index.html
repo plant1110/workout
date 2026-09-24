@@ -300,7 +300,11 @@ nav svg{width:25px;height:25px;stroke:currentColor;fill:none;stroke-width:1.8;st
 .tiles{display:flex;gap:10px;margin:2px 0 14px}
 .tile{flex:1;min-width:0;background:var(--card);border-radius:20px;padding:13px 14px 6px}
 .tile .tt{display:flex;align-items:center;justify-content:space-between;font-size:17px;font-weight:600}
-.tile .tb{font-size:23px;font-weight:650;letter-spacing:-.3px;margin-top:6px}
+.tile .tb{font-size:23px;font-weight:650;letter-spacing:-.3px;margin-top:4px;white-space:nowrap}
+.tile .tb b{font-size:30px;font-weight:700;letter-spacing:-.5px}
+.tile .tb i{font-style:normal;font-size:17px;font-weight:500;letter-spacing:0;color:var(--dim)}
+.tile .tt span{display:flex;align-items:center;gap:7px}
+.tic{width:20px;height:20px;flex:none;fill:none;stroke:currentColor;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
 .tile .tf{display:flex;align-items:center;justify-content:space-between;gap:6px;font-size:15px;color:var(--dim)}
 .tile .tf .x{padding:6px 0 6px 10px;font-size:22px}
 .rb{background:none;border:0;padding:0;display:flex;cursor:pointer}
@@ -1394,7 +1398,8 @@ const NICONS = {
   habits: '<path d="M12 12m-9 0a9 9 0 1 0 18 0a9 9 0 1 0 -18 0" /> <path d="M9 12l2 2l4 -4" />',
   menu:   '<path d="M19 3v12h-5c-.023 -3.681 .184 -7.406 5 -12zm0 12v6h-1v-3m-10 -14v17m-3 -17v3a3 3 0 1 0 6 0v-3" />',
   limits: '<path d="M12 21.5c-3.04 0 -5.952 -.714 -8.5 -1.983l8.5 -16.517l8.5 16.517a19.09 19.09 0 0 1 -8.5 1.983z" /> <path d="M5.38 15.866a14.94 14.94 0 0 0 6.815 1.634a14.944 14.944 0 0 0 6.502 -1.479" /> <path d="M13 11.01v-.01" /> <path d="M11 14v-.01" />',
-  presets: '<path d="M18 7v14l-6 -4l-6 4v-14a4 4 0 0 1 4 -4h4a4 4 0 0 1 4 4z" />'
+  presets: '<path d="M18 7v14l-6 -4l-6 4v-14a4 4 0 0 1 4 -4h4a4 4 0 0 1 4 4z" />',
+  water:  '<path d="M7.502 19.423c2.602 2.105 6.395 2.105 8.996 0c2.602 -2.105 3.262 -5.708 1.566 -8.546l-4.89 -7.26c-.42 -.625 -1.287 -.803 -1.936 -.397a1.376 1.376 0 0 0 -.41 .397l-4.893 7.26c-1.695 2.838 -1.035 6.441 1.567 8.546z" />'
 };
 const nicon = k => `<span class="wicon" style="width:21px;height:21px">&#8203;<svg viewBox="0 0 24 24">${NICONS[k]}</svg></span>`;
 const secTitle = (k, label, done) => `<div class="row" style="gap:9px">${nicon(k)}<div style="font-size:19px;font-weight:650;${done ? "color:var(--dim);text-decoration:line-through" : ""}">${label}</div></div>`;
@@ -1587,15 +1592,23 @@ function viewNutrition(){
   // the two things you count sit on top; their text says what's left (the ring already shows what's done)
   const wt = waterOf(), wc = num(l.water, 0), wT = Math.max(1, num(wt.target, 8)), wDone = wc >= wT;
   const pts = cheatPoints(sel), lim = num(state.cheats.limit, 0), over = pts > lim;
-  // the whole tile is the button (count one / spend); only the minus undoes
-  const tile = (name, act, ring, big, bigCol, sub, minusAct, data) => `<div class="tile tap" data-act="${act}" ${data}>
-      <div class="tt"><span>${name}</span>${ring}</div>
+  // the whole tile is the button (count one / spend); only the minus undoes.
+  // number first: the number big, its word small; the second line says what's counted and for when
+  const tile = (name, icon, iconCol, act, ring, big, bigCol, sub, minusAct, data) => `<div class="tile tap" data-act="${act}" ${data}>
+      <div class="tt"><span><svg class="tic" viewBox="0 0 24 24" style="color:${iconCol}">${icon}</svg>${name}</span>${ring}</div>
       <div class="tb" style="${bigCol ? `color:${bigCol}` : ""}">${big}</div>
       <div class="tf"><span>${sub}</span>${minusBtn(minusAct, data)}</div>
     </div>`;
+  const one = (n, u) => n === 1 ? u.replace(/sses$/, "ss").replace(/([^s])s$/, "$1") : u;   // 1 glass, 1 point
+  const wU = wt.unit || "glasses", wLeft = wT - wc, wWhen = sel === iso(new Date()) ? "today" : "that day";
+  const cN = over ? pts - lim : Math.max(0, lim - pts);
   html += `<div class="tiles">
-    ${tile("Water", "hplus", cring(wc, wT, "#38bdf8"), wDone ? "Done" : `${fmt(wT - wc)} more`, wDone ? "#38bdf8" : "", sel === iso(new Date()) ? "today" : "that day", "hminus", `data-r="water"`)}
-    ${tile("Cheats", "xspend", cring(pts, lim, over ? "var(--bad)" : "var(--warm)"), over ? `${fmt(pts - lim)} over` : `${fmt(Math.max(0, lim - pts))} left`, over ? "var(--bad)" : "", perWord(sel), "xundo", "")}
+    ${tile("Water", NICONS.water, "#38bdf8", "hplus", cring(wc, wT, "#38bdf8"),
+      wDone ? `<b>Done</b>` : `<b>${fmt(wLeft)}</b><i> more</i>`, wDone ? "#38bdf8" : "",
+      `${wDone ? `${fmt(wT)} ${esc(wU)}` : esc(one(wLeft, wU))} ${wWhen}`, "hminus", `data-r="water"`)}
+    ${tile("Cheats", NICONS.limits, "var(--warm)", "xspend", cring(pts, lim, over ? "var(--bad)" : "var(--warm)"),
+      `<b>${fmt(cN)}</b><i${over ? ` style="color:inherit"` : ""}> ${over ? "over" : "left"}</i>`, over ? "var(--bad)" : "",
+      `${one(cN, "points")} ${perWord(sel)}`, "xundo", "")}
   </div>`;
   if (num((state.nutrition.xnoslot || {})[sel], 0)) html += `<div class="onote" style="color:var(--bad);margin:-4px 4px 12px">Cheat used with no free slot, so this day doesn't count</div>`;
   // the meals: one card, a block per meal (name + check, its foods listed underneath)
