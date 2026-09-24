@@ -1399,7 +1399,12 @@ const NICONS = {
 const nicon = k => `<span class="wicon" style="width:21px;height:21px">&#8203;<svg viewBox="0 0 24 24">${NICONS[k]}</svg></span>`;
 const secTitle = (k, label, done) => `<div class="row" style="gap:9px">${nicon(k)}<div style="font-size:19px;font-weight:650;${done ? "color:var(--dim);text-decoration:line-through" : ""}">${label}</div></div>`;
 
-const perWord = () => { const per = (state.cheats || {}).xper || "week"; return per === "day" ? "today" : per === "month" ? "this month" : "this week"; };
+const perWord = ds => {
+  const per = (state.cheats || {}).xper || "week", t = iso(new Date());
+  if (per === "day") return ds === t ? "today" : "that day";
+  if (per === "month") return ds.slice(0, 7) === t.slice(0, 7) ? "this month" : "that month";
+  return iso(mondayOf(parseIso(ds))) === iso(mondayOf(new Date())) ? "this week" : "that week";
+};
 const weekOkFor = ds => cheatPoints(ds) <= num((state.cheats || {}).limit, 0);
 const waterOf = () => state.nutrition.water || { target: 8, unit: "glasses" };
 
@@ -1588,10 +1593,9 @@ function viewNutrition(){
       <div class="tb" style="${bigCol ? `color:${bigCol}` : ""}">${big}</div>
       <div class="tf"><span>${sub}</span>${minusBtn(minusAct, data)}</div>
     </div>`;
-  const unit = esc(wt.unit || "glasses");
   html += `<div class="tiles">
-    ${tile("Water", "hplus", cring(wc, wT, "#38bdf8"), wDone ? "Done" : `${fmt(wT - wc)} to go`, wDone ? "#38bdf8" : "", wDone ? `${fmt(wT)} ${unit}` : unit, "hminus", `data-r="water"`)}
-    ${tile("Cheats", "xspend", cring(pts, lim, over ? "var(--bad)" : "var(--warm)"), over ? `${fmt(pts - lim)} over` : `${fmt(Math.max(0, lim - pts))} left`, over ? "var(--bad)" : "", `points ${perWord()}`, "xundo", "")}
+    ${tile("Water", "hplus", cring(wc, wT, "#38bdf8"), wDone ? "Done" : `${fmt(wT - wc)} more`, wDone ? "#38bdf8" : "", sel === iso(new Date()) ? "today" : "that day", "hminus", `data-r="water"`)}
+    ${tile("Cheats", "xspend", cring(pts, lim, over ? "var(--bad)" : "var(--warm)"), over ? `${fmt(pts - lim)} over` : `${fmt(Math.max(0, lim - pts))} left`, over ? "var(--bad)" : "", perWord(sel), "xundo", "")}
   </div>`;
   if (num((state.nutrition.xnoslot || {})[sel], 0)) html += `<div class="onote" style="color:var(--bad);margin:-4px 4px 12px">Cheat used with no free slot, so this day doesn't count</div>`;
   // the meals: one card, a block per meal (name + check, its foods listed underneath)
