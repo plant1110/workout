@@ -1171,9 +1171,9 @@ function viewHome(){
     <span><svg viewBox="0 0 24 24">${TABS[2].icon}</svg>${daysDone("n")}</span>
   </div>
   <div class="card">
-    <div class="brow"><span class="bgoal" style="${wS.length ? "color:var(--acc);font-weight:600" : ""}">Weight</span><span><span class="bnum">${fmt(num(p.weightNow))}</span><span class="bgoal"> &rarr; ${fmt(num(p.weightTarget))} kg</span></span></div>
+    <div class="brow"><span class="bgoal" style="${wp > 0 ? "color:var(--acc);font-weight:600" : ""}">Weight</span><span><span class="bnum">${fmt(num(p.weightNow))}</span><span class="bgoal"> &rarr; ${fmt(num(p.weightTarget))} kg</span></span></div>
     <div class="bar2"><i style="width:${(wp * 100).toFixed(0)}%"></i></div>
-    <div class="brow" style="margin-top:18px"><span class="bgoal" style="${fS.length ? "color:var(--warm);font-weight:600" : ""}">Body fat</span><span><span class="bnum">${fmt(num(p.fatNow))}</span><span class="bgoal"> &rarr; ${fmt(num(p.fatTarget))} %</span></span></div>
+    <div class="brow" style="margin-top:18px"><span class="bgoal" style="${fp > 0 ? "color:var(--warm);font-weight:600" : ""}">Body fat</span><span><span class="bnum">${fmt(num(p.fatNow))}</span><span class="bgoal"> &rarr; ${fmt(num(p.fatTarget))} %</span></span></div>
     <div class="bar2 warm"><i style="width:${(fp * 100).toFixed(0)}%"></i></div>
     ${wS.length || fS.length ? `<div class="tchart">${trend2Svg([
       { pts: wS, target: tv("weightTarget"), color: "var(--acc)" },
@@ -1211,8 +1211,9 @@ function trend2Svg(series, fromIso, toIso){
     else { hiV = Math.max(...vs, g ?? -Infinity); loV = Math.min(...vs, g ?? Infinity); }
     const flat = hiV - loV < 1e-9;
     const py = v => flat ? (yHi + yLo) / 2 : clamp(yHi + (yLo - yHi) * (hiV - v) / (hiV - loV), yHi - 16, yLo + 14);
+    const atGoal = v => g != null && Math.abs(v - g) < 1e-9;
     body += (flat ? [hiV] : [hiV, loV]).map(v => `<line x1="${L}" y1="${py(v).toFixed(1)}" x2="${W - 4}" y2="${py(v).toFixed(1)}" stroke="#262f3b" stroke-width="1.2" stroke-dasharray="3 5"/>
-      <text x="${L - 7}" y="${(py(v) + 4.5).toFixed(1)}" text-anchor="end" style="font-size:13px;fill:var(--dim)">${fmt(v)}</text>`).join("");
+      ${atGoal(v) ? "" : `<text x="${L - 7}" y="${(py(v) + 4.5).toFixed(1)}" text-anchor="end" style="font-size:13px;fill:var(--dim)">${fmt(v)}</text>`}`).join("");
     const P = sr.pts.map(q => [px(parseIso(q.date).getTime()), py(q.v)]);
     if (g != null){
       const lp = P[P.length - 1];
