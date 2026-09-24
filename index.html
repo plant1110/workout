@@ -309,7 +309,7 @@ nav svg{width:25px;height:25px;stroke:currentColor;fill:none;stroke-width:1.8;st
 .mblk > .fl{padding:0 16px 14px;margin-top:-6px}
 .shs{font-size:15px;color:var(--dim);font-weight:400;margin-top:1px}
 /* home: two-line chart, photo thumbnails */
-.tchart{margin-top:16px}
+.tchart{margin-top:24px}
 .prow{display:flex;gap:10px;overflow-x:auto;padding:0 2px 4px;margin-bottom:6px;scrollbar-width:none;-webkit-overflow-scrolling:touch}
 .prow::-webkit-scrollbar{display:none}
 .ptile{flex:none;width:92px;height:122px;border-radius:16px;overflow:hidden;position:relative;background:var(--card);cursor:pointer}
@@ -367,10 +367,9 @@ nav svg{width:25px;height:25px;stroke:currentColor;fill:none;stroke-width:1.8;st
 .bnum{font-size:23px;font-weight:650;letter-spacing:-.3px}
 .bgoal{font-size:16px;color:var(--dim)}
 .bar2{height:5px;background:#222a34;border-radius:9px;margin-top:9px;overflow:hidden}
-.htop{padding:16px 16px 14px}
+.htop{padding:18px 16px 12px}
 .hmet{cursor:pointer;user-select:none;-webkit-user-select:none}
 .blab{font-size:16px;color:var(--dim)}
-.tpanel{background:var(--card2);border-radius:16px;padding:10px 10px 4px;margin-top:18px}
 .tnone{padding:30px 0 34px;text-align:center;font-size:16px;color:var(--dim)}
 .bar2 > i{display:block;height:100%;border-radius:9px;background:var(--acc)}
 .bar2.warm > i{background:var(--warm)}
@@ -1187,7 +1186,7 @@ function viewHome(){
     <div class="htop">
       ${mrow("weight", "Weight", p.weightNow, p.weightTarget, "kg", wp, "var(--acc)", true)}
       ${mrow("fat", "Body fat", p.fatNow, p.fatTarget, "%", fp, "var(--warm)", false)}
-      <div class="tpanel">${pts.length ? trendSvg({ pts, target: tv(isW ? "weightTarget" : "fatTarget"), color: isW ? "var(--acc)" : "var(--warm)" }, from, to)
+      <div class="tchart">${pts.length ? trendSvg({ pts, target: tv(isW ? "weightTarget" : "fatTarget"), color: isW ? "var(--acc)" : "var(--warm)" }, from, to)
         : `<div class="tnone">No ${isW ? "weight" : "body fat"} logs yet</div>`}</div>
     </div>
     ${logRows(mk, from, to)}
@@ -1196,12 +1195,13 @@ function viewHome(){
   ${photosRow()}
   <div class="sech">Cycles</div><div class="lst">${cycleRows()}</div>`;
 }
-// the trend, drawn like the approved draft: one line between two dashed guides (its first log and
-// its goal), the start value dim on the left, the goal a ring at the cycle end with its value above
+// the trend: the dotted line is the plan, straight from the first log to the goal at the cycle end;
+// the solid line is what was logged, today's (latest) point ringed. Only the start value and the
+// goal are written on the chart; the axis lines carry no numbers.
 function trendSvg(sr, fromIso, toIso){
-  const W = 330, H = 147, L = 40, xR = W - 12, yHi = 26, yLo = 109, base = 126;
-  const x0 = parseIso(fromIso).getTime(), x1 = parseIso(toIso).getTime();
-  const px = t => L + 4 + (xR - L - 4) * (x1 === x0 ? 0.5 : (t - x0) / (x1 - x0));
+  const W = 330, H = 150, AX = 10, xL = 18, xR = 316, yTop = 26, yBot = 112, base = 128;
+  const t0 = parseIso(fromIso).getTime(), t1 = parseIso(toIso).getTime();
+  const px = t => xL + (xR - xL) * (t1 === t0 ? 0.5 : (t - t0) / (t1 - t0));
   const path = P => {
     let d = `M${P[0][0].toFixed(1)},${P[0][1].toFixed(1)}`;
     for (let i = 0; i < P.length - 1; i++){
@@ -1211,34 +1211,30 @@ function trendSvg(sr, fromIso, toIso){
     return d;
   };
   const vs = sr.pts.map(q => q.v), first = vs[0], g = sr.target;
-  // the guides sit at the first log and the goal; without a distinct goal, at the logs' range
-  let hiV, loV;
-  if (g != null && Math.abs(g - first) > 1e-9){ hiV = Math.max(first, g); loV = Math.min(first, g); }
-  else { hiV = Math.max(...vs, g ?? -Infinity); loV = Math.min(...vs, g ?? Infinity); }
+  const hiV = Math.max(...vs, g ?? -Infinity), loV = Math.min(...vs, g ?? Infinity);
   const flat = hiV - loV < 1e-9;
-  const py = v => flat ? (yHi + yLo) / 2 : clamp(yHi + (yLo - yHi) * (hiV - v) / (hiV - loV), yHi - 16, yLo + 12);
-  const atGoal = v => g != null && Math.abs(v - g) < 1e-9;
-  let body = (flat ? [hiV] : [hiV, loV]).map(v => `<line x1="${L}" y1="${py(v).toFixed(1)}" x2="${W - 4}" y2="${py(v).toFixed(1)}" stroke="#2a3340" stroke-width="1.2" stroke-dasharray="3 5"/>
-    ${atGoal(v) ? "" : `<text x="${L - 7}" y="${(py(v) + 4.5).toFixed(1)}" text-anchor="end" style="font-size:13px;fill:var(--dim)">${fmt(v)}</text>`}`).join("");
+  const py = v => flat ? (yTop + yBot) / 2 : yTop + (yBot - yTop) * (hiV - v) / (hiV - loV);
   const P = sr.pts.map(q => [px(parseIso(q.date).getTime()), py(q.v)]);
-  if (g != null){
-    const lp = P[P.length - 1];
-    body += `<line x1="${lp[0].toFixed(1)}" y1="${lp[1].toFixed(1)}" x2="${xR}" y2="${py(g).toFixed(1)}" stroke="${sr.color}" stroke-width="1.8" stroke-dasharray="2 6" stroke-linecap="round" opacity=".6"/>`;
-  }
+  const f = n => n.toFixed(1), now = P[P.length - 1];
+  let body = `<line x1="${AX}" y1="8" x2="${AX}" y2="${base}" stroke="#34404e" stroke-width="1.4"/>
+    <line x1="${AX}" y1="${base}" x2="${W - 4}" y2="${base}" stroke="#34404e" stroke-width="1.4"/>`;
+  if (g != null) body += `<line x1="${f(P[0][0])}" y1="${f(P[0][1])}" x2="${xR}" y2="${f(py(g))}" stroke="${sr.color}" stroke-width="1.8" stroke-dasharray="2 6" stroke-linecap="round" opacity=".5"/>`;
   if (P.length > 1) body += `<path d="${path(P)}" fill="none" stroke="${sr.color}" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>`;
-  body += P.map(q => `<circle cx="${q[0].toFixed(1)}" cy="${q[1].toFixed(1)}" r="4.2" fill="${sr.color}" stroke="var(--card2)" stroke-width="1.6"/>`).join("");
+  body += P.slice(0, -1).map((q, i) => `<circle cx="${f(q[0])}" cy="${f(q[1])}" r="${i === 0 ? 4.2 : 3}" fill="${sr.color}" stroke="var(--card)" stroke-width="1.4"/>`).join("");
+  body += `<circle cx="${f(now[0])}" cy="${f(now[1])}" r="9.5" fill="${sr.color}" opacity=".2"/>
+    <circle cx="${f(now[0])}" cy="${f(now[1])}" r="5.2" fill="${sr.color}" stroke="var(--card)" stroke-width="1.6"/>`;
+  body += `<text x="${f(P[0][0] - 2)}" y="${f(P[0][1] - 12)}" style="font-size:13px;fill:var(--dim)">${fmt(first)}</text>`;
   if (g != null){
     const gy = py(g);
-    body += `<circle cx="${xR}" cy="${gy.toFixed(1)}" r="5" fill="var(--card2)" stroke="${sr.color}" stroke-width="2.5"/>
-      <text x="${xR - 3}" y="${(gy - 11).toFixed(1)}" text-anchor="middle" style="font-size:14.5px;font-weight:700;fill:${sr.color}">${fmt(g)}</text>`;
+    body += `<circle cx="${xR}" cy="${f(gy)}" r="5" fill="var(--card)" stroke="${sr.color}" stroke-width="2.5"/>
+      <text x="${xR - 3}" y="${f(gy - 11)}" text-anchor="middle" style="font-size:14.5px;font-weight:700;fill:${sr.color}">${fmt(g)}</text>`;
   }
-  const mid = new Date((x0 + x1) / 2);
+  const mid = new Date((t0 + t1) / 2);
   return `<svg viewBox="0 0 ${W} ${H}" style="width:100%;height:auto;display:block">
     ${body}
-    <line x1="${L}" y1="${base}" x2="${W - 4}" y2="${base}" stroke="#313b49" stroke-width="1.2"/>
-    <text x="${L}" y="${base + 17}" style="font-size:12.5px;fill:var(--dim)">${pdate(fromIso)}</text>
-    <text x="${((L + W - 4) / 2).toFixed(1)}" y="${base + 17}" text-anchor="middle" style="font-size:12.5px;fill:var(--dim)">${pdate(iso(mid))}</text>
-    <text x="${W - 4}" y="${base + 17}" text-anchor="end" style="font-size:12.5px;fill:var(--dim)">${pdate(toIso)}</text>
+    <text x="${AX}" y="${base + 18}" style="font-size:12.5px;fill:var(--dim)">${pdate(fromIso)}</text>
+    <text x="${f((AX + W - 4) / 2)}" y="${base + 18}" text-anchor="middle" style="font-size:12.5px;fill:var(--dim)">${pdate(iso(mid))}</text>
+    <text x="${W - 4}" y="${base + 18}" text-anchor="end" style="font-size:12.5px;fill:var(--dim)">${pdate(toIso)}</text>
   </svg>`;
 }
 // the logs of the metric on the chart, newest first; a row opens the log (date, weight and body fat)
