@@ -823,7 +823,7 @@ function deltas(exId){
 function resolve(ex){
   const d = deltas(ex.id);
   if (ex.type === "time"){
-    return { time: true, mins: Math.max(1, num(ex.mins, 30) + d.mins), d };
+    return { time: true, mins: Math.max(1, num(ex.mins, 30) + d.mins), tsets: Math.max(1, Math.round(num(ex.tsets, 1))), d };
   }
   return {
     time: false,
@@ -990,7 +990,7 @@ function wkCardView(w){
       if (r.d.weight) bump.push(`${sign(r.d.weight)} kg`);
       if (r.d.sets)   bump.push(`${sign(r.d.sets)} set${Math.abs(r.d.sets) === 1 ? "" : "s"}`);
     }
-    const targetTxt = r.time ? `${fmt(r.mins)} min` : `${r.sets} &times; ${fmt(r.reps)}${r.weight ? ` @ ${fmt(r.weight)} kg` : ""}`;
+    const targetTxt = r.time ? `${r.tsets > 1 ? `${r.tsets} &times; ` : ""}${fmt(r.mins)} min` : `${r.sets} &times; ${fmt(r.reps)}${r.weight ? ` @ ${fmt(r.weight)} kg` : ""}`;
     return `<div class="li">
       <div class="grow">
         <div class="lt ${on ? "dt" : ""}">${esc(ex.name)}</div>
@@ -1664,7 +1664,7 @@ const dayChips = (days, act, data) => `<div class="dchips">${DAYS.map((d, i) =>
   `<button class="daychip ${days.includes(i + 1) ? "on" : ""}" data-act="${act}" ${data} data-d="${i + 1}">${d[0]}</button>`).join("")}</div>`;
 const daysShort = days => !days || days.length === 7 ? "Every day" : days.length ? days.map(d => DAYS[d - 1].slice(0, 3)).join(", ") : "";
 const delLink = (act, key, data, label) => `<button class="danger" data-act="${act}" ${data}>${armed === `${act}:${key}` ? "Tap again to delete" : label}</button>`;
-const baseTxt = ex => ex.type === "time" ? `${fmt(num(ex.mins, 30))} min`
+const baseTxt = ex => ex.type === "time" ? `${num(ex.tsets, 1) > 1 ? `${num(ex.tsets, 1)} &times; ` : ""}${fmt(num(ex.mins, 30))} min`
   : `${num(ex.sets, 1)} &times; ${fmt(num(ex.reps, 1))}${num(ex.weight, 0) ? ` @ ${fmt(num(ex.weight))} kg` : ""}`;
 
 function pageTitle(pg){
@@ -1853,7 +1853,7 @@ function pageEx(pg){
   return `${backLink()}<input class="ttlin" data-act="exf" ${data} data-f="name" value="${esc(ex.name)}">
     <div class="lst" style="margin-top:16px">
       ${vrow("extrack", 0, "Tracking", time ? "Minutes" : "Sets &times; reps", vd)}
-      ${time ? f(0, "mins", "Minutes", "min") : f(0, "sets", "Sets", "") + f(1, "reps", "Reps", "") + f(2, "weight", "Weight", "kg")}
+      ${time ? vrow("exnum", 0, "Sets", fmt(num(ex.tsets, 1)), vd) + f(1, "mins", "Minutes", "min") : f(0, "sets", "Sets", "") + f(1, "reps", "Reps", "") + f(2, "weight", "Weight", "kg")}
     </div>
     ${delLink("delex", ex.id, data, "Delete exercise")}`;
 }
@@ -2117,7 +2117,8 @@ function groupSpec(g, d){
       else { delete ex.type; if (ex.sets == null) ex.sets = 3; if (ex.reps == null) ex.reps = 10; if (ex.weight == null) ex.weight = 0; }
     }, [["str", "Sets &times; reps"], ["time", "Minutes"]])] };
   if (g === "exnum" && ex) return { fields: ex.type === "time"
-    ? [F.num("Minutes", () => num(ex.mins, 30), v => { ex.mins = v; }, { min: 1, max: 300, unit: "min" })]
+    ? [F.num("Sets", () => num(ex.tsets, 1), v => { ex.tsets = Math.max(1, Math.round(v)); }, { min: 1, max: 20 }),
+       F.num("Minutes", () => num(ex.mins, 30), v => { ex.mins = v; }, { min: 1, max: 300, unit: "min" })]
     : [F.num("Sets", () => num(ex.sets, 3), v => { ex.sets = v; }, { min: 1, max: 20 }),
        F.num("Reps", () => num(ex.reps, 10), v => { ex.reps = v; }, { min: 1, max: 200 }),
        F.num("Weight", () => num(ex.weight, 0), v => { ex.weight = v; }, { min: 0, max: 300, dec: 1, unit: "kg" })] };
