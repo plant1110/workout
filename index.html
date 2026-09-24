@@ -212,7 +212,7 @@ nav svg{width:25px;height:25px;stroke:currentColor;fill:none;stroke-width:1.8;st
 .li{display:flex;align-items:center;gap:12px;padding:13px 16px;min-height:54px;font-size:17px}
 .li.col{flex-direction:column;align-items:stretch;gap:14px}
 .li .grow{min-width:0}
-.lt{font-size:17px;font-weight:500}
+.lt{font-size:17px;font-weight:600}
 .ls{font-size:15px;color:var(--dim);margin-top:2px}
 .lk{flex:1;color:var(--dim)}
 .lv{display:inline-flex;align-items:center;justify-content:flex-end;gap:7px;color:var(--tx);text-align:right;white-space:nowrap}
@@ -299,7 +299,7 @@ nav svg{width:25px;height:25px;stroke:currentColor;fill:none;stroke-width:1.8;st
 /* nutrition: water and cheats as tiles on top, all meals in one card */
 .tiles{display:flex;gap:10px;margin:2px 0 14px}
 .tile{flex:1;min-width:0;background:var(--card);border-radius:20px;padding:13px 14px 6px}
-.tile .tt{display:flex;align-items:center;justify-content:space-between;font-size:17px;font-weight:500}
+.tile .tt{display:flex;align-items:center;justify-content:space-between;font-size:17px;font-weight:600}
 .tile .tb{font-size:23px;font-weight:650;letter-spacing:-.3px;margin-top:6px}
 .tile .tf{display:flex;align-items:center;justify-content:space-between;gap:6px;font-size:15px;color:var(--dim)}
 .tile .tf .x{padding:6px 0 6px 10px;font-size:22px}
@@ -367,9 +367,10 @@ nav svg{width:25px;height:25px;stroke:currentColor;fill:none;stroke-width:1.8;st
 .bnum{font-size:23px;font-weight:650;letter-spacing:-.3px}
 .bgoal{font-size:16px;color:var(--dim)}
 .bar2{height:5px;background:#222a34;border-radius:9px;margin-top:9px;overflow:hidden}
-.htop{padding:18px 16px 12px}
+.htop{padding:18px 16px 14px}
 .hmet{cursor:pointer;user-select:none;-webkit-user-select:none}
-.blab{font-size:16px;color:var(--dim)}
+.blab{font-size:16px;font-weight:500;color:var(--dim)}
+.rt{font-weight:500}
 .tnone{padding:30px 0 34px;text-align:center;font-size:16px;color:var(--dim)}
 .bar2 > i{display:block;height:100%;border-radius:9px;background:var(--acc)}
 .bar2.warm > i{background:var(--warm)}
@@ -1173,7 +1174,7 @@ function viewHome(){
   const mrow = (k, name, now, target, unit, pr, color, first) => {
     const on = k === mk;
     return `<div class="hmet tap" data-act="gmetric" data-t="${k}"${first ? "" : ` style="margin-top:16px"`}>
-      <div class="brow"><span class="blab" style="${on ? `color:${pr > 0 ? color : "var(--tx)"};font-weight:600` : ""}">${name}</span><span><span class="bnum">${fmt(num(now))}</span><span class="bgoal"> &rarr; ${fmt(num(target))} ${unit}</span></span></div>
+      <div class="brow"><span class="blab" style="${on ? `color:${pr > 0 ? color : "var(--tx)"};font-weight:700` : ""}">${name}</span><span><span class="bnum">${fmt(num(now))}</span><span class="bgoal"> &rarr; ${fmt(num(target))} ${unit}</span></span></div>
       <div class="bar2${k === "fat" ? " warm" : ""}"><i style="width:${(pr * 100).toFixed(0)}%"></i></div>
     </div>`;
   };
@@ -1189,6 +1190,8 @@ function viewHome(){
       <div class="tchart">${pts.length ? trendSvg({ pts, target: tv(isW ? "weightTarget" : "fatTarget"), color: isW ? "var(--acc)" : "var(--warm)" }, from, to)
         : `<div class="tnone">No ${isW ? "weight" : "body fat"} logs yet</div>`}</div>
     </div>
+  </div>
+  <div class="lst">
     ${logRows(mk, from, to)}
     ${logDraft && logDraft.mode === "new" ? logPanel() : addLi("lnew", "Add log")}
   </div>
@@ -1670,7 +1673,7 @@ const backLink = () => {
 
 function pageCycle(){
   const p = state.profile, ended = cycleEnded(), total = Math.max(1, num(p.regimeDays, 30));
-  const planRow = (k, icon, label) => li(`<span class="dimi">${svgI(icon)}</span><span class="grow">${label}</span>`, `data-act="go" data-k="${k}"`, "tap");
+  const planRow = (k, icon, label) => li(`<span class="dimi">${svgI(icon)}</span><span class="grow rt">${label}</span>`, `data-act="go" data-k="${k}"`, "tap");
   return `${backLink()}<h1>${esc(modeLbl(p.mode))}</h1><div class="pgsub">${dRange(p.anchor, cycleEnd())}</div>
     <div class="lst" style="margin-top:18px">
       ${vrow("cycle", 0, "Goal", esc(modeLbl(p.mode)))}
@@ -1793,13 +1796,13 @@ function startCycle(){
 }
 
 function pageWks(){
-  const row = w => li(`${wicon(w)}<span class="grow">${esc(w.title)}</span><span class="lv dim">${daysShort(w.days)}</span>`,
+  const row = w => li(`${wicon(w)}<span class="grow rt">${esc(w.title)}</span><span class="lv dim">${daysShort(w.days)}</span>`,
     `data-act="go" data-k="wk" data-id="${w.id}" data-drag-row data-hold="workouts"`, "tap");
   const sch = state.workouts.filter(w => (w.days || []).length), un = state.workouts.filter(w => !(w.days || []).length);
   return `${backLink()}<h1>Workouts</h1>
     <div class="lst" style="margin-top:18px">${sch.map(row).join("")}${addLi("addwk", "Add workout")}</div>
     ${un.length ? `<div class="grp">Not scheduled</div><div class="lst">${un.map(row).join("")}</div>` : ""}
-    <div class="lst">${li(`<span class="dimi">${svgI(NICONS.trend)}</span><span class="grow">Autorules</span><span class="lv dim">${state.rules.length}</span>`, `data-act="go" data-k="rules"`, "tap")}</div>`;
+    <div class="lst">${li(`<span class="dimi">${svgI(NICONS.trend)}</span><span class="grow rt">Autorules</span><span class="lv dim">${state.rules.length}</span>`, `data-act="go" data-k="rules"`, "tap")}</div>`;
 }
 
 function pageWk(pg){
@@ -1815,7 +1818,7 @@ function pageWk(pg){
     </div>
     <div class="sech">Exercises</div>
     <div class="lst">
-      ${(w.exercises || []).map(ex => li(`<span class="grow">${esc(ex.name)}</span><span class="lv dim">${baseTxt(ex)}</span>`,
+      ${(w.exercises || []).map(ex => li(`<span class="grow rt">${esc(ex.name)}</span><span class="lv dim">${baseTxt(ex)}</span>`,
         `data-act="go" data-k="ex" data-w="${w.id}" data-id="${ex.id}" data-drag-row data-hold="exs:${w.id}"`, "tap")).join("")}
       ${addLi("addex", "Add exercise", `data-w="${w.id}"`)}
     </div>
@@ -1839,7 +1842,7 @@ function pageEx(pg){
 }
 
 function pageMenu(){
-  const row = m => li(`<div class="grow"><div>${mLabel(m)}</div>${(m.items || []).length ? `<div class="ls">${m.items.map(it => esc(it.name)).join(", ")}</div>` : ""}</div>${m.days && !m.days.length ? "" : `<span class="lv dim">${daysShort(m.days)}</span>`}`,
+  const row = m => li(`<div class="grow"><div class="rt">${mLabel(m)}</div>${(m.items || []).length ? `<div class="ls">${m.items.map(it => esc(it.name)).join(", ")}</div>` : ""}</div>${m.days && !m.days.length ? "" : `<span class="lv dim">${daysShort(m.days)}</span>`}`,
     `data-act="go" data-k="mi" data-id="${m.id}" data-drag-row data-hold="menu"`, "tap");
   const sch = state.nutrition.menu.filter(m => !m.days || m.days.length), un = state.nutrition.menu.filter(m => m.days && !m.days.length);
   return `${backLink()}<h1>Menu</h1>
@@ -1878,7 +1881,7 @@ function pageHabits(){
   const sum = r => r.kind === "count" ? `${fmt(num(r.target, 1))}${r.unit ? " " + esc(r.unit) : ""} a day`
     : r.kind === "limit" ? `max ${fmt(num(r.target, 0))} a ${r.xper || "day"}` : "";
   return `${backLink()}<h1>Habits</h1>
-    <div class="lst" style="margin-top:18px">${state.nutrition.rules.map(r => li(`<span class="grow">${esc(r.name)}</span><span class="lv dim">${sum(r)}</span>`,
+    <div class="lst" style="margin-top:18px">${state.nutrition.rules.map(r => li(`<span class="grow rt">${esc(r.name)}</span><span class="lv dim">${sum(r)}</span>`,
       `data-act="go" data-k="habit" data-id="${r.id}" data-drag-row data-hold="habits"`, "tap")).join("")}${addLi("naddrule", "Add habit")}</div>`;
 }
 
@@ -1900,7 +1903,7 @@ function pageHabit(pg){
 
 function pageCheats(){
   const c = state.cheats;
-  const opt = x => li(`<span class="grow">${amtLabel(x)}</span><span class="lv dim">${fmt(num(x.cost, 1))} pt${num(x.cost, 1) === 1 ? "" : "s"}${x.replaces ? ` &middot; ${x.replaces}` : ""}</span>`,
+  const opt = x => li(`<span class="grow rt">${amtLabel(x)}</span><span class="lv dim">${fmt(num(x.cost, 1))} pt${num(x.cost, 1) === 1 ? "" : "s"}${x.replaces ? ` &middot; ${x.replaces}` : ""}</span>`,
     `data-act="go" data-k="xo" data-id="${x.id}" data-drag-row data-hold="xopts"`, "tap");
   return `${backLink()}<h1>Cheats</h1>
     <div class="lst" style="margin-top:18px">
@@ -1925,7 +1928,7 @@ function pageXo(pg){
 
 function pagePresets(){
   const rows = state.nutrition.presets.map(pr => `<div class="li">
-      <span class="grow tap" data-act="npreset" data-id="${pr.id}">${armed === "npreset:" + pr.id ? `<span style="color:var(--acc)">Tap again to apply</span>` : esc(pr.name)}</span>
+      <span class="grow tap rt" data-act="npreset" data-id="${pr.id}">${armed === "npreset:" + pr.id ? `<span style="color:var(--acc)">Tap again to apply</span>` : esc(pr.name)}</span>
       ${delBtn("npresetdel", pr.id, `data-id="${pr.id}"`)}
     </div>`).join("");
   return `${backLink()}<h1>Presets</h1>
