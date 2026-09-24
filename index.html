@@ -1171,24 +1171,28 @@ function viewHome(){
     <span><svg viewBox="0 0 24 24">${TABS[2].icon}</svg>${daysDone("n")}</span>
   </div>
   <div class="card">
-    <div class="brow"><span class="bgoal" style="color:var(--acc)">Weight</span><span><span class="bnum">${fmt(num(p.weightNow))}</span><span class="bgoal"> &rarr; ${fmt(num(p.weightTarget))} kg</span></span></div>
+    <div class="brow"><span class="bgoal" style="${wS.length ? "color:var(--acc);font-weight:600" : ""}">Weight</span><span><span class="bnum">${fmt(num(p.weightNow))}</span><span class="bgoal"> &rarr; ${fmt(num(p.weightTarget))} kg</span></span></div>
     <div class="bar2"><i style="width:${(wp * 100).toFixed(0)}%"></i></div>
-    <div class="brow" style="margin-top:18px"><span class="bgoal" style="color:var(--warm)">Body fat</span><span><span class="bnum">${fmt(num(p.fatNow))}</span><span class="bgoal"> &rarr; ${fmt(num(p.fatTarget))} %</span></span></div>
+    <div class="brow" style="margin-top:18px"><span class="bgoal" style="${fS.length ? "color:var(--warm);font-weight:600" : ""}">Body fat</span><span><span class="bnum">${fmt(num(p.fatNow))}</span><span class="bgoal"> &rarr; ${fmt(num(p.fatTarget))} %</span></span></div>
     <div class="bar2 warm"><i style="width:${(fp * 100).toFixed(0)}%"></i></div>
     ${wS.length || fS.length ? `<div class="tchart">${trend2Svg([
-      { pts: wS, target: tv("weightTarget"), color: "var(--acc)", side: "l", band: [0, 0.6] },
-      { pts: fS, target: tv("fatTarget"), color: "var(--warm)", side: "r", band: [0.4, 1] }], from, to)}</div>` : ""}
+      { pts: wS, target: tv("weightTarget"), color: "var(--acc)" },
+      { pts: fS, target: tv("fatTarget"), color: "var(--warm)" }], from, to)}</div>` : ""}
   </div>
   ${logsList(from, to)}
   ${photosRow()}
   <div class="sech">Cycles</div><div class="lst">${cycleRows()}</div>`;
 }
-// weight and body fat in one chart: each line on its own scale (weight left, fat right), each to its goal
+// the trend, drawn like the approved draft: a line between two dashed guides (its first log and
+// its goal) with their values dim on the left, the goal a ring at the cycle end. With both metrics
+// logged, each gets its own band (weight above, body fat below) over one date axis.
 function trend2Svg(series, fromIso, toIso){
-  const W = 330, H = 200, L = 36, R = 14, T = 22, B = 30;
+  const S = series.filter(sr => sr.pts.length);
+  const W = 330, L = 40, xR = W - 12, top = 26;
+  const band = S.length > 1 ? 58 : 83, gap = 34;
+  const base = top + band * S.length + gap * (S.length - 1) + 17, H = base + 21;
   const x0 = parseIso(fromIso).getTime(), x1 = parseIso(toIso).getTime();
-  const px = t => L + (W - L - R) * (x1 === x0 ? 0.5 : (t - x0) / (x1 - x0));
-  const base = H - B, todayT = parseIso(iso(new Date())).getTime();
+  const px = t => L + 4 + (xR - L - 4) * (x1 === x0 ? 0.5 : (t - x0) / (x1 - x0));
   const path = P => {
     let d = `M${P[0][0].toFixed(1)},${P[0][1].toFixed(1)}`;
     for (let i = 0; i < P.length - 1; i++){
@@ -1198,44 +1202,37 @@ function trend2Svg(series, fromIso, toIso){
     return d;
   };
   let body = "";
-  const starts = [];
-  series.forEach(sr => {
-    if (!sr.pts.length) return;
-    const vals = sr.pts.map(q => q.v); if (sr.target != null) vals.push(sr.target);
-    let lo = Math.min(...vals), hi = Math.max(...vals);
-    if (hi - lo < 1){ lo -= 0.6; hi += 0.6; }
-    // each line gets its own band (weight upper, fat lower) so the two never sit on top of each other
-    const span = hi - lo, y0 = lo - span * 0.12, y1 = hi + span * 0.12, [f0, f1] = sr.band;
-    const py = v => T + (base - T) * (f0 + (f1 - f0) * (1 - (v - y0) / (y1 - y0)));
+  S.forEach((sr, k) => {
+    const yHi = top + k * (band + gap), yLo = yHi + band;
+    const vs = sr.pts.map(q => q.v), first = vs[0], g = sr.target;
+    // the guides sit at the first log and the goal; without a distinct goal, at the logs' range
+    let hiV, loV;
+    if (g != null && Math.abs(g - first) > 1e-9){ hiV = Math.max(first, g); loV = Math.min(first, g); }
+    else { hiV = Math.max(...vs, g ?? -Infinity); loV = Math.min(...vs, g ?? Infinity); }
+    const flat = hiV - loV < 1e-9;
+    const py = v => flat ? (yHi + yLo) / 2 : clamp(yHi + (yLo - yHi) * (hiV - v) / (hiV - loV), yHi - 16, yLo + 14);
+    body += (flat ? [hiV] : [hiV, loV]).map(v => `<line x1="${L}" y1="${py(v).toFixed(1)}" x2="${W - 4}" y2="${py(v).toFixed(1)}" stroke="#262f3b" stroke-width="1.2" stroke-dasharray="3 5"/>
+      <text x="${L - 7}" y="${(py(v) + 4.5).toFixed(1)}" text-anchor="end" style="font-size:13px;fill:var(--dim)">${fmt(v)}</text>`).join("");
     const P = sr.pts.map(q => [px(parseIso(q.date).getTime()), py(q.v)]);
-    starts.push({ x: P[0][0] - 8, y: P[0][1] + 4.5, v: sr.pts[0].v, color: sr.color });
-    if (sr.target != null){
+    if (g != null){
       const lp = P[P.length - 1];
-      body += `<line x1="${lp[0].toFixed(1)}" y1="${lp[1].toFixed(1)}" x2="${px(x1).toFixed(1)}" y2="${py(sr.target).toFixed(1)}" stroke="${sr.color}" stroke-width="1.5" stroke-dasharray="2 6" opacity=".55"/>`;
+      body += `<line x1="${lp[0].toFixed(1)}" y1="${lp[1].toFixed(1)}" x2="${xR}" y2="${py(g).toFixed(1)}" stroke="${sr.color}" stroke-width="1.8" stroke-dasharray="2 6" stroke-linecap="round" opacity=".6"/>`;
     }
     if (P.length > 1) body += `<path d="${path(P)}" fill="none" stroke="${sr.color}" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>`;
-    body += P.map(q => `<circle cx="${q[0].toFixed(1)}" cy="${q[1].toFixed(1)}" r="4" fill="${sr.color}" stroke="var(--card)" stroke-width="1.6"/>`).join("");
-    if (sr.target != null){
-      const gx = px(x1), gy = py(sr.target);
-      body += `<circle cx="${gx.toFixed(1)}" cy="${gy.toFixed(1)}" r="5" fill="var(--card)" stroke="${sr.color}" stroke-width="2.5"/>
-        <text x="${(gx - 9).toFixed(1)}" y="${(sr.side === "l" ? Math.max(gy - 10, 13) : Math.min(gy + 19, base - 4)).toFixed(1)}" text-anchor="end" style="font-size:13px;font-weight:700;fill:${sr.color}">${fmt(sr.target)}</text>`;
+    body += P.map(q => `<circle cx="${q[0].toFixed(1)}" cy="${q[1].toFixed(1)}" r="4.2" fill="${sr.color}" stroke="var(--card)" stroke-width="1.6"/>`).join("");
+    if (g != null){
+      const gy = py(g);
+      body += `<circle cx="${xR}" cy="${gy.toFixed(1)}" r="5" fill="var(--card)" stroke="${sr.color}" stroke-width="2.5"/>
+        <text x="${xR - 3}" y="${(gy - 11).toFixed(1)}" text-anchor="middle" style="font-size:14.5px;font-weight:700;fill:${sr.color}">${fmt(g)}</text>`;
     }
   });
-  // where each line starts; two start labels too close together are pushed apart
-  if (starts.length === 2 && Math.abs(starts[0].x - starts[1].x) < 40 && Math.abs(starts[0].y - starts[1].y) < 15){
-    const [a2, b2] = starts[0].y <= starts[1].y ? starts : [starts[1], starts[0]], mid = (a2.y + b2.y) / 2;
-    a2.y = mid - 7.5; b2.y = mid + 7.5;
-  }
-  body += starts.map(q => `<text x="${q.x.toFixed(1)}" y="${q.y.toFixed(1)}" text-anchor="end" style="font-size:12.5px;fill:${q.color}">${fmt(q.v)}</text>`).join("");
+  const mid = new Date((x0 + x1) / 2);
   return `<svg viewBox="0 0 ${W} ${H}" style="width:100%;height:auto;display:block">
-    ${todayT > x0 && todayT < x1 ? `<line x1="${px(todayT).toFixed(1)}" y1="${T}" x2="${px(todayT).toFixed(1)}" y2="${base}" stroke="#3a4656" stroke-width="1" stroke-dasharray="2 5"/>` : ""}
     ${body}
-    <line x1="${L}" y1="${base}" x2="${W - R}" y2="${base}" stroke="#2b3544" stroke-width="1.5"/>
-    ${[0, 1 / 3, 2 / 3, 1].map(f => {
-      const x = L + (W - L - R) * f, dd = new Date(x0 + (x1 - x0) * f);
-      return `<line x1="${x.toFixed(1)}" y1="${base}" x2="${x.toFixed(1)}" y2="${base + 4}" stroke="#2b3544" stroke-width="1.5"/>
-        <text x="${x.toFixed(1)}" y="${H - 7}" text-anchor="${f === 0 ? "start" : f === 1 ? "end" : "middle"}" style="font-size:12.5px;fill:var(--dim)">${pdate(iso(dd))}</text>`;
-    }).join("")}
+    <line x1="${L}" y1="${base}" x2="${W - 4}" y2="${base}" stroke="#2b3544" stroke-width="1.2"/>
+    <text x="${L}" y="${base + 17}" style="font-size:12.5px;fill:var(--dim)">${pdate(fromIso)}</text>
+    <text x="${((L + W - 4) / 2).toFixed(1)}" y="${base + 17}" text-anchor="middle" style="font-size:12.5px;fill:var(--dim)">${pdate(iso(mid))}</text>
+    <text x="${W - 4}" y="${base + 17}" text-anchor="end" style="font-size:12.5px;fill:var(--dim)">${pdate(toIso)}</text>
   </svg>`;
 }
 // logs: one row per day (weight and body fat); adding or editing opens a titled panel with the wheel
