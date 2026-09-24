@@ -296,6 +296,27 @@ nav svg{width:25px;height:25px;stroke:currentColor;fill:none;stroke-width:1.8;st
 .li.sel{background:rgba(195,245,60,.07)}
 .vtxt{flex:1;min-width:0;background:transparent;border:0;border-radius:0;padding:4px 0;text-align:right;font-size:17px;color:var(--tx)}
 .vtxt:focus{outline:none;border:0}
+/* nutrition: water and cheats as tiles on top, all meals in one card */
+.tiles{display:flex;gap:10px;margin:2px 0 14px}
+.tile{flex:1;min-width:0;background:var(--card);border-radius:20px;padding:13px 14px 6px}
+.tile .tt{display:flex;align-items:center;justify-content:space-between;font-size:17px;font-weight:500}
+.tile .tb{font-size:23px;font-weight:650;letter-spacing:-.3px;margin-top:6px}
+.tile .tf{display:flex;align-items:center;justify-content:space-between;gap:6px;font-size:15px;color:var(--dim)}
+.tile .tf .x{padding:6px 0 6px 10px;font-size:22px}
+.rb{background:none;border:0;padding:0;display:flex;cursor:pointer}
+.tile{user-select:none;-webkit-user-select:none}
+.mblk .li.mh{min-height:54px}
+.mblk > .fl{padding:0 16px 14px;margin-top:-6px}
+.shs{font-size:15px;color:var(--dim);font-weight:400;margin-top:1px}
+/* home: two-line chart, photo thumbnails */
+.tchart{margin-top:16px}
+.prow{display:flex;gap:10px;overflow-x:auto;padding:0 2px 4px;margin-bottom:6px;scrollbar-width:none;-webkit-overflow-scrolling:touch}
+.prow::-webkit-scrollbar{display:none}
+.ptile{flex:none;width:92px;height:122px;border-radius:16px;overflow:hidden;position:relative;background:var(--card);cursor:pointer}
+.ptile img{width:100%;height:100%;object-fit:cover;display:block}
+.ptile span{position:absolute;left:8px;bottom:6px;font-size:12px;font-weight:600;color:#fff;text-shadow:0 1px 3px rgba(0,0,0,.7)}
+.ptile.add{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;color:var(--acc)}
+.ptile.add span{position:static;color:var(--acc);text-shadow:none;font-size:15px;font-weight:500}
 /* trend logs: rows inside the card, add/edit in place */
 .lrow{display:flex;align-items:center;gap:12px;min-height:50px;font-size:17px;border-top:1px solid var(--hair)}
 .lrow .lv{font-weight:500}
@@ -508,7 +529,7 @@ if (state.nutrition.cheat){
 if (!state.nutrition.exclusions) state.nutrition.exclusions = [];
 if (!state.nutrition.rules) state.nutrition.rules = [];
 state.nutrition.rules.forEach(r => { if (!r.kind) r.kind = "check"; });
-if (state.nutrition.water){
+if (state.nutrition.water && state.nutrition.water.goal != null){   // the pre-v70 water object (it had a goal)
   if (!state.nutrition.rules.some(r => r.id === "water"))
     state.nutrition.rules.push({ id: "water", name: "Water", kind: "count", target: num(state.nutrition.water.goal, 5), unit: "glasses" });
   for (const d in (state.nutrition.wlog || {})){
@@ -695,6 +716,43 @@ if (!state.xbudget1){
   if (!state.nutrition.tlog) state.nutrition.tlog = {};
   state.xbudget1 = true;
 }
+// v166: water is a fixed item of the menu, not a habit (its logs keep the "water" key)
+if (!state.water2){
+  const wr = state.nutrition.rules.find(r => r.id === "water")
+    || state.nutrition.rules.find(r => r.kind === "count" && /^water$/i.test(String(r.name || "").trim()));
+  state.nutrition.water = { target: wr ? Math.max(1, num(wr.target, 8)) : 8, unit: (wr && wr.unit) || "glasses" };
+  if (wr){
+    state.nutrition.rules = state.nutrition.rules.filter(r => r !== wr);
+    if (wr.id !== "water") for (const d in state.nutrition.logs){
+      const l0 = state.nutrition.logs[d];
+      if (l0[wr.id] != null){ l0.water = l0[wr.id]; delete l0[wr.id]; }
+    }
+  }
+  state.water2 = true;
+}
+if (!state.nutrition.water) state.nutrition.water = { target: 8, unit: "glasses" };
+// v166: cheats are ONE budget of points; each option says what it replaces (was: per-type budgets)
+if (!state.cheat1){
+  const types = state.xtypes || [];
+  const byId = {}; types.forEach(t => { byId[t.id] = t; });
+  const pers = types.map(t => t.xper || "week");
+  state.cheats = { limit: types.reduce((s0, t) => s0 + num(t.limit, 0), 0) || 3,
+    xper: ["week", "day", "month"].sort((p1, p2) => pers.filter(x => x === p2).length - pers.filter(x => x === p1).length)[0] };
+  state.nutrition.exclusions.forEach(x => {
+    if (x.replaces == null){ const t = byId[x.xt]; x.replaces = t ? (t.replaces || "") : ""; }
+    delete x.xt;
+  });
+  const tl0 = state.nutrition.tlog || {};
+  for (const d in tl0){
+    if (tl0[d].all) continue;
+    const all = []; for (const k in tl0[d]) (tl0[d][k] || []).forEach(e => all.push(e));
+    tl0[d] = { all };
+  }
+  for (const d in state.nutrition.xmeal) for (const mid in state.nutrition.xmeal[d]) delete state.nutrition.xmeal[d][mid].t;
+  state.xtypes = [];
+  state.cheat1 = true;
+}
+if (!state.cheats) state.cheats = { limit: 3, xper: "week" };
 for (const d in state.logs) for (const id in state.logs[d]){
   const e = state.logs[d][id];
   if (e && e.sets){ state.logs[d][id] = { done: e.sets.some(Boolean) }; }
@@ -811,8 +869,15 @@ function weekStrip(kind){
     const f = dayFlags(id);
     if (kind === "nutrition"){
       if (f.nTracked){
-        const done = state.nutrition.rules.filter(r => habitDone(r, id)).length;
-        dot = f.nOk ? "full" : done > 0 ? "part" : "plan";
+        const l2 = state.nutrition.logs[id] || {};
+        const any = num(l2.water, 0) > 0 || state.nutrition.menu.some(m => l2[m.id]);
+        dot = f.nOk ? "full" : any ? "part" : "plan";
+      }
+    } else if (kind === "habits"){
+      const hs = state.nutrition.rules;
+      if (hs.length){
+        const done = hs.filter(r => habitDone(r, id)).length;
+        dot = done === hs.length ? "full" : done > 0 ? "part" : "plan";
       }
     } else {
       if (f.wPlanned){
@@ -894,24 +959,19 @@ function wkCardView(w){
   const eff = effOf(w, sel);
   const hasAlts = state.workouts.some(o => o.id !== w.id);
   const titleAct = hasAlts ? `data-act="wchoose" data-w="${w.id}"` : "";
-  const origin = eff !== w ? `<div class="ls">${esc(w.title)}</div>` : "";
+  // like Nutrition: the name sits above the card; tapping it swaps in another workout
+  const head = `<div class="sech ${hasAlts ? "tap" : ""}" ${titleAct}>${wicon(eff)}<div class="grow">${esc(eff.title)}${eff !== w ? `<div class="shs">instead of ${esc(w.title)}</div>` : ""}</div></div>`;
   if (eff.type === "activity"){
     const r = resolve({ id: eff.id, type: "time", mins: eff.mins });
     const on = exDone(sel, { id: eff.id });
     const bump = r.d.mins ? ` <span class="up">&uarr; ${(r.d.mins > 0 ? "+" : "") + fmt(r.d.mins)} min</span>` : "";
-    return `<div class="lst"><div class="li whd">${wicon(eff)}
-        <div class="grow ${hasAlts ? "tap" : ""}" ${titleAct}>
-          <div class="${on ? "dt" : ""}">${esc(eff.title)}</div>${origin}
-          <div class="ls">${fmt(r.mins)} min${bump}</div>
-        </div>
+    return `${head}<div class="lst"><div class="li">
+        <div class="grow lt ${on ? "dt" : ""}">${fmt(r.mins)} min${bump}</div>
         <div class="cb ${on ? "on" : ""}" data-act="exdone" data-ex="${eff.id}">${CK}</div>
       </div></div>`;
   }
-  const total = (eff.exercises || []).length;
-  let done = 0;
   const rows = (eff.exercises || []).map(ex => {
     const r = resolve(ex), on = exDone(sel, ex);
-    if (on) done++;
     const sign = n => (n > 0 ? "+" : "") + fmt(n);
     const bump = [];
     if (r.time){
@@ -930,13 +990,7 @@ function wkCardView(w){
       <div class="cb ${on ? "on" : ""}" data-act="exdone" data-ex="${ex.id}">${CK}</div>
     </div>`;
   }).join("");
-  const allDone = total > 0 && done === total;
-  return `<div class="lst"><div class="li whd">${wicon(eff)}
-      <div class="grow ${hasAlts ? "tap" : ""}" ${titleAct}>
-        <div class="${allDone ? "dt" : ""}">${esc(eff.title)}</div>${origin}
-      </div>
-      ${pring(total ? done / total : 0)}
-    </div>${rows}</div>`;
+  return `${head}<div class="lst">${rows}</div>`;
 }
 
 function viewWorkout(){
@@ -1106,17 +1160,112 @@ function viewHome(){
   const prog = (now, start, target) => (num(target) === num(start)) ? 1 : clamp((num(now) - num(start)) / (num(target) - num(start)), 0, 1);
   const wp = prog(p.weightNow, p.weightStart, p.weightTarget);
   const fp = prog(p.fatNow, p.fatStart, p.fatTarget);
+  const { from, to } = gPeriod();
+  const series = k => (state.measurements || []).filter(m => m[k] != null && !isNaN(num(m[k], NaN)) && m.date >= from && m.date <= to)
+    .sort((a, b) => a.date < b.date ? -1 : 1).map(m => ({ date: m.date, v: num(m[k]) }));
+  const tv = k => vEmpty(p[k]) ? null : num(p[k]);
+  const wS = series("weight"), fS = series("fat");
   return `<div class="hring" data-act="ring">${bigRing(ended ? "complete" : `of ${total}`, ended ? "var(--acc)" : "")}</div>
   <div class="hstats">
     <span><svg viewBox="0 0 24 24">${TABS[1].icon}</svg>${daysDone("w")}</span>
     <span><svg viewBox="0 0 24 24">${TABS[2].icon}</svg>${daysDone("n")}</span>
   </div>
   <div class="card">
-    <div class="brow"><span class="bgoal">Weight</span><span><span class="bnum">${fmt(num(p.weightNow))}</span><span class="bgoal"> &rarr; ${fmt(num(p.weightTarget))} kg</span></span></div>
+    <div class="brow"><span class="bgoal" style="color:var(--acc)">Weight</span><span><span class="bnum">${fmt(num(p.weightNow))}</span><span class="bgoal"> &rarr; ${fmt(num(p.weightTarget))} kg</span></span></div>
     <div class="bar2"><i style="width:${(wp * 100).toFixed(0)}%"></i></div>
-    <div class="brow" style="margin-top:18px"><span class="bgoal">Body fat</span><span><span class="bnum">${fmt(num(p.fatNow))}</span><span class="bgoal"> &rarr; ${fmt(num(p.fatTarget))} %</span></span></div>
+    <div class="brow" style="margin-top:18px"><span class="bgoal" style="color:var(--warm)">Body fat</span><span><span class="bnum">${fmt(num(p.fatNow))}</span><span class="bgoal"> &rarr; ${fmt(num(p.fatTarget))} %</span></span></div>
     <div class="bar2 warm"><i style="width:${(fp * 100).toFixed(0)}%"></i></div>
+    ${wS.length || fS.length ? `<div class="tchart">${trend2Svg([
+      { pts: wS, target: tv("weightTarget"), color: "var(--acc)", side: "l", band: [0, 0.6] },
+      { pts: fS, target: tv("fatTarget"), color: "var(--warm)", side: "r", band: [0.4, 1] }], from, to)}</div>` : ""}
+  </div>
+  ${logsList(from, to)}
+  ${photosRow()}
+  <div class="sech">Cycles</div><div class="lst">${cycleRows()}</div>`;
+}
+// weight and body fat in one chart: each line on its own scale (weight left, fat right), each to its goal
+function trend2Svg(series, fromIso, toIso){
+  const W = 330, H = 200, L = 36, R = 14, T = 22, B = 30;
+  const x0 = parseIso(fromIso).getTime(), x1 = parseIso(toIso).getTime();
+  const px = t => L + (W - L - R) * (x1 === x0 ? 0.5 : (t - x0) / (x1 - x0));
+  const base = H - B, todayT = parseIso(iso(new Date())).getTime();
+  const path = P => {
+    let d = `M${P[0][0].toFixed(1)},${P[0][1].toFixed(1)}`;
+    for (let i = 0; i < P.length - 1; i++){
+      const a = P[Math.max(0, i - 1)], b = P[i], c = P[i + 1], e = P[Math.min(P.length - 1, i + 2)];
+      d += `C${(b[0] + (c[0] - a[0]) / 6).toFixed(1)},${(b[1] + (c[1] - a[1]) / 6).toFixed(1)} ${(c[0] - (e[0] - b[0]) / 6).toFixed(1)},${(c[1] - (e[1] - b[1]) / 6).toFixed(1)} ${c[0].toFixed(1)},${c[1].toFixed(1)}`;
+    }
+    return d;
+  };
+  let body = "";
+  const starts = [];
+  series.forEach(sr => {
+    if (!sr.pts.length) return;
+    const vals = sr.pts.map(q => q.v); if (sr.target != null) vals.push(sr.target);
+    let lo = Math.min(...vals), hi = Math.max(...vals);
+    if (hi - lo < 1){ lo -= 0.6; hi += 0.6; }
+    // each line gets its own band (weight upper, fat lower) so the two never sit on top of each other
+    const span = hi - lo, y0 = lo - span * 0.12, y1 = hi + span * 0.12, [f0, f1] = sr.band;
+    const py = v => T + (base - T) * (f0 + (f1 - f0) * (1 - (v - y0) / (y1 - y0)));
+    const P = sr.pts.map(q => [px(parseIso(q.date).getTime()), py(q.v)]);
+    starts.push({ x: P[0][0] - 8, y: P[0][1] + 4.5, v: sr.pts[0].v, color: sr.color });
+    if (sr.target != null){
+      const lp = P[P.length - 1];
+      body += `<line x1="${lp[0].toFixed(1)}" y1="${lp[1].toFixed(1)}" x2="${px(x1).toFixed(1)}" y2="${py(sr.target).toFixed(1)}" stroke="${sr.color}" stroke-width="1.5" stroke-dasharray="2 6" opacity=".55"/>`;
+    }
+    if (P.length > 1) body += `<path d="${path(P)}" fill="none" stroke="${sr.color}" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>`;
+    body += P.map(q => `<circle cx="${q[0].toFixed(1)}" cy="${q[1].toFixed(1)}" r="4" fill="${sr.color}" stroke="var(--card)" stroke-width="1.6"/>`).join("");
+    if (sr.target != null){
+      const gx = px(x1), gy = py(sr.target);
+      body += `<circle cx="${gx.toFixed(1)}" cy="${gy.toFixed(1)}" r="5" fill="var(--card)" stroke="${sr.color}" stroke-width="2.5"/>
+        <text x="${(gx - 9).toFixed(1)}" y="${(sr.side === "l" ? Math.max(gy - 10, 13) : Math.min(gy + 19, base - 4)).toFixed(1)}" text-anchor="end" style="font-size:13px;font-weight:700;fill:${sr.color}">${fmt(sr.target)}</text>`;
+    }
+  });
+  // where each line starts; two start labels too close together are pushed apart
+  if (starts.length === 2 && Math.abs(starts[0].x - starts[1].x) < 40 && Math.abs(starts[0].y - starts[1].y) < 15){
+    const [a2, b2] = starts[0].y <= starts[1].y ? starts : [starts[1], starts[0]], mid = (a2.y + b2.y) / 2;
+    a2.y = mid - 7.5; b2.y = mid + 7.5;
+  }
+  body += starts.map(q => `<text x="${q.x.toFixed(1)}" y="${q.y.toFixed(1)}" text-anchor="end" style="font-size:12.5px;fill:${q.color}">${fmt(q.v)}</text>`).join("");
+  return `<svg viewBox="0 0 ${W} ${H}" style="width:100%;height:auto;display:block">
+    ${todayT > x0 && todayT < x1 ? `<line x1="${px(todayT).toFixed(1)}" y1="${T}" x2="${px(todayT).toFixed(1)}" y2="${base}" stroke="#3a4656" stroke-width="1" stroke-dasharray="2 5"/>` : ""}
+    ${body}
+    <line x1="${L}" y1="${base}" x2="${W - R}" y2="${base}" stroke="#2b3544" stroke-width="1.5"/>
+    ${[0, 1 / 3, 2 / 3, 1].map(f => {
+      const x = L + (W - L - R) * f, dd = new Date(x0 + (x1 - x0) * f);
+      return `<line x1="${x.toFixed(1)}" y1="${base}" x2="${x.toFixed(1)}" y2="${base + 4}" stroke="#2b3544" stroke-width="1.5"/>
+        <text x="${x.toFixed(1)}" y="${H - 7}" text-anchor="${f === 0 ? "start" : f === 1 ? "end" : "middle"}" style="font-size:12.5px;fill:var(--dim)">${pdate(iso(dd))}</text>`;
+    }).join("")}
+  </svg>`;
+}
+// logs: one row per day (weight and body fat); adding or editing opens a titled panel with the wheel
+function logsList(from, to){
+  const logs = (state.measurements || []).filter(m => m.date >= from && m.date <= to && (m.weight != null || m.fat != null))
+    .sort((a, b) => a.date < b.date ? 1 : -1);
+  const val = m => [m.weight != null ? `${fmt(num(m.weight))} kg` : "", m.fat != null ? `${fmt(num(m.fat))} %` : ""].filter(Boolean).join(" &middot; ");
+  return `<div class="lst">
+    ${logs.map(m => logDraft && logDraft.mode === "edit" && logDraft.orig === m.date ? logPanel()
+      : li(`<span class="lk">${pdate(m.date)}</span><span class="lv">${val(m)}</span>`, `data-act="ledit" data-d="${m.date}"`, "tap")).join("")}
+    ${logDraft && logDraft.mode === "new" ? logPanel() : addLi("lnew", "Add log")}
   </div>`;
+}
+function logPanel(){
+  const ld = logDraft, nw = ld.mode === "new";
+  return `<div class="lpanel">
+    <div class="lptitle">${nw ? "New log" : "Edit log"}</div>
+    <div class="lpgrp">${vrow("log", 0, "Date", vDisp({ t: "date" }, ld.date))}${vrow("log", 1, "Weight", vEmpty(ld.w) ? NOTSET : `${fmt(num(ld.w))} kg`)}${vrow("log", 2, "Body fat", vEmpty(ld.f) ? NOTSET : `${fmt(num(ld.f))} %`)}</div>
+    <div class="lacts">${nw ? `<button class="lbtn" data-act="ldcancel">Cancel</button><button class="lbtn acc" data-act="ldsave">Add</button>`
+      : `<button class="lbtn bad" data-act="lddel">${armed === "lddel" ? "Tap again to delete" : "Delete"}</button><button class="lbtn acc" data-act="ldsave">Done</button>`}</div>
+  </div>`;
+}
+// progress photos: a row of thumbnails (the viewer opens on tap)
+function photosRow(){
+  return `<div class="sech">Photos</div>
+    <div class="prow">
+      <div class="ptile add" data-act="paddphoto">${svgI(PLUS)}<span>Add</span></div>
+      ${photos.map(ph => `<div class="ptile" data-act="popen" data-p="${ph.id}"><img src="${ph.url}" alt="" loading="lazy" decoding="async"><span>${pdate(ph.date)}</span></div>`).join("")}
+    </div>
+    <input type="file" accept="image/*" multiple data-act="pfile" style="display:none">`;
 }
 
 function photoMeta(p){
@@ -1134,66 +1283,13 @@ function photoMeta(p){
   return { day: dnum >= 1 ? `Day ${dnum}` : "", sub: parts.join(" &middot; ") };
 }
 
-function trendSvg(points, target, color, fromIso, toIso){
-  // drawn at phone size, so its text renders at real size (the old 560-wide chart shrank labels to ~7px)
-  const W = 330, H = 200, L = 36, R = 12, T = 24, B = 30;
-  const ys = points.map(p => p.v);
-  let lo = Math.min(...ys), hi = Math.max(...ys);
-  if (target != null){ lo = Math.min(lo, target); hi = Math.max(hi, target); }
-  if (hi - lo < 1){ lo -= 0.6; hi += 0.6; }
-  const span = hi - lo;
-  const y0 = lo - span * 0.16, y1 = hi + span * 0.16;
-  const x0 = parseIso(fromIso).getTime(), x1 = parseIso(toIso).getTime();
-  const px = t => L + (W - L - R) * (x1 === x0 ? 0.5 : (t - x0) / (x1 - x0));
-  const py = v => T + (H - T - B) * (1 - (v - y0) / (y1 - y0));
-  const base = H - B;
-  const clampX = x => Math.max(L + 16, Math.min(W - R - 16, x));
-  const P = points.map(p => [px(parseIso(p.date).getTime()), py(p.v)]);
-  let d = P.length ? `M${P[0][0].toFixed(1)},${P[0][1].toFixed(1)}` : "";
-  for (let i = 0; i < P.length - 1; i++){
-    const a = P[Math.max(0, i - 1)], b = P[i], c = P[i + 1], e = P[Math.min(P.length - 1, i + 2)];
-    d += `C${(b[0] + (c[0] - a[0]) / 6).toFixed(1)},${(b[1] + (c[1] - a[1]) / 6).toFixed(1)} ${(c[0] - (e[0] - b[0]) / 6).toFixed(1)},${(c[1] - (e[1] - b[1]) / 6).toFixed(1)} ${c[0].toFixed(1)},${c[1].toFixed(1)}`;
-  }
-  const area = P.length > 1 ? `${d} L${P[P.length - 1][0].toFixed(1)},${base} L${P[0][0].toFixed(1)},${base} Z` : "";
-  const gx = px(x1), gy = target != null ? py(target) : 0;
-  const lastP = P.length ? P[P.length - 1] : null;
-  const todayT = parseIso(iso(new Date())).getTime();
-  return `<svg viewBox="0 0 ${W} ${H}" style="width:100%;height:auto;display:block">
-    <defs><linearGradient id="tg" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0" stop-color="${color}" stop-opacity=".22"/>
-      <stop offset="1" stop-color="${color}" stop-opacity="0"/>
-    </linearGradient></defs>
-    <line x1="${L}" y1="${py(hi).toFixed(1)}" x2="${W - R}" y2="${py(hi).toFixed(1)}" stroke="#212a35" stroke-width="1" stroke-dasharray="3 6"/>
-    <line x1="${L}" y1="${py(lo).toFixed(1)}" x2="${W - R}" y2="${py(lo).toFixed(1)}" stroke="#212a35" stroke-width="1" stroke-dasharray="3 6"/>
-    ${todayT > x0 && todayT < x1 ? `<line x1="${px(todayT).toFixed(1)}" y1="${T}" x2="${px(todayT).toFixed(1)}" y2="${base}" stroke="#3a4656" stroke-width="1" stroke-dasharray="2 5"/>` : ""}
-    <text x="${L - 6}" y="${(py(hi) + 4.5).toFixed(1)}" text-anchor="end" style="font-size:13px;fill:var(--dim)">${fmt(hi)}</text>
-    <text x="${L - 6}" y="${(py(lo) + 4.5).toFixed(1)}" text-anchor="end" style="font-size:13px;fill:var(--dim)">${fmt(lo)}</text>
-    ${area ? `<path d="${area}" fill="url(#tg)"/>` : ""}
-    ${target != null && lastP ? `<line x1="${lastP[0].toFixed(1)}" y1="${lastP[1].toFixed(1)}" x2="${gx.toFixed(1)}" y2="${gy.toFixed(1)}" stroke="${color}" stroke-width="1.5" stroke-dasharray="2 6" opacity=".5"/>` : ""}
-    ${P.length > 1 ? `<path d="${d}" fill="none" stroke="${color}" stroke-width="7" opacity=".15" stroke-linejoin="round" stroke-linecap="round"/>
-      <path d="${d}" fill="none" stroke="${color}" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>` : ""}
-    ${P.map(q => `<circle cx="${q[0].toFixed(1)}" cy="${q[1].toFixed(1)}" r="4" fill="${color}" stroke="var(--bg)" stroke-width="1.6"/>`).join("")}
-    ${target != null ? `<circle cx="${gx.toFixed(1)}" cy="${gy.toFixed(1)}" r="5" fill="var(--bg)" stroke="${color}" stroke-width="2.5"/>
-      <text x="${clampX(gx).toFixed(1)}" y="${Math.max(gy - 12, 14).toFixed(1)}" text-anchor="middle" style="font-size:14px;font-weight:700;fill:${color}">${fmt(target)}</text>` : ""}
-    <line x1="${L}" y1="${base}" x2="${W - R}" y2="${base}" stroke="#2b3544" stroke-width="1.5"/>
-    ${[0, 1 / 3, 2 / 3, 1].map(f => {
-      const x = L + (W - L - R) * f;
-      const dd = new Date(x0 + (x1 - x0) * f);
-      return `<line x1="${x.toFixed(1)}" y1="${base}" x2="${x.toFixed(1)}" y2="${base + 4}" stroke="#2b3544" stroke-width="1.5"/>
-        <text x="${x.toFixed(1)}" y="${H - 7}" text-anchor="${f === 0 ? "start" : f === 1 ? "end" : "middle"}" style="font-size:12.5px;fill:var(--dim)">${pdate(iso(dd))}</text>`;
-    }).join("")}
-  </svg>`;
-}
-
 // reverse a cheat-filled meal slot: drop the link and un-log that cheat pick
 function unXmeal(mid){
   const link = (state.nutrition.xmeal[sel] || {})[mid];
   if (!link) return;
   delete state.nutrition.xmeal[sel][mid];
-  if (link.t){   // remove the matching entry from the type log
-    const list = ((state.nutrition.tlog[sel] || {})[link.t]) || [];
-    for (let i = list.length - 1; i >= 0; i--) if (list[i].slot === mid){ list.splice(i, 1); break; }
-  }
+  const list = ((state.nutrition.tlog[sel] || {}).all) || [];
+  for (let i = list.length - 1; i >= 0; i--) if (list[i].slot === mid){ list.splice(i, 1); break; }
 }
 
 // current weight/fat = the latest log that has that metric
@@ -1211,95 +1307,6 @@ function gPeriod(){
   const e = parseIso(anchor);
   e.setDate(e.getDate() + Math.max(1, num(state.profile.regimeDays, 90)) - 1);
   return { from: anchor, to: iso(e) };
-}
-
-function trendCard(){
-  const isW = gMetric === "weight";
-  const color = isW ? "var(--acc)" : "var(--warm)";
-  // the chart shows the regime window; every log inside is a point
-  const { from: pFrom, to: pTo } = gPeriod();
-  const points = [...(state.measurements || [])]
-    .filter(m => m[gMetric] != null && !isNaN(num(m[gMetric], NaN)) && m.date >= pFrom && m.date <= pTo)
-    .sort((a, b) => a.date < b.date ? -1 : 1)
-    .map(m => ({ date: m.date, v: num(m[gMetric]) }));
-  const tRaw = state.profile[isW ? "weightTarget" : "fatTarget"];
-  const target = tRaw == null || String(tRaw).trim() === "" ? null : num(tRaw);
-  const unitG = isW ? "kg" : "%";
-  // a log being added or edited: a titled panel, its Date and value picked on the wheel
-  const logPanel = () => {
-    const ld = logDraft, nw = ld.mode === "new";
-    return `<div class="lpanel">
-      <div class="lptitle">${nw ? `New ${isW ? "weight" : "body fat"} log` : "Edit log"}</div>
-      <div class="lpgrp">${vrow("log", 0, "Date", vDisp({ t: "date" }, ld.date))}${vrow("log", 1, isW ? "Weight" : "Body fat", vEmpty(ld.v) ? NOTSET : `${fmt(num(ld.v))} ${unitG}`)}</div>
-      <div class="lacts">${nw ? `<button class="lbtn" data-act="ldcancel">Cancel</button><button class="lbtn acc" data-act="ldsave">Add</button>`
-        : `<button class="lbtn bad" data-act="lddel">${armed === "lddel" ? "Tap again to delete" : "Delete"}</button><button class="lbtn acc" data-act="ldsave">Done</button>`}</div>
-    </div>`;
-  };
-  return `<div class="sech"><span class="grow">Trend</span>
-      <div class="seg">
-        <button class="${isW ? "on" : ""}" data-act="gmetric" data-t="weight">Weight</button>
-        <button class="${isW ? "" : "on warm"}" data-act="gmetric" data-t="fat">Fat</button>
-      </div>
-    </div>
-    <div class="card">
-    ${points.length ? (() => {
-      const lastP = points[points.length - 1], firstP = points[0];
-      const delta = lastP.v - firstP.v;
-      const toward = target != null ? Math.abs(lastP.v - target) <= Math.abs(firstP.v - target) : delta <= 0;
-      const dcol = delta === 0 ? "var(--dim)" : toward ? "var(--acc)" : "var(--warm)";
-      const arrow = delta > 0 ? "&#9650;" : delta < 0 ? "&#9660;" : "&#8212;";
-      const unit = isW ? "kg" : "%";
-      return `<div class="between" style="margin-bottom:4px">
-        <div class="row" style="gap:10px">
-          <span style="font-size:28px;font-weight:750;letter-spacing:-.6px">${fmt(lastP.v)}<span style="font-size:14px;font-weight:500;color:var(--dim)"> ${unit}</span></span>
-          ${points.length > 1 ? `<span class="chip" style="font-size:12.5px;padding:4px 10px;color:${dcol}">${arrow} ${fmt(Math.abs(delta))}</span>` : ""}
-        </div>
-        ${target != null ? `<span class="tiny">${fmt(Math.abs(lastP.v - target))} ${unit} to goal</span>` : ""}
-      </div>`;
-    })() : ""}
-    ${points.length ? trendSvg(points, target, color, pFrom, pTo)
-      : `<div class="onote" style="margin:0 0 2px">No logs yet</div>`}
-  </div>
-  <div class="lst">
-    ${[...points].reverse().map(p => logDraft && logDraft.mode === "edit" && logDraft.orig === p.date ? logPanel()
-      : li(`<span class="lk">${pdate(p.date)}</span><span class="lv">${fmt(p.v)} ${unitG}</span>`, `data-act="ledit" data-d="${p.date}"`, "tap")).join("")}
-    ${logDraft && logDraft.mode === "new" ? logPanel() : addLi("lnew", "Add log")}
-  </div>`;
-}
-
-function viewPhotos(){
-  let html = "";
-  if (!photos.length){
-    html += `<div class="card" style="text-align:center;padding:46px 18px">
-      <span class="wicon" style="width:46px;height:46px;display:inline-block;margin-bottom:10px"><svg viewBox="0 0 24 24">${NICONS.photos}</svg></span>
-      <div style="font-size:19px;font-weight:650">No photos yet</div>
-    </div>`;
-  } else {
-    html += `<div class="pcar">${photos.map(p => {
-      const mm = photoMeta(p);
-      const isArmed = armed === "pdel:" + p.id;
-      return `<div class="pslide">
-        <div class="pframe" data-act="popen" data-p="${p.id}">
-          <img src="${p.url}" alt="" loading="lazy" decoding="async">
-          <div class="pgrad"></div>
-          <button class="pxdel ${isArmed ? "armed" : ""}" data-act="pdel" data-p="${p.id}">${isArmed ? "Tap again" : "&times;"}</button>
-          <div class="pmeta">
-            ${mm.day ? `<div class="pday">${mm.day}</div>` : ""}
-            <div class="pbig">${parseIso(p.date).toLocaleDateString(undefined, { day: "numeric", month: "long", year: "numeric" })}</div>
-            ${mm.sub ? `<div class="psub">${mm.sub}</div>` : ""}
-          </div>
-        </div>
-      </div>`;
-    }).join("")}</div>`;
-    if (photos.length > 1) html += photos.length <= 10
-      ? `<div class="pdots" id="pdots">${photos.map((_, i) => `<i class="${i === 0 ? "on" : ""}"></i>`).join("")}</div>`
-      : `<div class="pcount" id="pcount">1 / ${photos.length}</div>`;
-  }
-  html += `<div class="lst" style="margin-top:14px">${addLi("paddphoto", "Add photo")}</div>
-    <input type="file" accept="image/*" multiple data-act="pfile" style="display:none">`;
-  html += trendCard();
-  html += `<div class="sech">Cycles</div><div class="lst">${cycleRows()}</div>`;
-  return html;
 }
 
 function cycleRows(){
@@ -1393,8 +1400,9 @@ const NICONS = {
 const nicon = k => `<span class="wicon" style="width:21px;height:21px">&#8203;<svg viewBox="0 0 24 24">${NICONS[k]}</svg></span>`;
 const secTitle = (k, label, done) => `<div class="row" style="gap:9px">${nicon(k)}<div style="font-size:19px;font-weight:650;${done ? "color:var(--dim);text-decoration:line-through" : ""}">${label}</div></div>`;
 
-const perWord = x => (x.xper || "week") === "day" ? "today" : (x.xper === "month" ? "this month" : "this week");
-const weekOkFor = ds => state.xtypes.every(t => typePoints(t.id, ds, t.xper) <= num(t.limit, 0));
+const perWord = () => { const per = (state.cheats || {}).xper || "week"; return per === "day" ? "today" : per === "month" ? "this month" : "this week"; };
+const weekOkFor = ds => cheatPoints(ds) <= num((state.cheats || {}).limit, 0);
+const waterOf = () => state.nutrition.water || { target: 8, unit: "glasses" };
 
 function habitPeriodCount(h, ds){
   const per = h.xper || "day";
@@ -1428,9 +1436,11 @@ function dayFlags(ds){
   const exIds = exercisesFor(ds).map(e => e.id);
   const wPlanned = exIds.length > 0;
   const wOk = !wPlanned || exIds.every(id => exDone(ds, { id }));
-  const habs = state.nutrition.rules;
-  const nTracked = habs.length > 0;
-  const nOk = !nTracked || (habs.every(h => habitDone(h, ds)) && weekOkFor(ds) && !num((state.nutrition.xnoslot || {})[ds], 0));
+  const di0 = dayIdx(parseIso(ds));
+  const meals = state.nutrition.menu.filter(m => !m.days || m.days.includes(di0));
+  const wt = num(waterOf().target, 0), ln = state.nutrition.logs[ds] || {};
+  const nTracked = meals.length > 0 || wt > 0;
+  const nOk = !nTracked || (meals.every(m => ln[m.id]) && num(ln.water, 0) >= wt && weekOkFor(ds) && !num((state.nutrition.xnoslot || {})[ds], 0));
   const r = { wPlanned, wOk, nTracked, nOk };
   if (past) state.verdicts[ds] = r;   // persists with the next save; deterministic until then
   return r;
@@ -1483,23 +1493,26 @@ const amtLabel = it => esc(it.name) + (it.amt ? ` &middot; ${esc(it.amt)}` : "")
 // undefined = not slot-bound (custom type); null = slot-bound but nothing free.
 // a meal/snack type fills a free menu slot: meal -> lunch/dinner, snack -> snack.
 // undefined = the type replaces nothing; null = slot-bound but nothing free.
-function freeSlotForType(t, ds){
-  if (t.replaces !== "meal" && t.replaces !== "snack") return undefined;
+// an option that replaces a meal/snack fills a free menu slot: meal -> lunch/dinner, snack -> snack.
+// undefined = the option replaces nothing; null = slot-bound but nothing free.
+function freeSlotFor(x, ds){
+  const rp = x.replaces || "";
+  if (rp !== "meal" && rp !== "snack") return undefined;
   const d = ds || sel;
   const di2 = dayIdx(parseIso(d));
   const mm = state.nutrition.menu.filter(m => !m.days || m.days.includes(di2));
   const l2 = state.nutrition.logs[d] || {};
-  const want = t.replaces === "snack" ? ["snack"] : ["lunch", "dinner"];
+  const want = rp === "snack" ? ["snack"] : ["lunch", "dinner"];
   return mm.find(m => want.includes(m.mtype || "snack") && !l2[m.id]) || null;
 }
-// one cheat use: the option's cost lands on the TYPE's budget; a meal/snack type fills the
-// given slot (mid) or the first free one, else the use voids the day (entry.ns -> xnoslot)
-function logType(t, x, mid){
-  const label = x.name + (x.amt ? ` \u00b7 ${x.amt}` : "");
-  const entry = { x: x.id, label, cost: +x.cost || 1, slot: null };
+// one cheat use: its points come off the one budget; a meal/snack option fills the given slot (mid)
+// or the first free one, else the use voids the day (entry.ns -> xnoslot)
+function logCheat(x, mid){
+  const label = x.name + (x.amt ? ` · ${x.amt}` : "");
+  const entry = { x: x.id, label, cost: num(x.cost, 1), slot: null };
   if (mid) entry.slot = mid;
-  else if (t.replaces){
-    const slot = freeSlotForType(t);
+  else if (x.replaces){
+    const slot = freeSlotFor(x);
     if (slot) entry.slot = slot.id;
     else {
       entry.ns = true;
@@ -1508,16 +1521,16 @@ function logType(t, x, mid){
     }
   }
   if (entry.slot){
-    (state.nutrition.xmeal[sel] = state.nutrition.xmeal[sel] || {})[entry.slot] = { x: x.id, label, t: t.id };
+    (state.nutrition.xmeal[sel] = state.nutrition.xmeal[sel] || {})[entry.slot] = { x: x.id, label };
     (state.nutrition.logs[sel] = state.nutrition.logs[sel] || {})[entry.slot] = true;
   }
   const tl = state.nutrition.tlog[sel] || (state.nutrition.tlog[sel] = {});
-  (tl[t.id] = tl[t.id] || []).push(entry);
+  (tl.all = tl.all || []).push(entry);
 }
-// points a type has spent in its period window
-function typePoints(tid, ds, xper){
-  const per = xper || (state.xtypes.find(t => t.id === tid) || {}).xper || "week";
-  const sum = d => (((state.nutrition.tlog || {})[d] || {})[tid] || []).reduce((s2, e) => s2 + (+e.cost || 1), 0);
+// points spent in the budget's period window
+function cheatPoints(ds){
+  const per = (state.cheats || {}).xper || "week";
+  const sum = d => ((((state.nutrition.tlog || {})[d] || {}).all) || []).reduce((s2, e) => s2 + num(e.cost, 1), 0);
   if (per === "day") return sum(ds);
   if (per === "month"){
     const pre = ds.slice(0, 7);
@@ -1531,62 +1544,67 @@ function typePoints(tid, ds, xper){
   return n;
 }
 
+const minusBtn = (act, data) => `<button class="x" data-act="${act}" ${data} title="Undo one">&minus;</button>`;
+function habitRow(h, l){
+  if (h.kind === "limit"){
+    const t = num(h.target, 0), c = habitPeriodCount(h, sel), over = c > t;
+    const pw = h.xper === "month" ? "this month" : h.xper === "week" ? "this week" : "today";
+    return `<div class="li">
+      <div class="grow tap" data-act="hplus" data-r="${h.id}">
+        <div class="lt">${esc(h.name)}</div>
+        <div class="ls" style="${over ? "color:var(--bad)" : ""}">${c} of ${fmt(t)}${h.unit ? ` ${esc(h.unit)}` : ""} ${pw}${over ? " &middot; over limit" : ""}</div>
+      </div>
+      ${minusBtn("hminus", `data-r="${h.id}"`)}
+      <button class="rb" data-act="hplus" data-r="${h.id}">${cring(c, t, over ? "var(--bad)" : "var(--warm)")}</button>
+    </div>`;
+  }
+  if (h.kind === "count"){
+    const t = num(h.target, 1), c = num(l[h.id], 0), on = c >= t;
+    return `<div class="li">
+      <div class="grow tap" data-act="hplus" data-r="${h.id}">
+        <div class="lt ${on ? "dt" : ""}">${esc(h.name)}</div>
+        <div class="ls">${c} of ${fmt(t)}${h.unit ? ` ${esc(h.unit)}` : ""}</div>
+      </div>
+      ${minusBtn("hminus", `data-r="${h.id}"`)}
+      <button class="rb" data-act="hplus" data-r="${h.id}">${cring(c, t, "#38bdf8")}</button>
+    </div>`;
+  }
+  return `<div class="li tap" data-act="ndone" data-r="${h.id}">
+    <div class="grow lt ${l[h.id] ? "dt" : ""}">${esc(h.name)}</div>
+    <div class="cb blue ${l[h.id] ? "on" : ""}">${CK}</div>
+  </div>`;
+}
+
 function viewNutrition(){
   const di = dayIdx(parseIso(sel));
-  const rules = state.nutrition.rules;
   const menu = state.nutrition.menu.filter(m => !m.days || m.days.includes(di));
-  const xts = state.xtypes.map(t => ({ t: t.id, name: t.name, limit: num(t.limit, 0), xper: t.xper, replaces: t.replaces }));
   const l = state.nutrition.logs[sel] || {};
-  const mdone = menu.filter(m => l[m.id]).length;
-  const minus = (act, data) => `<button class="x" data-act="${act}" ${data} title="Undo one">&minus;</button>`;
   let html = weekStrip("nutrition");
-
-  // habits
-  const hrow = h => {
-    if (h.kind === "limit"){
-      const t = num(h.target, 0), c = habitPeriodCount(h, sel), over = c > t;
-      const pw = h.xper === "month" ? "this month" : h.xper === "week" ? "this week" : "today";
-      return `<div class="li">
-        <div class="grow tap" data-act="hplus" data-r="${h.id}">
-          <div class="lt">${esc(h.name)}</div>
-          <div class="ls" style="${over ? "color:var(--bad)" : ""}">${c} of ${fmt(t)}${h.unit ? ` ${esc(h.unit)}` : ""} ${pw}${over ? " &middot; over limit" : ""}</div>
-        </div>
-        ${minus("hminus", `data-r="${h.id}"`)}
-        <button class="tap" style="background:none;border:0;padding:0" data-act="hplus" data-r="${h.id}">${cring(c, t, over ? "var(--bad)" : "var(--warm)")}</button>
-      </div>`;
-    }
-    if (h.kind === "count"){
-      const t = num(h.target, 1), c = num(l[h.id], 0), on = c >= t;
-      return `<div class="li">
-        <div class="grow tap" data-act="hplus" data-r="${h.id}">
-          <div class="lt ${on ? "dt" : ""}">${esc(h.name)}</div>
-          <div class="ls">${c} of ${fmt(t)}${h.unit ? ` ${esc(h.unit)}` : ""}</div>
-        </div>
-        ${minus("hminus", `data-r="${h.id}"`)}
-        <button class="tap" style="background:none;border:0;padding:0" data-act="hplus" data-r="${h.id}">${cring(c, t, "#38bdf8")}</button>
-      </div>`;
-    }
-    return `<div class="li tap" data-act="ndone" data-r="${h.id}">
-      <div class="grow lt ${l[h.id] ? "dt" : ""}">${esc(h.name)}</div>
-      <div class="cb blue ${l[h.id] ? "on" : ""}">${CK}</div>
+  // the two things you count sit on top; their text says what's left (the ring already shows what's done)
+  const wt = waterOf(), wc = num(l.water, 0), wT = Math.max(1, num(wt.target, 8)), wDone = wc >= wT;
+  const pts = cheatPoints(sel), lim = num(state.cheats.limit, 0), over = pts > lim;
+  // the whole tile is the button (count one / spend); only the minus undoes
+  const tile = (name, act, ring, big, bigCol, sub, minusAct, data) => `<div class="tile tap" data-act="${act}" ${data}>
+      <div class="tt"><span>${name}</span>${ring}</div>
+      <div class="tb" style="${bigCol ? `color:${bigCol}` : ""}">${big}</div>
+      <div class="tf"><span>${sub}</span>${minusBtn(minusAct, data)}</div>
     </div>`;
-  };
-  html += `<div class="sech">${nicon("habits")}<span class="grow">Habits</span></div>`;
-  html += rules.length
-    ? `<div class="lst">${rules.map(hrow).join("")}</div>`
-    : `<div class="lst">${addLi("naddrule", "Add habit")}${li(`<span class="dimi">${svgI(NICONS.presets)}</span><span class="grow">Start from a preset</span>`, `data-act="go" data-k="presets"`, "tap")}</div>`;
-
-  // menu
+  const unit = esc(wt.unit || "glasses");
+  html += `<div class="tiles">
+    ${tile("Water", "hplus", cring(wc, wT, "#38bdf8"), wDone ? "Done" : `${fmt(wT - wc)} to go`, wDone ? "#38bdf8" : "", wDone ? `${fmt(wT)} ${unit}` : unit, "hminus", `data-r="water"`)}
+    ${tile("Cheats", "xspend", cring(pts, lim, over ? "var(--bad)" : "var(--warm)"), over ? `${fmt(pts - lim)} over` : `${fmt(Math.max(0, lim - pts))} left`, over ? "var(--bad)" : "", `points ${perWord()}`, "xundo", "")}
+  </div>`;
+  if (num((state.nutrition.xnoslot || {})[sel], 0)) html += `<div class="onote" style="color:var(--bad);margin:-4px 4px 12px">Cheat used with no free slot, so this day doesn't count</div>`;
+  // the meals: one card, a block per meal (name + check, its foods listed underneath)
   const mopts = state.nutrition.mopts[sel] || {};
-  // one card per meal: the meal row (name + check), its foods listed underneath
-  const mcard = m => {
+  const mblk = m => {
     const link = (state.nutrition.xmeal[sel] || {})[m.id];
     const pickId = mopts[m.id];
     const chosenObj = pickId ? state.nutrition.menu.find(o => o.id === pickId && o.id !== m.id) : null;
     const foods = link ? [{ name: link.label, amt: "" }] : chosenObj ? (chosenObj.items || []) : (m.items || []);
     const done = !!l[m.id];
     const canChoose = state.nutrition.menu.some(o => o.id !== m.id && mtypeOf(o) === mtypeOf(m)) || state.nutrition.exclusions.length > 0;
-    return `<div class="lst meal">
+    return `<div class="mblk">
       <div class="li mh">
         <div class="grow tap lt ${done ? "dt" : ""}" data-act="${canChoose ? "nmchoose" : "ndone"}" data-m="${m.id}" data-r="${m.id}">${mLabel(m)}</div>
         <div class="cb ${done ? "on" : ""}" data-act="ndone" data-r="${m.id}">${CK}</div>
@@ -1595,35 +1613,17 @@ function viewNutrition(){
         `<div class="fi"><span>${esc(it.name)}</span><span class="fa">${esc(it.amt || "")}</span></div>`).join("")}</div>` : ""}
     </div>`;
   };
-  html += `<div class="sech">${nicon("menu")}<span class="grow">Menu</span></div>`;
-  html += menu.length ? menu.map(mcard).join("")
+  html += menu.length ? `<div class="lst">${menu.map(mblk).join("")}</div>`
     : `<div class="lst"><div class="li"><span class="grow" style="color:var(--dim)">No menu for this day</span></div></div>`;
+  return html;
+}
 
-  // cheats
-  if (xts.length){
-    const trow = t => {
-      const pts = typePoints(t.t, sel, t.xper), lim = num(t.limit, 0), over = pts > lim;
-      const picks = ((state.nutrition.tlog[sel] || {})[t.t]) || [];
-      const grouped = picks.reduce((gs, e) => {
-        const g = gs.find(y => y.t === e.label);
-        if (g) g.n++; else gs.push({ t: e.label, n: 1 });
-        return gs;
-      }, []);
-      return `<div class="li">
-        <div class="grow tap" data-act="xtchoose" data-t="${t.t}">
-          <div class="lt ${picks.length ? "dt" : ""}">${esc(t.name)}</div>
-          <div class="ls" style="${over ? "color:var(--bad)" : ""}">${fmt(pts)} of ${fmt(lim)} ${perWord(t)}${over ? " &middot; over limit" : ""}</div>
-          ${t.replaces && freeSlotForType(t) === null && pts < lim ? `<div class="ls" style="color:var(--warm)">No free ${t.replaces} slot, logging voids the day</div>` : ""}
-          ${grouped.length ? `<div class="pk">${grouped.map(g => `<div>${esc(g.t)} (${g.n})</div>`).join("")}</div>` : ""}
-        </div>
-        ${minus("xtminus", `data-t="${t.t}"`)}
-        <button class="tap" style="background:none;border:0;padding:0" data-act="xtplus" data-t="${t.t}">${cring(pts, lim, over ? "var(--bad)" : "var(--warm)")}</button>
-      </div>`;
-    };
-    html += `<div class="sech">${nicon("limits")}<span class="grow">Cheats</span></div>`;
-    if (num((state.nutrition.xnoslot || {})[sel], 0)) html += `<div class="onote" style="color:var(--bad);margin:-2px 4px 10px">Cheat used with no free slot, so this day doesn't count</div>`;
-    html += `<div class="lst">${xts.map(trow).join("")}</div>`;
-  }
+function viewHabits(){
+  const l = state.nutrition.logs[sel] || {};
+  const rules = state.nutrition.rules;
+  let html = weekStrip("habits");
+  html += rules.length ? `<div class="lst" style="margin-top:6px">${rules.map(h => habitRow(h, l)).join("")}</div>`
+    : `<div class="lst" style="margin-top:6px">${addLi("naddrule", "Add habit")}${li(`<span class="dimi">${svgI(NICONS.presets)}</span><span class="grow">Start from a preset</span>`, `data-act="go" data-k="presets"`, "tap")}</div>`;
   return html;
 }
 
@@ -1662,7 +1662,6 @@ function pageTitle(pg){
   if (k === "habits") return "Habits";
   if (k === "habit"){ const r = state.nutrition.rules.find(x => x.id === pg.id); return r ? r.name : "Habit"; }
   if (k === "cheats") return "Cheats";
-  if (k === "xt"){ const t = state.xtypes.find(x => x.id === pg.id); return t ? t.name : "Cheats"; }
   if (k === "xo"){ const x = state.nutrition.exclusions.find(y => y.id === pg.id); return x ? x.name : "Option"; }
   if (k === "presets") return "Presets";
   if (k === "rules") return "Autorules";
@@ -1848,7 +1847,8 @@ function pageMenu(){
     `data-act="go" data-k="mi" data-id="${m.id}" data-drag-row data-hold="menu"`, "tap");
   const sch = state.nutrition.menu.filter(m => !m.days || m.days.length), un = state.nutrition.menu.filter(m => m.days && !m.days.length);
   return `${backLink()}<h1>Menu</h1>
-    <div class="lst" style="margin-top:18px">${sch.map(row).join("")}${addLi("nmadd", "Add menu item")}</div>
+    <div class="lst" style="margin-top:18px">${vrow("water", 0, "Water", `${fmt(num(waterOf().target, 8))} ${esc(waterOf().unit || "glasses")}`)}</div>
+    <div class="lst">${sch.map(row).join("")}${addLi("nmadd", "Add menu item")}</div>
     ${un.length ? `<div class="grp">Not scheduled</div><div class="lst">${un.map(row).join("")}</div>` : ""}`;
 }
 
@@ -1903,27 +1903,16 @@ function pageHabit(pg){
 }
 
 function pageCheats(){
-  const sum = t => `${fmt(num(t.limit, 0))} pt${num(t.limit, 0) === 1 ? "" : "s"} a ${t.xper || "week"}`;
+  const c = state.cheats;
+  const opt = x => li(`<span class="grow">${amtLabel(x)}</span><span class="lv dim">${fmt(num(x.cost, 1))} pt${num(x.cost, 1) === 1 ? "" : "s"}${x.replaces ? ` &middot; ${x.replaces}` : ""}</span>`,
+    `data-act="go" data-k="xo" data-id="${x.id}" data-drag-row data-hold="xopts"`, "tap");
   return `${backLink()}<h1>Cheats</h1>
-    <div class="lst" style="margin-top:18px">${state.xtypes.map(t => li(`<span class="grow">${esc(t.name)}</span><span class="lv dim">${sum(t)}</span>`,
-      `data-act="go" data-k="xt" data-id="${t.id}" data-drag-row data-hold="limits"`, "tap")).join("")}${addLi("xtaddnew", "Add cheat type")}</div>`;
-}
-
-function pageXt(pg){
-  const t = state.xtypes.find(x => x.id === pg.id); if (!t) return backLink();
-  const opts = state.nutrition.exclusions.filter(x => x.xt === t.id);
-  const per = t.xper || "week", rp = t.replaces || "";
-  return `${backLink()}<input class="ttlin" data-act="xtname" data-t="${t.id}" value="${esc(t.name)}">
-    <div class="lst" style="margin-top:16px">
-      ${vrow("xt", 0, "Points", `${fmt(num(t.limit, 3))} pts`, `data-id="${t.id}"`)}
-      ${vrow("xt", 1, "Per", cap1(per), `data-id="${t.id}"`)}
-      ${vrow("xt", 2, "Replaces", rp ? cap1(rp) : "Nothing", `data-id="${t.id}"`)}
+    <div class="lst" style="margin-top:18px">
+      ${vrow("cheats", 0, "Points", `${fmt(num(c.limit, 3))} pt${num(c.limit, 3) === 1 ? "" : "s"}`)}
+      ${vrow("cheats", 1, "Per", cap1(c.xper || "week"))}
     </div>
     <div class="sech">Options</div>
-    <div class="lst">${opts.map(x => li(`<span class="grow">${amtLabel(x)}</span><span class="lv dim">${fmt(num(x.cost, 1))} pt${num(x.cost, 1) === 1 ? "" : "s"}</span>`,
-      `data-act="go" data-k="xo" data-id="${x.id}" data-drag-row data-hold="xopts:${t.id}"`, "tap")).join("")}${addLi("xadd", "Add option", `data-t="${t.id}"`)}</div>
-    ${editAllLi()}
-    ${delLink("xtdel", t.id, `data-t="${t.id}"`, "Delete cheat type")}`;
+    <div class="lst">${state.nutrition.exclusions.map(opt).join("")}${addLi("xadd", "Add option")}</div>`;
 }
 
 function pageXo(pg){
@@ -1932,8 +1921,8 @@ function pageXo(pg){
   return `${backLink()}<input class="ttlin" data-act="xf" ${data} value="${esc(x.name)}">
     <div class="lst" style="margin-top:16px">
       ${vrow("xo", 0, "Serving", x.amt ? esc(x.amt) : NOTSET, `data-id="${x.id}"`)}
-      ${vrow("xo", 1, "Points", `${fmt(num(x.cost, 1))} pts`, `data-id="${x.id}"`)}
-      ${xrow("xdays", "Planned on", daysShort(x.days) || "Chooser only", dayChips(x.days || [1, 2, 3, 4, 5, 6, 7], "xday", data))}
+      ${vrow("xo", 1, "Points", `${fmt(num(x.cost, 1))} pt${num(x.cost, 1) === 1 ? "" : "s"}`, `data-id="${x.id}"`)}
+      ${vrow("xo", 2, "Replaces", x.replaces ? cap1(x.replaces) : "Nothing", `data-id="${x.id}"`)}
     </div>
     ${delLink("xdel", x.id, data, "Delete option")}`;
 }
@@ -1952,7 +1941,7 @@ function pagePresets(){
 const pageRules = () => `${backLink()}<h1>Autorules</h1><div style="margin-top:18px">${viewRules()}</div>`;
 
 const PAGES = { cycle: pageCycle, review: pageReview, onb: pageOnb, wks: pageWks, wk: pageWk, ex: pageEx,
-  menu: pageMenu, mi: pageMi, habits: pageHabits, habit: pageHabit, cheats: pageCheats, xt: pageXt, xo: pageXo,
+  menu: pageMenu, mi: pageMi, habits: pageHabits, habit: pageHabit, cheats: pageCheats, xo: pageXo,
   presets: pagePresets, rules: pageRules };
 
 function pushPage(pg){
@@ -2075,10 +2064,20 @@ function groupSpec(g, d){
     F.num("Length", () => num(p.regimeDays, 30), v => { p.regimeDays = p.lenPlan = Math.max(1, Math.round(v)); }, { min: 1, max: 365, unit: "days", rr: true }),
     F.num("Target weight", () => p.weightTarget, v => { p.weightTarget = v; }, W),
     F.num("Target body fat", () => p.fatTarget, v => { p.fatTarget = v; }, FAT)] };
+  if (g === "cheats") return { fields: [
+    F.num("Points", () => num(state.cheats.limit, 3), v => { state.cheats.limit = v; }, { min: 0, max: 50, dec: 1, unit: "pts" }),
+    F.choice("Per", () => state.cheats.xper || "week", v => { state.cheats.xper = v; }, PER)] };
+  if (g === "water") return { fields: [
+    F.num("Water", () => num(waterOf().target, 8), v => { state.nutrition.water = { ...waterOf(), target: Math.max(1, Math.round(v)) }; },
+      { min: 1, max: 30, unit: waterOf().unit || "glasses" })] };
   if (g === "log" && logDraft){
-    const isW = gMetric === "weight";
-    return { fields: [F.date("Date", () => logDraft.date, v => { logDraft.date = v; }),
-      F.num(isW ? "Weight" : "Body fat", () => logDraft.v, v => { logDraft.v = v; }, isW ? W : FAT)] };
+    // an empty value starts the wheel at the latest log, not at a generic default
+    const lastOf = k => { const m0 = (state.measurements || []).filter(x => x[k] != null && !isNaN(num(x[k], NaN))).sort((a, b) => a.date < b.date ? -1 : 1).at(-1);
+      return m0 ? num(m0[k]) : undefined; };
+    return { fields: [
+      F.date("Date", () => logDraft.date, v => { logDraft.date = v; }),
+      F.num("Weight", () => logDraft.w, v => { logDraft.w = v; }, { ...W, def: lastOf("weight") ?? W.def }),
+      F.num("Body fat", () => logDraft.f, v => { logDraft.f = v; }, { ...FAT, def: lastOf("fat") ?? FAT.def })] };
   }
   if (g === "onb1" && onb){
     const tape = () => { const tb = tapeBF({ heightCm: onb.h, waistCm: onb.waist, neckCm: onb.neck }); if (tb.state === "ok") onb.fNow = tb.bf; };
@@ -2131,15 +2130,11 @@ function groupSpec(g, d){
       { min: lim ? 0 : 1, max: 100, unit: r.unit || "" });
     return { fields: lim ? [tF, F.choice("Per", () => r.xper || "day", v => { r.xper = v; }, PER)] : [tF] };
   }
-  const t = d.id ? state.xtypes.find(x => x.id === d.id) : null;
-  if (g === "xt" && t) return { fields: [
-    F.num("Points", () => num(t.limit, 3), v => { t.limit = v; }, { min: 0, max: 50, dec: 1, unit: "pts" }),
-    F.choice("Per", () => t.xper || "week", v => { t.xper = v; }, PER),
-    F.choice("Replaces", () => t.replaces || "", v => { t.replaces = v; }, [["meal", "Meal"], ["snack", "Snack"], ["", "Nothing"]])] };
   const x = d.id ? state.nutrition.exclusions.find(y => y.id === d.id) : null;
   if (g === "xo" && x) return { fields: [
     F.amt("Serving", () => x.amt || "", v => { x.amt = v; }),
-    F.num("Points", () => num(x.cost, 1), v => { x.cost = v; }, { min: 0, max: 20, dec: 1, unit: "pts" })] };
+    F.num("Points", () => num(x.cost, 1), v => { x.cost = v; }, { min: 0, max: 20, dec: 1, unit: "pts" }),
+    F.choice("Replaces", () => x.replaces || "", v => { x.replaces = v; }, [["meal", "Meal"], ["snack", "Snack"], ["", "Nothing"]])] };
   return null;
 }
 const dkey = (g, i, data) => g + i + String(data || "").replace(/[^a-z0-9]/gi, "");
@@ -2213,14 +2208,14 @@ const TABS = [
   { id:"home",      label:"Home",      icon:'<path d="M5 12l-2 0l9 -9l9 9l-2 0" /> <path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-7" /> <path d="M9 21v-6a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v6" />' },
   { id:"workout",   label:"Workout",   icon:'<path d="M2 12h1" /> <path d="M6 8h-2a1 1 0 0 0 -1 1v6a1 1 0 0 0 1 1h2" /> <path d="M6 7v10a1 1 0 0 0 1 1h1a1 1 0 0 0 1 -1v-10a1 1 0 0 0 -1 -1h-1a1 1 0 0 0 -1 1z" /> <path d="M9 12h6" /> <path d="M15 7v10a1 1 0 0 0 1 1h1a1 1 0 0 0 1 -1v-10a1 1 0 0 0 -1 -1h-1a1 1 0 0 0 -1 1z" /> <path d="M18 8h2a1 1 0 0 1 1 1v6a1 1 0 0 1 -1 1h-2" /> <path d="M22 12h-1" />' },
   { id:"nutrition", label:"Nutrition", icon:'<path d="M4 11.319c0 3.102 .444 5.319 2.222 7.978c1.351 1.797 3.156 2.247 5.08 .988c.426 -.268 .97 -.268 1.397 0c1.923 1.26 3.728 .809 5.079 -.988c1.778 -2.66 2.222 -4.876 2.222 -7.977c0 -2.661 -1.99 -5.32 -4.444 -5.32c-1.267 0 -2.41 .693 -3.22 1.44a.5 .5 0 0 1 -.672 0c-.809 -.746 -1.953 -1.44 -3.22 -1.44c-2.454 0 -4.444 2.66 -4.444 5.319" /> <path d="M7 12c0 -1.47 .454 -2.34 1.5 -3" /> <path d="M12 7c0 -1.2 .867 -4 3 -4" />' },
-  { id:"photos",    label:"Progress",  icon:'<path d="M3 17l6 -6l4 4l8 -8" /> <path d="M14 7l7 0l0 7" />' }
+  { id:"habits",    label:"Habits",    icon:NICONS.habits }
 ];
-const VIEWS = { home:viewHome, workout:viewWorkout, nutrition:viewNutrition, photos:viewPhotos };
+const VIEWS = { home:viewHome, workout:viewWorkout, nutrition:viewNutrition, habits:viewHabits };
 const HEAD = {
   home:      () => ({ t: "Home", s: "" }),
   workout:   () => ({ t: "Workout", s: "" }),
   nutrition: () => ({ t: "Nutrition", s: "" }),
-  photos:    () => ({ t: "Progress", s: "" })
+  habits:    () => ({ t: "Habits", s: "" })
 };
 
 function render(){
@@ -2234,23 +2229,11 @@ function render(){
   head.innerHTML = top ? "" : tab === "home"
     ? `<h1>${esc(modeLbl(state.profile.mode))}</h1><div class="pgsub">${dRange(state.profile.anchor, cycleEnd())}</div>`
     : `<h1>${esc(HEAD[tab]().t)}</h1>`;
-  const pcar0 = document.querySelector("#view .pcar");
-  const pscroll = pcar0 ? pcar0.scrollLeft : null;
+  const prow0 = document.querySelector("#view .prow");
+  const pscroll = prow0 ? prow0.scrollLeft : null;
   document.getElementById("view").innerHTML = top ? PAGES[top.k](top) : VIEWS[tab]();
-  const pcar1 = document.querySelector("#view .pcar");
-  if (pcar1){
-    if (pscroll != null) pcar1.scrollLeft = pscroll;
-    pcar1.onscroll = () => {
-      const first = pcar1.firstElementChild;
-      const w = first ? first.getBoundingClientRect().width + 12 : 1;
-      const i = Math.max(0, Math.min(photos.length - 1, Math.round(pcar1.scrollLeft / w)));
-      const dots = document.getElementById("pdots");
-      if (dots) [...dots.children].forEach((d, j) => d.classList.toggle("on", j === i));
-      const cnt = document.getElementById("pcount");
-      if (cnt) cnt.textContent = `${i + 1} / ${photos.length}`;
-    };
-    pcar1.onscroll();
-  }
+  const prow1 = document.querySelector("#view .prow");
+  if (prow1 && pscroll != null) prow1.scrollLeft = pscroll;
   const sroot = document.getElementById("sheetRoot");
   if (sheet){
     let title = "", content = "", foot = `<button data-act="shcancel">Close</button>`;
@@ -2269,25 +2252,27 @@ function render(){
         .filter(o => o.id !== m.id && mtypeOf(o) === mtypeOf(m))
         .map(o => optRow(o.id, itemsLbl(o.items) || mLabel(o), "", cur === o.id)).join("");
       const wantCat = mtypeOf(m) === "snack" ? "snack" : (mtypeOf(m) === "lunch" || mtypeOf(m) === "dinner") ? "meal" : "none";
-      const cheats = state.xtypes.filter(t2 => t2.replaces === wantCat).flatMap(t2 =>
-        state.nutrition.exclusions.filter(x => x.xt === t2.id).map(x =>
+      const cheats = state.nutrition.exclusions.filter(x => (x.replaces || "") === wantCat).map(x =>
           `<div class="opt tap" data-act="xmeal" data-m="${m.id}" data-x="${x.id}">
             <div class="grow"><div class="oname">${amtLabel(x)}</div>
-              <div class="target" style="margin-top:2px">${esc(t2.name)} &middot; ${fmt(num(x.cost, 1))} pt${num(x.cost, 1) === 1 ? "" : "s"}</div></div>
+              <div class="target" style="margin-top:2px">${fmt(num(x.cost, 1))} pt${num(x.cost, 1) === 1 ? "" : "s"}</div></div>
             <div class="ck" style="color:var(--dim)">&#43;</div>
-          </div>`)).join("");
+          </div>`).join("");
       content = own + (others ? `<div class="tiny" style="margin:12px 0 2px">Other ${mtypeOf(m) === "lunch" ? "lunches" : esc(mtypeOf(m)) + "s"}</div>${others}` : "")
         + (cheats ? `<div class="tiny" style="margin:12px 0 2px">Cheat instead</div>${cheats}` : "");
       foot = `<button data-act="shcancel">Cancel</button>`;
     } else if (sheet.kind === "xpick"){
-      const t2 = state.xtypes.find(z => z.id === sheet.t) || { name: "" };
-      title = `Choose ${esc(t2.name)}`;
-      content = state.nutrition.exclusions.filter(x => x.xt === sheet.t).map(x =>
+      title = "Spend points";
+      const picks = (((state.nutrition.tlog[sel] || {}).all) || []).reduce((gs, e) => {
+        const g = gs.find(y => y.t === e.label); if (g) g.n++; else gs.push({ t: e.label, n: 1 }); return gs; }, []);
+      content = state.nutrition.exclusions.map(x =>
         `<div class="opt tap" data-act="xpickopt" data-x="${x.id}">
           <div class="grow"><div class="oname">${amtLabel(x)}</div>
             <div class="target" style="margin-top:2px">${fmt(num(x.cost, 1))} pt${num(x.cost, 1) === 1 ? "" : "s"}</div></div>
           <div class="ck" style="color:var(--dim)">&#43;</div>
-        </div>`).join("");
+        </div>`).join("")
+        + (picks.length ? `<div class="tiny" style="margin:14px 0 4px">Spent ${sel === iso(new Date()) ? "today" : "this day"}</div>
+          <div class="fl">${picks.map(g => `<div class="fi"><span>${esc(g.t)}</span><span class="fa">${g.n > 1 ? `&times;${g.n}` : ""}</span></div>`).join("")}</div>` : "");
       foot = `<button data-act="shcancel">Cancel</button>`;
     } else if (sheet.kind === "wpick"){
       const w = state.workouts.find(x => x.id === sheet.wid) || {};
@@ -2359,16 +2344,17 @@ document.addEventListener("click", e => {
   if (a === "witem"){ const col = el.parentElement; col.scrollTo({ top: +el.dataset.k * WH, behavior: "smooth" }); return; }
   // ---------- Trend logs: a marked panel in the list, values on the wheel ----------
   if (a === "lnew" || a === "ledit"){
-    const isW = gMetric === "weight", k = isW ? "weight" : "fat";
     if (a === "lnew"){
-      const logs = (state.measurements || []).filter(x => x[k] != null && !isNaN(num(x[k], NaN))).sort((p1, p2) => p1.date < p2.date ? -1 : 1);
-      logDraft = { mode: "new", orig: null, date: iso(new Date()), v: logs.length ? num(logs[logs.length - 1][k]) : num(state.profile[isW ? "weightNow" : "fatNow"], NaN) };
+      const last = k => { const m0 = (state.measurements || []).filter(x => x[k] != null && !isNaN(num(x[k], NaN))).sort((p1, p2) => p1.date < p2.date ? -1 : 1).at(-1);
+        return m0 ? num(m0[k]) : num(state.profile[k === "weight" ? "weightNow" : "fatNow"], NaN); };
+      logDraft = { mode: "new", orig: null, date: iso(new Date()), w: last("weight"), f: "" };
     } else {
       const m0 = state.measurements.find(x => x.date === el.dataset.d); if (!m0) return;
-      logDraft = { mode: "edit", orig: m0.date, date: m0.date, v: num(m0[k]) };
+      logDraft = { mode: "edit", orig: m0.date, date: m0.date, w: m0.weight != null ? num(m0.weight) : "", f: m0.fat != null ? num(m0.fat) : "" };
     }
     armed = null;
-    openDock("log", 1, {}, dkey("log", 1, ""));
+    const i0 = vEmpty(logDraft.w) && !vEmpty(logDraft.f) ? 2 : 1;
+    openDock("log", i0, {}, dkey("log", i0, ""));
     return;
   }
   if (a === "ldcancel"){ logDraft = null; dock = null; render(); return; }
@@ -2377,19 +2363,14 @@ document.addEventListener("click", e => {
     if (a === "lddel" && armed !== "lddel"){ armed = "lddel"; render(); return; }
     armed = null;
     dockSettle();
-    const isW = gMetric === "weight", k = isW ? "weight" : "fat", other = isW ? "fat" : "weight";
+    if (a === "ldsave" && (!ld.date || (vEmpty(ld.w) && vEmpty(ld.f)))) return;
     const old = ld.orig ? state.measurements.find(x => x.date === ld.orig) : null;
-    const dropIfEmpty = m0 => { if (m0[other] == null) state.measurements = state.measurements.filter(x => x !== m0); };
-    if (a === "lddel"){ if (old){ delete old[k]; dropIfEmpty(old); } }
-    else {
-      if (!ld.date || vEmpty(ld.v)) return;
-      if (old && ld.date === old.date) old[k] = ld.v;
-      else {
-        if (old){ delete old[k]; dropIfEmpty(old); }   // only this metric moves; never fabricate the other one
-        let m0 = state.measurements.find(x => x.date === ld.date);
-        if (!m0){ m0 = { date: ld.date }; state.measurements.push(m0); }
-        m0[k] = ld.v;
-      }
+    if (old) state.measurements = state.measurements.filter(x => x !== old);
+    if (a === "ldsave"){
+      let m0 = state.measurements.find(x => x.date === ld.date);   // another log that day: the values join it
+      if (!m0){ m0 = { date: ld.date }; state.measurements.push(m0); }
+      if (!vEmpty(ld.w)) m0.weight = ld.w;
+      if (!vEmpty(ld.f)) m0.fat = ld.f;
     }
     syncNow(); gSel = null; logDraft = null; dock = null;
     save(); render(); return;
@@ -2578,33 +2559,21 @@ document.addEventListener("click", e => {
     r.xper = el.dataset.t;
     save(); render(); return;
   }
-  if (a === "xtchoose"){
-    const t = state.xtypes.find(z => z.id === el.dataset.t); if (!t) return;
-    const opts = state.nutrition.exclusions.filter(x => x.xt === t.id);
-    if (!opts.length) return;
-    if (opts.length === 1){ logType(t, opts[0]); save(); render(); return; }
-    sheetNew = true; sheet = { kind: "xpick", t: t.id };
-    render(); return;
-  }
-  if (a === "xtplus"){
-    const t = state.xtypes.find(z => z.id === el.dataset.t); if (!t) return;
-    const opts = state.nutrition.exclusions.filter(x => x.xt === t.id);
-    if (!opts.length) return;
-    const planned = opts.find(x => !x.days || x.days.includes(dayIdx(parseIso(sel))));
-    const pick = planned || (opts.length === 1 ? opts[0] : null);
-    if (pick){ logType(t, pick); save(); render(); return; }
-    sheetNew = true; sheet = { kind: "xpick", t: t.id };
+  if (a === "xspend"){   // spend points: pick what to spend them on
+    const opts = state.nutrition.exclusions;
+    if (!opts.length){ pushPage({ k: "cheats" }); return; }
+    if (opts.length === 1){ logCheat(opts[0]); save(); render(); return; }
+    sheetNew = true; sheet = { kind: "xpick" };
     render(); return;
   }
   if (a === "xpickopt"){
     if (!sheet || sheet.kind !== "xpick") return;
-    const t = state.xtypes.find(z => z.id === sheet.t);
     const x = state.nutrition.exclusions.find(y => y.id === el.dataset.x);
-    if (t && x) logType(t, x);
+    if (x) logCheat(x);
     sheet = null; save(); render(); return;
   }
-  if (a === "xtminus"){
-    const list = ((state.nutrition.tlog[sel] || {})[el.dataset.t]) || [];
+  if (a === "xundo"){
+    const list = ((state.nutrition.tlog[sel] || {}).all) || [];
     const e = list.pop();
     if (!e){ render(); return; }
     if (e.slot){
@@ -2616,32 +2585,8 @@ document.addEventListener("click", e => {
     }
     save(); render(); return;
   }
-  if (a === "xtaddnew"){
-    const nt = { id: uid(), name: "New type", limit: 3, xper: "week", replaces: "" };
-    state.xtypes.push(nt);
-    save(); pushPage({ k: "xt", id: nt.id }); return;
-  }
-  if (a === "xtdel"){
-    const k = "xtdel:" + el.dataset.t;
-    if (armed !== k){ armed = k; render(); return; }
-    armed = null;
-    state.xtypes = state.xtypes.filter(t => t.id !== el.dataset.t);
-    state.nutrition.exclusions = state.nutrition.exclusions.filter(x => x.xt !== el.dataset.t);
-    save(); popIf("xt", el.dataset.t); return;
-  }
-  if (a === "xtper"){
-    const t = state.xtypes.find(z => z.id === el.dataset.t); if (!t) return;
-    t.xper = el.dataset.p;
-    save(); render(); return;
-  }
-  if (a === "xtrep"){
-    const t = state.xtypes.find(z => z.id === el.dataset.t); if (!t) return;
-    if (el.dataset.r) t.replaces = el.dataset.r; else t.replaces = "";
-    save(); render(); return;
-  }
   if (a === "xadd"){
-    const t = state.xtypes.find(z => z.id === el.dataset.t); if (!t) return;
-    const nx = { id: uid(), name: "New option", amt: "", cost: 1, xt: t.id };
+    const nx = { id: uid(), name: "New option", amt: "", cost: 1, replaces: "" };
     state.nutrition.exclusions.push(nx);
     save(); pushPage({ k: "xo", id: nx.id }); return;
   }
@@ -2689,10 +2634,9 @@ document.addEventListener("click", e => {
     if (!sheet || sheet.kind !== "pick") return;
     const mid = el.dataset.m;
     const x = state.nutrition.exclusions.find(y => y.id === el.dataset.x);
-    const t = x && state.xtypes.find(z => z.id === x.xt);
-    if (!t){ sheet = null; render(); return; }
+    if (!x){ sheet = null; render(); return; }
     unXmeal(mid);
-    logType(t, x, mid);
+    logCheat(x, mid);
     if (state.nutrition.mopts[sel]) delete state.nutrition.mopts[sel][mid];
     sheet = null; save(); render(); return;
   }
@@ -2712,9 +2656,9 @@ document.addEventListener("click", e => {
     if (armed !== "nreset"){ armed = "nreset"; render(); return; }
     armed = null;
     const presets = state.nutrition.presets;
-    state.nutrition = { rules: [{ id: "water", name: "Water", kind: "count", target: 5, unit: "glasses" }],
+    state.nutrition = { rules: [], water: { target: 8, unit: "glasses" },
       logs: {}, presets, menu: [], exclusions: [], exlog: {}, mopts: {}, xpicks: {}, xmeal: {}, tlog: {}, xnoslot: {} };
-    state.xtypes = [];
+    state.xtypes = []; state.cheats = { limit: 3, xper: "week" };
     save(); render(); return;
   }
   if (a === "nmiadd"){
@@ -2767,35 +2711,32 @@ document.addEventListener("click", e => {
           name: (a.name && a.name !== m.name) ? a.name : (((a.items || [])[0] || {}).name || m.name + " 2"),
           mtype: m.mtype || inferT(m.name), days: [], items: (a.items || []).map(cloneFood) }));
       });
-      if (pr.xtypes){
-        state.xtypes = []; n2.exclusions = [];
-        pr.xtypes.forEach(t => {
-          const nt = { id: uid(), name: t.name, limit: num(t.limit, 0), xper: t.xper || "week", replaces: t.replaces || "" };
-          state.xtypes.push(nt);
-          (t.options || []).forEach(o => n2.exclusions.push({ id: uid(), name: o.name, amt: o.amt || "",
-            cost: num(o.cost, 1), days: o.days, xt: nt.id }));
-        });
-      } else if (pr.exclusions){
-        // pre-v140 preset: group per-cheat entries into type budgets (max of member limits)
-        state.xtypes = []; n2.exclusions = [];
-        const byName = {};
+      // water lives in the menu now: a water habit from an older preset becomes the water target
+      const wIdx = n2.rules.findIndex(r => r.kind === "count" && /^water$/i.test(String(r.name || "").trim()));
+      if (wIdx >= 0){ n2.water = { target: Math.max(1, num(n2.rules[wIdx].target, 8)), unit: n2.rules[wIdx].unit || "glasses" }; n2.rules.splice(wIdx, 1); }
+      if (pr.water != null) n2.water = { target: Math.max(1, num(pr.water, 8)), unit: "glasses" };
+      if (pr.options){
+        state.cheats = { limit: num((pr.cheats || {}).limit, 3), xper: (pr.cheats || {}).xper || "week" };
+        n2.exclusions = pr.options.map(o => ({ id: uid(), name: o.name, amt: o.amt || "", cost: num(o.cost, 1), days: o.days, replaces: o.replaces || "" }));
+      } else if (pr.xtypes){   // v140-v165 preset: per-type budgets merge into one
+        n2.exclusions = [];
+        state.cheats = { limit: pr.xtypes.reduce((s0, t) => s0 + num(t.limit, 0), 0) || 3, xper: (pr.xtypes[0] || {}).xper || "week" };
+        pr.xtypes.forEach(t => (t.options || []).forEach(o => n2.exclusions.push({ id: uid(), name: o.name, amt: o.amt || "",
+          cost: num(o.cost, 1), days: o.days, replaces: t.replaces || "" })));
+      } else if (pr.exclusions){   // pre-v140 preset: per-cheat entries
+        n2.exclusions = []; let lim0 = 0;
         pr.exclusions.forEach(x => {
-          const cat = x.xcat || "other";
-          if (!byName[cat]){
-            byName[cat] = { id: uid(), name: cat[0].toUpperCase() + cat.slice(1), limit: 0, xper: x.xper || "week",
-              replaces: cat === "meal" ? "meal" : cat === "snack" ? "snack" : "" };
-            state.xtypes.push(byName[cat]);
-          }
-          byName[cat].limit = Math.max(byName[cat].limit, num(x.limit, 0));
+          const cat = x.xcat || "other", rp = cat === "meal" ? "meal" : cat === "snack" ? "snack" : "";
+          lim0 = Math.max(lim0, num(x.limit, 0));
           const it0 = (x.items || [])[0];
-          n2.exclusions.push({ id: uid(), name: x.name || (it0 && it0.name) || "Cheat", days: x.days, cost: 1, xt: byName[cat].id,
+          n2.exclusions.push({ id: uid(), name: x.name || (it0 && it0.name) || "Cheat", days: x.days, cost: 1, replaces: rp,
             amt: x.amt || ((x.items || []).length === 1 && it0 && it0.amt) || "" });
           (x.alts || []).forEach(a2 => n2.exclusions.push({ id: uid(), name: typeof a2 === "string" ? a2 : a2.name,
-            days: [], cost: 1, xt: byName[cat].id, amt: (typeof a2 === "string" ? "" : a2.amt) || "" }));
+            days: [], cost: 1, replaces: rp, amt: (typeof a2 === "string" ? "" : a2.amt) || "" }));
         });
+        state.cheats = { limit: lim0 || 3, xper: "week" };
       }
-      if (pr.water != null && !n2.rules.some(r => r.kind === "count" && r.name === "Water"))
-        n2.rules.push({ id: uid(), name: "Water", kind: "count", target: num(pr.water, 5), unit: "glasses" });   // legacy presets stored water separately
+      state.xtypes = [];
     } else {
       for (const name of pr.rules){
         if (!n2.rules.some(r => r.name === name))
@@ -2821,9 +2762,10 @@ document.addEventListener("click", e => {
     n2.presets.push({
       id: uid(), name: String(name).trim(), full: true,
       rules: n2.rules.map(r => ({ name: r.name, kind: r.kind, target: r.target, unit: r.unit, xper: r.xper })),
+      water: num(waterOf().target, 8),
       menu: n2.menu.map(m => ({ mtype: m.mtype, items: (m.items || []).map(copyFood), days: m.days ? [...m.days] : undefined })),
-      xtypes: state.xtypes.map(t => ({ name: t.name, limit: t.limit, xper: t.xper, replaces: t.replaces,
-        options: state.nutrition.exclusions.filter(x => x.xt === t.id).map(x => ({ name: x.name, amt: x.amt, cost: x.cost, days: x.days })) }))
+      cheats: { limit: state.cheats.limit, xper: state.cheats.xper },
+      options: n2.exclusions.map(x => ({ name: x.name, amt: x.amt, cost: x.cost, days: x.days, replaces: x.replaces || "" }))
     });
     save(); render(); return;
   }
@@ -2897,8 +2839,6 @@ document.addEventListener("change", e => {
       }
     }
     else if (a === "nrper"){ const r = state.nutrition.rules.find(x => x.id === el.dataset.r); if (r) r.xper = v2; }
-    else if (a === "xtper"){ const t = state.xtypes.find(z => z.id === el.dataset.t); if (t) t.xper = v2; }
-    else if (a === "xtrep"){ const t = state.xtypes.find(z => z.id === el.dataset.t); if (t) t.replaces = v2; }
     else if (a === "nmtype"){ const m = findMenu(el.dataset.m); if (m) m.mtype = v2; }
     else if (a === "wkwtype"){
       const w = findWk(el.dataset.w); if (!w) return;
@@ -2925,8 +2865,6 @@ document.addEventListener("change", e => {
   }
   if (a === "xf"){ const x = state.nutrition.exclusions.find(y => y.id === el.dataset.x); if (x){ x.name = v; save(); } return; }
   if (a === "xcost"){ const x = state.nutrition.exclusions.find(y => y.id === el.dataset.x); if (x){ x.cost = Math.max(0, num(v, x.cost ?? 1)); el.value = x.cost; save(); } return; }
-  if (a === "xtname"){ const t = state.xtypes.find(z => z.id === el.dataset.t); if (t){ t.name = v; save(); } return; }
-  if (a === "xtlimit"){ const t = state.xtypes.find(z => z.id === el.dataset.t); if (t){ t.limit = Math.max(0, num(v, t.limit)); el.value = t.limit; save(); } return; }
   if (a === "xq" || a === "xu"){
     const x = state.nutrition.exclusions.find(y => y.id === el.dataset.x); if (!x) return;
     const p = parseAmt(x.amt);
@@ -2998,7 +2936,7 @@ const DRAG_LISTS = {
   workouts: () => state.workouts,
   menu:     () => state.nutrition.menu,
   habits:   () => state.nutrition.rules,
-  limits:   () => state.xtypes
+  xopts:    () => state.nutrition.exclusions
 };
 // nested lists are addressed as "kind:parentId"; food/option rows have no ids, so they carry their index
 function dragListFor(key){
