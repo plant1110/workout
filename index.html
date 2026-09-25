@@ -319,8 +319,10 @@ nav svg{width:25px;height:25px;stroke:currentColor;fill:none;stroke-width:1.8;st
 .pbig img{width:100%;height:100%;object-fit:cover;display:block}
 .pbig.goal::after{content:"";position:absolute;inset:0;border-radius:18px;box-shadow:inset 0 0 0 2px var(--acc);pointer-events:none}
 .pbig.empty{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;color:var(--acc);font-size:15px;font-weight:500}
-.pcap{position:absolute;left:12px;bottom:10px;right:10px;text-shadow:0 1px 2px rgba(0,0,0,.95),0 0 6px rgba(0,0,0,.8),0 0 16px rgba(0,0,0,.6)}
-.pcap .pic{filter:drop-shadow(0 1px 2px rgba(0,0,0,.95)) drop-shadow(0 0 6px rgba(0,0,0,.7))}
+.pcap{position:absolute;left:12px;bottom:10px;right:10px;text-shadow:0 1px 3px rgba(0,0,0,.6)}
+.pfade{position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,.88),rgba(0,0,0,.45) 22%,rgba(0,0,0,0) 50%);pointer-events:none}
+.pview{border-radius:18px;overflow:hidden;background:var(--card);margin:14px 0}
+.pview img{width:100%;display:block}
 .pcap b{display:flex;align-items:center;gap:5px;font-size:17px;font-weight:600;color:#f2f5f7}
 .pcap span{display:block;font-size:13px;color:#dfe4ea;margin-top:1px}
 .pic{flex:none;fill:none;stroke:currentColor;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
@@ -328,7 +330,7 @@ nav svg{width:25px;height:25px;stroke:currentColor;fill:none;stroke-width:1.8;st
 .prow::-webkit-scrollbar{display:none}
 .ptile{flex:none;width:92px;height:122px;border-radius:16px;overflow:hidden;position:relative;background:var(--card);cursor:pointer}
 .ptile img{width:100%;height:100%;object-fit:cover;display:block}
-.ptile span{position:absolute;left:8px;bottom:6px;font-size:12px;font-weight:600;color:#fff;text-shadow:0 1px 2px rgba(0,0,0,.95),0 0 5px rgba(0,0,0,.8),0 0 12px rgba(0,0,0,.6)}
+.ptile span{position:absolute;left:8px;bottom:6px;font-size:12px;font-weight:600;color:#fff;text-shadow:0 1px 3px rgba(0,0,0,.6)}
 .ptile.add{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;color:var(--acc)}
 .ptile.add span{position:static;color:var(--acc);text-shadow:none;font-size:15px;font-weight:500}
 /* trend logs: rows inside the card, add/edit in place */
@@ -1219,10 +1221,11 @@ function viewHome(){
   <div class="sech">Cycles</div><div class="lst">${cycleRows()}</div>`;
 }
 // the trend: the dotted line is the plan, straight from the first log to the goal at the cycle end;
-// the solid line is what was logged, today's (latest) point ringed. Only the start value and the
-// goal are written on the chart; the axis lines carry no numbers.
+// the solid line is what was logged, today's (latest) point ringed. A dotted line in the axis color
+// marks the starting weight, ticks on the bottom line mark each week of the cycle. Only the start
+// value and the goal are written on the chart; dates sit centered under their spots.
 function trendSvg(sr, fromIso, toIso){
-  const W = 330, H = 150, AX = 10, xL = 30, xR = 302, yTop = 32, yBot = 106, base = 128;
+  const W = 330, H = 175, AX = 14, END = 318, xL = 32, xR = 300, yTop = 38, yBot = 124, base = 150, axis = "#34404e";
   const t0 = parseIso(fromIso).getTime(), t1 = parseIso(toIso).getTime();
   const px = t => xL + (xR - xL) * (t1 === t0 ? 0.5 : (t - t0) / (t1 - t0));
   const path = P => {
@@ -1239,8 +1242,12 @@ function trendSvg(sr, fromIso, toIso){
   const py = v => flat ? (yTop + yBot) / 2 : yTop + (yBot - yTop) * (hiV - v) / (hiV - loV);
   const P = sr.pts.map(q => [px(parseIso(q.date).getTime()), py(q.v)]);
   const f = n => n.toFixed(1), now = P[P.length - 1];
-  let body = `<line x1="${AX}" y1="8" x2="${AX}" y2="${base}" stroke="#34404e" stroke-width="1.4"/>
-    <line x1="${AX}" y1="${base}" x2="${W - 4}" y2="${base}" stroke="#34404e" stroke-width="1.4"/>`;
+  const dayAt = k => { const d = parseIso(fromIso); d.setDate(d.getDate() + k); return d; };
+  const days = Math.round((t1 - t0) / 864e5);
+  let body = `<line x1="${AX}" y1="${f(py(first))}" x2="${END}" y2="${f(py(first))}" stroke="${axis}" stroke-width="1.4" stroke-dasharray="2 5" stroke-linecap="round"/>
+    <line x1="${AX}" y1="10" x2="${AX}" y2="${base}" stroke="${axis}" stroke-width="1.4"/>
+    <line x1="${AX}" y1="${base}" x2="${END}" y2="${base}" stroke="${axis}" stroke-width="1.4"/>`;
+  for (let k = 7; k < days; k += 7){ const x = f(px(dayAt(k).getTime())); body += `<line x1="${x}" y1="${base}" x2="${x}" y2="${base - 6}" stroke="${axis}" stroke-width="1.4"/>`; }
   if (g != null) body += `<line x1="${f(P[0][0])}" y1="${f(P[0][1])}" x2="${xR}" y2="${f(py(g))}" stroke="${sr.color}" stroke-width="1.8" stroke-dasharray="2 6" stroke-linecap="round" opacity=".5"/>`;
   if (P.length > 1) body += `<path d="${path(P)}" fill="none" stroke="${sr.color}" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>`;
   body += P.slice(0, -1).map((q, i) => `<circle cx="${f(q[0])}" cy="${f(q[1])}" r="${i === 0 ? 4.2 : 3}" fill="${sr.color}" stroke="var(--card)" stroke-width="1.4"/>`).join("");
@@ -1252,12 +1259,11 @@ function trendSvg(sr, fromIso, toIso){
     body += `<circle cx="${xR}" cy="${f(gy)}" r="5" fill="var(--card)" stroke="${sr.color}" stroke-width="2.5"/>
       <text x="${xR - 3}" y="${f(gy - 11)}" text-anchor="middle" style="font-size:14.5px;font-weight:700;fill:${sr.color}">${fmt(g)}</text>`;
   }
-  const mid = new Date((t0 + t1) / 2);
+  const mid = dayAt(Math.floor(days / 2));
+  const lbl = (x, text) => `<text x="${f(x)}" y="${base + 18}" text-anchor="middle" style="font-size:12.5px;fill:var(--dim)">${text}</text>`;
   return `<svg viewBox="0 0 ${W} ${H}" style="width:100%;height:auto;display:block">
     ${body}
-    <text x="${AX}" y="${base + 18}" style="font-size:12.5px;fill:var(--dim)">${pdate(fromIso)}</text>
-    <text x="${f((AX + W - 4) / 2)}" y="${base + 18}" text-anchor="middle" style="font-size:12.5px;fill:var(--dim)">${pdate(iso(mid))}</text>
-    <text x="${W - 4}" y="${base + 18}" text-anchor="end" style="font-size:12.5px;fill:var(--dim)">${pdate(toIso)}</text>
+    ${lbl(xL, pdate(fromIso))}${lbl(px(mid.getTime()), pdate(iso(mid)))}${lbl(xR, pdate(toIso))}
   </svg>`;
 }
 // the logs of the metric on the chart, newest first; a row opens the log (date, weight and body fat)
@@ -1285,20 +1291,38 @@ function photosRow(){
   const lw = latest ? lastValTo("weight", latest.date) : null;
   const gt = vEmpty(p.weightTarget) ? null : num(p.weightTarget);
   const left = latest
-    ? `<div class="pbig" data-act="popen" data-p="${latest.id}"><img src="${latest.url}" alt="" decoding="async">
+    ? `<div class="pbig" data-act="popen" data-p="${latest.id}"><img src="${latest.url}" alt="" decoding="async"><i class="pfade"></i>
         <div class="pcap"><b>${pdate(latest.date)}</b>${lw != null ? `<span>${fmt(lw)} kg</span>` : ""}</div></div>`
     : `<div class="pbig empty" data-act="paddphoto">${ic(NICONS.photos, 30)}Add photo</div>`;
   const right = goalPhoto
-    ? `<div class="pbig goal" data-act="gopen"><img src="${goalPhoto.url}" alt="" decoding="async">
+    ? `<div class="pbig goal" data-act="gopen"><img src="${goalPhoto.url}" alt="" decoding="async"><i class="pfade"></i>
         <div class="pcap"><b style="color:var(--acc)">${ic(FLAG, 16)}Goal</b>${gt != null ? `<span>${fmt(gt)} kg</span>` : ""}</div></div>`
     : `<div class="pbig empty" data-act="gaddphoto">${ic(FLAG, 30)}Add goal photo</div>`;
   return `<div class="sech">Photos</div>
     <div class="ppair">${left}${right}</div>
     ${latest ? `<div class="prow">
       <div class="ptile add" data-act="paddphoto">${svgI(PLUS)}<span>Add</span></div>
-      ${photos.slice(1).map(ph => `<div class="ptile" data-act="popen" data-p="${ph.id}"><img src="${ph.url}" alt="" loading="lazy" decoding="async"><span>${pdate(ph.date)}</span></div>`).join("")}
+      ${photos.slice(1).map(ph => `<div class="ptile" data-act="popen" data-p="${ph.id}"><img src="${ph.url}" alt="" loading="lazy" decoding="async"><i class="pfade"></i><span>${pdate(ph.date)}</span></div>`).join("")}
     </div>` : ""}
     <input type="file" accept="image/*" multiple data-act="pfile" style="display:none">
+    <input type="file" accept="image/*" data-act="gfile" style="display:none">`;
+}
+
+// a photo's own page: its date (changed on the wheel) and delete
+function pagePhoto(pg){
+  const ph = photos.find(x => x.id === pg.id); if (!ph) return backLink();
+  return `${backLink()}<h1>${pdate(ph.date)}</h1>
+    <div class="pview"><img src="${ph.url}" alt="" decoding="async"></div>
+    <div class="lst">${vrow("photo", 0, "Date", vDisp({ t: "date" }, ph.date), `data-id="${ph.id}"`)}</div>
+    ${delLink("pdel", ph.id, `data-p="${ph.id}"`, "Delete photo")}`;
+}
+// the goal photo's page: replace or delete
+function pageGoal(){
+  if (!goalPhoto) return backLink();
+  return `${backLink()}<h1>Goal</h1>
+    <div class="pview"><img src="${goalPhoto.url}" alt="" decoding="async"></div>
+    <div class="lst">${li(`${svgI(NICONS.photos)}<span>Replace photo</span>`, `data-act="gaddphoto"`, "acts tap")}</div>
+    ${delLink("gdel", "goal", "", "Delete photo")}
     <input type="file" accept="image/*" data-act="gfile" style="display:none">`;
 }
 
@@ -1390,8 +1414,8 @@ function loadPhotos(){
   return ptx("readonly", st => st.getAll()).then(rows => {
     const all = rows || [], g = all.find(r => r.id === "goal");
     goalPhoto = g ? { id: "goal", date: g.date, url: URL.createObjectURL(g.blob) } : null;
-    photos = all.filter(r => r.id !== "goal").sort((a, b) => (b.ts || 0) - (a.ts || 0))
-      .map(r => ({ id: r.id, date: r.date, url: URL.createObjectURL(r.blob) }));
+    photos = all.filter(r => r.id !== "goal").map(r => ({ id: r.id, date: r.date, ts: r.ts || 0, url: URL.createObjectURL(r.blob) }));
+    sortPhotos();
   }).catch(() => {});
 }
 // downscale to 1400px JPEG before storing (IndexedDB holds the blob; localStorage is too small for images)
@@ -1415,9 +1439,17 @@ function addPhoto(file){
     if (!blob) return;
     const rec = { id: uid(), date: iso(new Date()), ts: Date.now(), blob };
     return ptx("readwrite", st => st.put(rec)).then(() => {
-      photos.unshift({ id: rec.id, date: rec.date, url: URL.createObjectURL(blob) });
+      photos.unshift({ id: rec.id, date: rec.date, ts: rec.ts, url: URL.createObjectURL(blob) });
+      sortPhotos();
     }).catch(() => {});
   });
+}
+// newest date first (a photo's date can be changed on its page); same day: the one added last first
+const sortPhotos = () => photos.sort((a, b) => a.date < b.date ? 1 : a.date > b.date ? -1 : (b.ts || 0) - (a.ts || 0));
+function setPhotoDate(id, date){
+  const ph = photos.find(x => x.id === id); if (!ph || !date) return;
+  ph.date = date; sortPhotos();
+  ptx("readwrite", st => { const q = st.get(id); q.onsuccess = () => { if (q.result){ q.result.date = date; st.put(q.result); } }; return q; }).catch(() => {});
 }
 function setGoalPhoto(file){
   return shrinkImage(file).then(blob => {
@@ -1723,6 +1755,8 @@ const baseTxt = ex => ex.type === "time" ? `${num(ex.tsets, 1) > 1 ? `${num(ex.t
 function pageTitle(pg){
   const k = pg.k;
   if (k === "cycle") return modeLbl(state.profile.mode);
+  if (k === "photo"){ const ph = photos.find(x => x.id === pg.id); return ph ? pdate(ph.date) : "Photo"; }
+  if (k === "goalph") return "Goal";
   if (k === "wks") return "Workouts";
   if (k === "wk"){ const w = findWk(pg.id); return w ? w.title : "Workout"; }
   if (k === "ex"){ const w = findWk(pg.w), ex = w && (w.exercises || []).find(x => x.id === pg.id); return ex ? ex.name : "Exercise"; }
@@ -2011,7 +2045,7 @@ const pageRules = () => `${backLink()}<h1>Autorules</h1><div style="margin-top:1
 
 const PAGES = { cycle: pageCycle, review: pageReview, onb: pageOnb, wks: pageWks, wk: pageWk, ex: pageEx,
   menu: pageMenu, mi: pageMi, habits: pageHabits, habit: pageHabit, cheats: pageCheats, xo: pageXo,
-  presets: pagePresets, rules: pageRules };
+  presets: pagePresets, rules: pageRules, photo: pagePhoto, goalph: pageGoal };
 
 function pushPage(pg){
   const sc = document.getElementById("scroll");
@@ -2139,6 +2173,10 @@ function groupSpec(g, d){
   if (g === "water") return { fields: [
     F.num("Water", () => num(waterOf().target, 8), v => { state.nutrition.water = { ...waterOf(), target: Math.max(1, Math.round(v)) }; },
       { min: 1, max: 30, unit: waterOf().unit || "glasses" })] };
+  if (g === "photo"){
+    const ph = photos.find(x => x.id === d.id); if (!ph) return null;
+    return { fields: [F.date("Date", () => ph.date, v => { setPhotoDate(ph.id, v); })] };
+  }
   if (g === "log" && logDraft){
     // an empty value starts the wheel at the latest log, not at a generic default
     const lastOf = k => { const m0 = (state.measurements || []).filter(x => x[k] != null && !isNaN(num(x[k], NaN))).sort((a, b) => a.date < b.date ? -1 : 1).at(-1);
@@ -2362,18 +2400,6 @@ function render(){
         + (others.length ? `<div class="tiny" style="margin:12px 0 2px">Other ${esc(wtypeOfW(w))} workouts</div>${others.map(o => wRow(o)).join("")}` : "")
         + (rest.length ? `<div class="tiny" style="margin:12px 0 2px">Other types</div>${rest.map(o => wRow(o, true)).join("")}` : "");
       foot = `<button data-act="shcancel">Cancel</button>`;
-    } else if (sheet.kind === "goal"){
-      title = "Goal";
-      content = goalPhoto ? `<img src="${goalPhoto.url}" decoding="async" style="width:100%;border-radius:14px;display:block">` : "";
-      foot = `<button class="ghost" data-act="gdel" style="color:var(--bad)">${armed === "gdel" ? "Tap again to delete" : "Delete"}</button>
-        <button class="ghost" data-act="gaddphoto">Replace</button>
-        <button class="pri" data-act="shcancel">Close</button>`;
-    } else if (sheet.kind === "photo"){
-      const p = photos.find(x => x.id === sheet.pid);
-      title = p ? pdate(p.date, true) : "Photo";
-      content = p ? `<img src="${p.url}" decoding="async" style="width:100%;border-radius:14px;display:block">` : "";
-      foot = `<button class="ghost" data-act="pdel" data-p="${sheet.pid}" style="color:var(--bad)">${armed === "pdel:" + sheet.pid ? "Tap again to delete" : "Delete"}</button>
-        <button class="pri" data-act="shcancel">Close</button>`;
     }
     sroot.innerHTML = `<div class="overlay" data-act="shcancel"></div>
       <div class="sheet${sheetNew ? "" : " noanim"}">
@@ -2548,20 +2574,20 @@ document.addEventListener("click", e => {
     gAdd = false; save(); render(); return;
   }
   if (a === "paddphoto"){ const f = document.querySelector('input[data-act="pfile"]'); if (f) f.click(); return; }
-  if (a === "popen"){ sheetNew = true; sheet = { kind: "photo", pid: el.dataset.p }; render(); return; }
+  if (a === "popen"){ pushPage({ k: "photo", id: el.dataset.p }); return; }
   if (a === "gaddphoto"){ const f = document.querySelector('input[data-act="gfile"]'); if (f) f.click(); return; }
-  if (a === "gopen"){ sheetNew = true; sheet = { kind: "goal" }; render(); return; }
+  if (a === "gopen"){ pushPage({ k: "goalph" }); return; }
   if (a === "gdel"){
-    if (armed !== "gdel"){ armed = "gdel"; render(); return; }
+    if (armed !== "gdel:goal"){ armed = "gdel:goal"; render(); return; }
     armed = null;
-    delGoalPhoto().then(() => { sheet = null; render(); });
+    delGoalPhoto().then(() => popIf("goalph", undefined));
     return;
   }
   if (a === "pdel"){
     const id = el.dataset.p;
     if (armed !== "pdel:" + id){ armed = "pdel:" + id; render(); return; }
     armed = null;
-    delPhoto(id).then(() => { sheet = null; render(); });
+    delPhoto(id).then(() => popIf("photo", id));
     return;
   }
 
