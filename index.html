@@ -319,7 +319,8 @@ nav svg{width:25px;height:25px;stroke:currentColor;fill:none;stroke-width:1.8;st
 .pbig img{width:100%;height:100%;object-fit:cover;display:block}
 .pbig.goal::after{content:"";position:absolute;inset:0;border-radius:18px;box-shadow:inset 0 0 0 2px var(--acc);pointer-events:none}
 .pbig.empty{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;color:var(--acc);font-size:15px;font-weight:500}
-.pcap{position:absolute;left:12px;bottom:10px;right:10px;text-shadow:0 1px 4px rgba(0,0,0,.8)}
+.pcap{position:absolute;left:12px;bottom:10px;right:10px;text-shadow:0 1px 2px rgba(0,0,0,.95),0 0 6px rgba(0,0,0,.8),0 0 16px rgba(0,0,0,.6)}
+.pcap .pic{filter:drop-shadow(0 1px 2px rgba(0,0,0,.95)) drop-shadow(0 0 6px rgba(0,0,0,.7))}
 .pcap b{display:flex;align-items:center;gap:5px;font-size:17px;font-weight:600;color:#f2f5f7}
 .pcap span{display:block;font-size:13px;color:#dfe4ea;margin-top:1px}
 .pic{flex:none;fill:none;stroke:currentColor;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
@@ -327,7 +328,7 @@ nav svg{width:25px;height:25px;stroke:currentColor;fill:none;stroke-width:1.8;st
 .prow::-webkit-scrollbar{display:none}
 .ptile{flex:none;width:92px;height:122px;border-radius:16px;overflow:hidden;position:relative;background:var(--card);cursor:pointer}
 .ptile img{width:100%;height:100%;object-fit:cover;display:block}
-.ptile span{position:absolute;left:8px;bottom:6px;font-size:12px;font-weight:600;color:#fff;text-shadow:0 1px 3px rgba(0,0,0,.7)}
+.ptile span{position:absolute;left:8px;bottom:6px;font-size:12px;font-weight:600;color:#fff;text-shadow:0 1px 2px rgba(0,0,0,.95),0 0 5px rgba(0,0,0,.8),0 0 12px rgba(0,0,0,.6)}
 .ptile.add{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;color:var(--acc)}
 .ptile.add span{position:static;color:var(--acc);text-shadow:none;font-size:15px;font-weight:500}
 /* trend logs: rows inside the card, add/edit in place */
@@ -1221,7 +1222,7 @@ function viewHome(){
 // the solid line is what was logged, today's (latest) point ringed. Only the start value and the
 // goal are written on the chart; the axis lines carry no numbers.
 function trendSvg(sr, fromIso, toIso){
-  const W = 330, H = 150, AX = 10, xL = 18, xR = 316, yTop = 26, yBot = 112, base = 128;
+  const W = 330, H = 150, AX = 10, xL = 30, xR = 302, yTop = 32, yBot = 106, base = 128;
   const t0 = parseIso(fromIso).getTime(), t1 = parseIso(toIso).getTime();
   const px = t => xL + (xR - xL) * (t1 === t0 ? 0.5 : (t - t0) / (t1 - t0));
   const path = P => {
