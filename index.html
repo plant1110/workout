@@ -314,6 +314,15 @@ nav svg{width:25px;height:25px;stroke:currentColor;fill:none;stroke-width:1.8;st
 .shs{font-size:15px;color:var(--dim);font-weight:400;margin-top:1px}
 /* home: two-line chart, photo thumbnails */
 .tchart{margin-top:24px}
+.ppair{display:flex;gap:10px;margin-bottom:10px}
+.pbig{flex:1;min-width:0;height:232px;border-radius:18px;background:var(--card);position:relative;overflow:hidden;cursor:pointer}
+.pbig img{width:100%;height:100%;object-fit:cover;display:block}
+.pbig.goal::after{content:"";position:absolute;inset:0;border-radius:18px;box-shadow:inset 0 0 0 2px var(--acc);pointer-events:none}
+.pbig.empty{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;color:var(--acc);font-size:15px;font-weight:500}
+.pcap{position:absolute;left:12px;bottom:10px;right:10px;text-shadow:0 1px 4px rgba(0,0,0,.8)}
+.pcap b{display:flex;align-items:center;gap:5px;font-size:17px;font-weight:600;color:#f2f5f7}
+.pcap span{display:block;font-size:13px;color:#dfe4ea;margin-top:1px}
+.pic{flex:none;fill:none;stroke:currentColor;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
 .prow{display:flex;gap:10px;overflow-x:auto;padding:0 2px 4px;margin-bottom:6px;scrollbar-width:none;-webkit-overflow-scrolling:touch}
 .prow::-webkit-scrollbar{display:none}
 .ptile{flex:none;width:92px;height:122px;border-radius:16px;overflow:hidden;position:relative;background:var(--card);cursor:pointer}
@@ -1267,14 +1276,29 @@ function logPanel(){
       : `<button class="lbtn bad" data-act="lddel">${armed === "lddel" ? "Tap again to delete" : "Delete"}</button><button class="lbtn acc" data-act="ldsave">Done</button>`}</div>
   </div>`;
 }
-// progress photos: a row of thumbnails (the viewer opens on tap)
+// photos: the latest beside the goal (the target look), older ones in the row underneath
+const FLAG = '<path d="M5 5a5 5 0 0 1 7 0a5 5 0 0 0 7 0v9a5 5 0 0 1 -7 0a5 5 0 0 0 -7 0v-9z" /> <path d="M5 21v-7" />';
 function photosRow(){
+  const p = state.profile, latest = photos[0];
+  const ic = (paths, px) => `<svg class="pic" viewBox="0 0 24 24" style="width:${px}px;height:${px}px">${paths}</svg>`;
+  const lw = latest ? lastValTo("weight", latest.date) : null;
+  const gt = vEmpty(p.weightTarget) ? null : num(p.weightTarget);
+  const left = latest
+    ? `<div class="pbig" data-act="popen" data-p="${latest.id}"><img src="${latest.url}" alt="" decoding="async">
+        <div class="pcap"><b>${pdate(latest.date)}</b>${lw != null ? `<span>${fmt(lw)} kg</span>` : ""}</div></div>`
+    : `<div class="pbig empty" data-act="paddphoto">${ic(NICONS.photos, 30)}Add photo</div>`;
+  const right = goalPhoto
+    ? `<div class="pbig goal" data-act="gopen"><img src="${goalPhoto.url}" alt="" decoding="async">
+        <div class="pcap"><b style="color:var(--acc)">${ic(FLAG, 16)}Goal</b>${gt != null ? `<span>${fmt(gt)} kg</span>` : ""}</div></div>`
+    : `<div class="pbig empty" data-act="gaddphoto">${ic(FLAG, 30)}Add goal photo</div>`;
   return `<div class="sech">Photos</div>
-    <div class="prow">
+    <div class="ppair">${left}${right}</div>
+    ${latest ? `<div class="prow">
       <div class="ptile add" data-act="paddphoto">${svgI(PLUS)}<span>Add</span></div>
-      ${photos.map(ph => `<div class="ptile" data-act="popen" data-p="${ph.id}"><img src="${ph.url}" alt="" loading="lazy" decoding="async"><span>${pdate(ph.date)}</span></div>`).join("")}
-    </div>
-    <input type="file" accept="image/*" multiple data-act="pfile" style="display:none">`;
+      ${photos.slice(1).map(ph => `<div class="ptile" data-act="popen" data-p="${ph.id}"><img src="${ph.url}" alt="" loading="lazy" decoding="async"><span>${pdate(ph.date)}</span></div>`).join("")}
+    </div>` : ""}
+    <input type="file" accept="image/*" multiple data-act="pfile" style="display:none">
+    <input type="file" accept="image/*" data-act="gfile" style="display:none">`;
 }
 
 function photoMeta(p){
@@ -1347,6 +1371,7 @@ function xring(c, limit, color, px = 54){
 
 /* ---------- progress photos: stored in IndexedDB (localStorage is too small for images) ---------- */
 let photos = [];                                  // { id, date, url } newest first, in-memory mirror
+let goalPhoto = null;                             // { id: "goal", date, url } — the target look, one for all cycles
 function ptx(mode, fn){
   return new Promise((res, rej) => {
     const q = indexedDB.open("workout.photos", 1);
@@ -1362,11 +1387,14 @@ function ptx(mode, fn){
 }
 function loadPhotos(){
   return ptx("readonly", st => st.getAll()).then(rows => {
-    photos = (rows || []).sort((a, b) => (b.ts || 0) - (a.ts || 0))
+    const all = rows || [], g = all.find(r => r.id === "goal");
+    goalPhoto = g ? { id: "goal", date: g.date, url: URL.createObjectURL(g.blob) } : null;
+    photos = all.filter(r => r.id !== "goal").sort((a, b) => (b.ts || 0) - (a.ts || 0))
       .map(r => ({ id: r.id, date: r.date, url: URL.createObjectURL(r.blob) }));
   }).catch(() => {});
 }
-function addPhoto(file){
+// downscale to 1400px JPEG before storing (IndexedDB holds the blob; localStorage is too small for images)
+function shrinkImage(file){
   return new Promise(res => {
     const img = new Image();
     img.onload = () => {
@@ -1375,18 +1403,36 @@ function addPhoto(file){
       c.width = Math.round(img.naturalWidth * scale); c.height = Math.round(img.naturalHeight * scale);
       c.getContext("2d").drawImage(img, 0, 0, c.width, c.height);
       URL.revokeObjectURL(img.src);
-      c.toBlob(blob => {
-        if (!blob) return res();
-        const rec = { id: uid(), date: iso(new Date()), ts: Date.now(), blob };
-        ptx("readwrite", st => st.put(rec)).then(() => {
-          photos.unshift({ id: rec.id, date: rec.date, url: URL.createObjectURL(blob) });
-          res();
-        }).catch(res);
-      }, "image/jpeg", 0.85);
+      c.toBlob(blob => res(blob || null), "image/jpeg", 0.85);
     };
-    img.onerror = () => res();
+    img.onerror = () => res(null);
     img.src = URL.createObjectURL(file);
   });
+}
+function addPhoto(file){
+  return shrinkImage(file).then(blob => {
+    if (!blob) return;
+    const rec = { id: uid(), date: iso(new Date()), ts: Date.now(), blob };
+    return ptx("readwrite", st => st.put(rec)).then(() => {
+      photos.unshift({ id: rec.id, date: rec.date, url: URL.createObjectURL(blob) });
+    }).catch(() => {});
+  });
+}
+function setGoalPhoto(file){
+  return shrinkImage(file).then(blob => {
+    if (!blob) return;
+    const rec = { id: "goal", date: iso(new Date()), ts: Date.now(), blob };
+    return ptx("readwrite", st => st.put(rec)).then(() => {
+      if (goalPhoto) URL.revokeObjectURL(goalPhoto.url);
+      goalPhoto = { id: "goal", date: rec.date, url: URL.createObjectURL(blob) };
+    }).catch(() => {});
+  });
+}
+function delGoalPhoto(){
+  return ptx("readwrite", st => st.delete("goal")).then(() => {
+    if (goalPhoto) URL.revokeObjectURL(goalPhoto.url);
+    goalPhoto = null;
+  }).catch(() => {});
 }
 function delPhoto(id){
   return ptx("readwrite", st => st.delete(id)).then(() => {
@@ -2315,6 +2361,12 @@ function render(){
         + (others.length ? `<div class="tiny" style="margin:12px 0 2px">Other ${esc(wtypeOfW(w))} workouts</div>${others.map(o => wRow(o)).join("")}` : "")
         + (rest.length ? `<div class="tiny" style="margin:12px 0 2px">Other types</div>${rest.map(o => wRow(o, true)).join("")}` : "");
       foot = `<button data-act="shcancel">Cancel</button>`;
+    } else if (sheet.kind === "goal"){
+      title = "Goal";
+      content = goalPhoto ? `<img src="${goalPhoto.url}" decoding="async" style="width:100%;border-radius:14px;display:block">` : "";
+      foot = `<button class="ghost" data-act="gdel" style="color:var(--bad)">${armed === "gdel" ? "Tap again to delete" : "Delete"}</button>
+        <button class="ghost" data-act="gaddphoto">Replace</button>
+        <button class="pri" data-act="shcancel">Close</button>`;
     } else if (sheet.kind === "photo"){
       const p = photos.find(x => x.id === sheet.pid);
       title = p ? pdate(p.date, true) : "Photo";
@@ -2358,7 +2410,7 @@ document.addEventListener("click", e => {
   }
   if (el.tagName === "SELECT" || el.tagName === "INPUT") return;   // fields act on change, not on tap
   const a = el.dataset.act;
-  const ARMED_ACTS = ["nreset", "delwk", "pdel", "nmdel", "ndel", "xdel", "delex", "nmidel", "xtdel", "gldel", "npresetdel", "delrule", "endcyc", "npreset", "lddel"];
+  const ARMED_ACTS = ["nreset", "delwk", "pdel", "gdel", "nmdel", "ndel", "xdel", "delex", "nmidel", "xtdel", "gldel", "npresetdel", "delrule", "endcyc", "npreset", "lddel"];
   if (armed && !ARMED_ACTS.includes(a)) armed = null;
 
   // ---------- values: the docked wheel ----------
@@ -2496,6 +2548,14 @@ document.addEventListener("click", e => {
   }
   if (a === "paddphoto"){ const f = document.querySelector('input[data-act="pfile"]'); if (f) f.click(); return; }
   if (a === "popen"){ sheetNew = true; sheet = { kind: "photo", pid: el.dataset.p }; render(); return; }
+  if (a === "gaddphoto"){ const f = document.querySelector('input[data-act="gfile"]'); if (f) f.click(); return; }
+  if (a === "gopen"){ sheetNew = true; sheet = { kind: "goal" }; render(); return; }
+  if (a === "gdel"){
+    if (armed !== "gdel"){ armed = "gdel"; render(); return; }
+    armed = null;
+    delGoalPhoto().then(() => { sheet = null; render(); });
+    return;
+  }
   if (a === "pdel"){
     const id = el.dataset.p;
     if (armed !== "pdel:" + id){ armed = "pdel:" + id; render(); return; }
@@ -2875,6 +2935,12 @@ document.addEventListener("change", e => {
     const files = [...(el.files || [])];
     el.value = "";
     if (files.length) Promise.all(files.map(addPhoto)).then(() => render());
+    return;
+  }
+  if (a === "gfile"){   // new or replaced goal photo; the viewer (if open) closes on the new picture
+    const f = (el.files || [])[0];
+    el.value = "";
+    if (f) setGoalPhoto(f).then(() => { sheet = null; render(); });
     return;
   }
   if (a === "nrulef"){ const r = state.nutrition.rules.find(x => x.id === el.dataset.r); if (r){ r.name = v; save(); } return; }
