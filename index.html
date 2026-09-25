@@ -1534,7 +1534,9 @@ function dayFlags(ds){
   const meals = state.nutrition.menu.filter(m => !m.days || m.days.includes(di0));
   const wt = num(waterOf().target, 0), ln = state.nutrition.logs[ds] || {};
   const nTracked = meals.length > 0 || wt > 0;
-  const nOk = !nTracked || (meals.every(m => ln[m.id]) && num(ln.water, 0) >= wt && weekOkFor(ds) && !num((state.nutrition.xnoslot || {})[ds], 0));
+  // in a cut, eating less than the menu is the point: an unchecked meal counts as skipped, not missed
+  const mealsOk = state.profile.mode === "cut" || meals.every(m => ln[m.id]);
+  const nOk = !nTracked || (mealsOk && num(ln.water, 0) >= wt && weekOkFor(ds) && !num((state.nutrition.xnoslot || {})[ds], 0));
   const r = { wPlanned, wOk, nTracked, nOk };
   if (past) state.verdicts[ds] = r;   // persists with the next save; deterministic until then
   return r;
