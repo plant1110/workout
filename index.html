@@ -1133,6 +1133,12 @@ function segRing(codes, px, sw){
     <circle cx="50" cy="50" r="${r}" stroke="#1c232d" stroke-width="${sw}" fill="none"/>${arcs}</svg>`;
 }
 const mring = codes => `<div class="mring">${segRing(codes, 48, 10)}<b>${[...codes].filter(c => c === "g").length}</b></div>`;
+// a cycle counts from its first log (the start values logged when it began)
+function firstValIn(k, from, to){
+  const m = (state.measurements || []).filter(x => x[k] != null && !isNaN(num(x[k], NaN)) && x.date >= from && x.date <= to)
+    .sort((a, b) => a.date < b.date ? -1 : 1)[0];
+  return m ? num(m[k]) : null;
+}
 function lastValTo(k, to){
   const m = (state.measurements || []).filter(x => x[k] != null && !isNaN(num(x[k], NaN)) && x.date <= to)
     .sort((a, b) => a.date < b.date ? -1 : 1).at(-1);
@@ -1158,8 +1164,8 @@ function cycleRecord(from, to){
     if (f.nTracked && f.nOk) nd++;
   }
   return { from, to, mode: p.mode, days: days.join(""), wd, nd,
-    w: { start: p.weightStart, end: lastValTo("weight", to) ?? p.weightNow, target: p.weightTarget },
-    f: { start: p.fatStart, end: lastValTo("fat", to) ?? p.fatNow, target: p.fatTarget } };
+    w: { start: firstValIn("weight", from, to) ?? p.weightStart, end: lastValTo("weight", to) ?? p.weightNow, target: p.weightTarget },
+    f: { start: firstValIn("fat", from, to) ?? p.fatStart, end: lastValTo("fat", to) ?? p.fatNow, target: p.fatTarget } };
 }
 
 function viewHome(){
@@ -1167,9 +1173,9 @@ function viewHome(){
   const ended = cycleEnded();
   const total = Math.max(1, num(p.regimeDays, 30));
   const prog = (now, start, target) => (num(target) === num(start)) ? 1 : clamp((num(now) - num(start)) / (num(target) - num(start)), 0, 1);
-  const wp = prog(p.weightNow, p.weightStart, p.weightTarget);
-  const fp = prog(p.fatNow, p.fatStart, p.fatTarget);
   const { from, to } = gPeriod();
+  const wp = prog(p.weightNow, firstValIn("weight", from, to) ?? p.weightStart, p.weightTarget);
+  const fp = prog(p.fatNow, firstValIn("fat", from, to) ?? p.fatStart, p.fatTarget);
   const series = k => (state.measurements || []).filter(m => m[k] != null && !isNaN(num(m[k], NaN)) && m.date >= from && m.date <= to)
     .sort((a, b) => a.date < b.date ? -1 : 1).map(m => ({ date: m.date, v: num(m[k]) }));
   const tv = k => vEmpty(p[k]) ? null : num(p[k]);
@@ -1788,15 +1794,15 @@ function startCycle(){
   const p = state.profile, o = onb, today = iso(new Date());
   const r = archiveRange();
   if (r) state.regimes.push(cycleRecord(r.from, r.to));
-  // a new weight or fat becomes today's log; an unchanged value is never re-logged
+  // the start weight and body fat are the cycle's first logs (today), even when unchanged
   const wN = num(o.wNow, NaN), fN = num(o.fNow, NaN);
-  const logIt = (k, v, prev) => {
-    if (isNaN(v) || v === num(prev, NaN)) return;
+  const logIt = (k, v) => {
+    if (isNaN(v)) return;
     let m = state.measurements.find(x => x.date === today);
     if (!m){ m = { date: today }; state.measurements.push(m); }
     m[k] = v;
   };
-  logIt("weight", wN, p.weightNow); logIt("fat", fN, p.fatNow);
+  logIt("weight", wN); logIt("fat", fN);
   syncNow();
   if (!isNaN(wN)) p.weightNow = wN;
   if (!isNaN(fN)) p.fatNow = fN;
