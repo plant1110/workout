@@ -3159,21 +3159,6 @@ if (!state.verdictSeed1){
   }
   state.verdictSeed1 = true;
 }
-// one-time (v182): the cut rule (an unchecked meal counts as skipped) reaches this cycle's ended days too.
-// It only upgrades their nutrition result where water was done, cheats stayed within budget and no cheat
-// voided the day; workout results and days of other cycles stay exactly as they were locked.
-if (!state.cutMeals1){
-  if (state.profile.mode === "cut"){
-    const today = iso(new Date()), wt = num(waterOf().target, 0);
-    for (const ds in state.verdicts){
-      const v = state.verdicts[ds];
-      if (ds < state.profile.anchor || ds >= today || !v || v.nOk || !v.nTracked) continue;
-      const ln = state.nutrition.logs[ds] || {};
-      if (num(ln.water, 0) >= wt && weekOkFor(ds) && !num((state.nutrition.xnoslot || {})[ds], 0)) v.nOk = true;
-    }
-  }
-  state.cutMeals1 = true;
-}
 save();
 bootPages();
 render();
