@@ -1780,7 +1780,7 @@ function pageCycle(){
   const planRow = (k, icon, label) => li(`<span class="dimi">${svgI(icon)}</span><span class="grow rt">${label}</span>`, `data-act="go" data-k="${k}"`, "tap");
   return `${backLink()}<h1>${esc(modeLbl(p.mode))}</h1><div class="pgsub">${dRange(p.anchor, cycleEnd())}</div>
     <div class="lst" style="margin-top:18px">
-      ${vrow("cycle", 0, "Goal", esc(modeLbl(p.mode)))}
+      ${vrow("cycle", 0, "Mode", esc(modeLbl(p.mode)))}
       ${vrow("cycle", 1, "Length", `${total} days`)}
       ${vrow("cycle", 2, "Target weight", vEmpty(p.weightTarget) ? NOTSET : `${fmt(num(p.weightTarget))} kg`)}
       ${vrow("cycle", 3, "Target body fat", vEmpty(p.fatTarget) ? NOTSET : `${fmt(num(p.fatTarget))} %`)}
@@ -1844,7 +1844,7 @@ function pageOnb(){
   let body;
   if (o.step === 0){
     const opt = (m, icon) => `<div class="ocard ${o.mode === m ? "on" : ""}" data-act="onbmode" data-m="${m}"><svg viewBox="0 0 24 24">${icon}</svg>${modeLbl(m)}${o.mode === m ? `<span class="ok">${CK}</span>` : ""}</div>`;
-    body = `<div class="oq">What's your goal?</div>${opt("cut", ICO_DOWN)}${opt("maintain", ICO_FLAT)}${opt("bulk", ICO_UP)}`;
+    body = `<div class="oq">Choose your mode</div>${opt("cut", ICO_DOWN)}${opt("maintain", ICO_FLAT)}${opt("bulk", ICO_UP)}`;
   } else if (o.step === 1){
     const tb = tapeBF({ heightCm: o.h, waistCm: o.waist, neckCm: o.neck });
     body = `<div class="oq">Where are you now?</div>
@@ -2163,7 +2163,7 @@ function groupSpec(g, d){
   const FAT = { min: 3, max: 50, dec: 1, unit: "%", def: 15 };
   const PER = [["day", "Day"], ["week", "Week"], ["month", "Month"]];
   if (g === "cycle") return { fields: [
-    F.choice("Goal", () => p.mode, v => { p.mode = v; }, [["cut", "Cut"], ["maintain", "Maintain"], ["bulk", "Bulk"]]),
+    F.choice("Mode", () => p.mode, v => { p.mode = v; }, [["cut", "Cut"], ["maintain", "Maintain"], ["bulk", "Bulk"]]),
     F.num("Length", () => num(p.regimeDays, 30), v => { p.regimeDays = p.lenPlan = Math.max(1, Math.round(v)); }, { min: 1, max: 365, unit: "days", rr: true }),
     F.num("Target weight", () => p.weightTarget, v => { p.weightTarget = v; }, W),
     F.num("Target body fat", () => p.fatTarget, v => { p.fatTarget = v; }, FAT)] };
