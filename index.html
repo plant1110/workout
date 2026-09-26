@@ -322,6 +322,17 @@ nav svg{width:25px;height:25px;stroke:currentColor;fill:none;stroke-width:1.8;st
 .pcap{position:absolute;left:12px;bottom:10px;right:10px;text-shadow:0 1px 3px rgba(0,0,0,.6)}
 .pfade{position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,.88),rgba(0,0,0,.45) 22%,rgba(0,0,0,0) 50%);pointer-events:none}
 .pview{border-radius:18px;overflow:hidden;background:var(--card);margin:14px 0}
+.pcard{position:relative;border-radius:18px;overflow:hidden;background:var(--card);margin-top:14px;touch-action:none;user-select:none;-webkit-user-select:none;cursor:pointer;transition:height .25s ease}
+.pcard img{width:100%;height:100%;object-fit:cover;display:block;pointer-events:none;-webkit-user-drag:none}
+.pbars{position:absolute;left:10px;right:10px;top:10px;display:flex;gap:4px;pointer-events:none}
+.pbars i{flex:1;height:3px;border-radius:9px;background:rgba(255,255,255,.35)}
+.pbars i.on{background:#fff}
+.pccap{position:absolute;left:14px;right:14px;bottom:14px;text-shadow:0 1px 3px rgba(0,0,0,.6);pointer-events:none}
+.pccap b{display:block;font-size:24px;font-weight:650;color:#f2f5f7}
+.pccap span{display:block;font-size:15px;color:#e6e9ee;margin-top:1px}
+.pedit{margin-top:12px}
+.pedit.anim{animation:pedup .25s ease}
+@keyframes pedup{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:none}}
 .pview img{width:100%;display:block}
 .pcap b{display:flex;align-items:center;gap:5px;font-size:17px;font-weight:600;color:#f2f5f7}
 .pcap span{display:block;font-size:13px;color:#dfe4ea;margin-top:1px}
@@ -1309,12 +1320,36 @@ function photosRow(){
 }
 
 // a photo's own page: its date (changed on the wheel) and delete
+// a photo's own page, like Tinder: the photo fills the screen, bars on top show where you are,
+// its date and weight sit on it. Editing (date, delete) exists only after a swipe up.
+let photoCardH = 0, photoEditAnim = false;
 function pagePhoto(pg){
   const ph = photos.find(x => x.id === pg.id); if (!ph) return backLink();
-  return `${backLink()}<h1>${pdate(ph.date)}</h1>
-    <div class="pview"><img src="${ph.url}" alt="" decoding="async"></div>
-    <div class="lst">${vrow("photo", 0, "Date", vDisp({ t: "date" }, ph.date), `data-id="${ph.id}"`)}</div>
-    ${delLink("pdel", ph.id, `data-p="${ph.id}"`, "Delete photo")}`;
+  const w = lastValTo("weight", ph.date);
+  const anim = photoEditAnim; photoEditAnim = false;
+  return `${backLink()}
+    <div class="pcard"><img src="${ph.url}" alt="" decoding="async"><i class="pfade"></i>
+      <div class="pbars">${photos.map(p => `<i class="${p.id === ph.id ? "on" : ""}"></i>`).join("")}</div>
+      <div class="pccap"><b>${pdate(ph.date)}</b>${w != null ? `<span>${fmt(w)} kg</span>` : ""}</div></div>
+    ${pg.edit ? `<div class="pedit${anim ? " anim" : ""}">
+      <div class="lst">${vrow("photo", 0, "Date", vDisp({ t: "date" }, ph.date), `data-id="${ph.id}"`)}</div>
+      ${delLink("pdel", ph.id, `data-p="${ph.id}"`, "Delete photo")}</div>` : ""}`;
+}
+// the photo takes exactly the height that's left, so the page never scrolls; a height change
+// (editing on/off) animates from the previous height
+function fitPhotoCard(){
+  const sc = document.getElementById("scroll"), app = document.getElementById("app"), card = document.querySelector("#view .pcard");
+  if (!card) return;
+  if (photoCardH){ card.style.transition = "none"; card.style.height = photoCardH + "px"; }
+  const cs = getComputedStyle(sc);
+  const room = sc.clientHeight - app.offsetHeight - parseFloat(cs.paddingTop) - parseFloat(cs.paddingBottom);
+  const target = Math.max(260, Math.round(card.offsetHeight + room));
+  if (photoCardH && target !== photoCardH){
+    void card.offsetHeight;
+    card.style.transition = "";
+    requestAnimationFrame(() => { card.style.height = target + "px"; });
+  } else { card.style.transition = ""; card.style.height = target + "px"; }
+  photoCardH = target;
 }
 // the goal photo's page: replace or delete
 function pageGoal(){
@@ -2344,6 +2379,7 @@ function render(){
   document.getElementById("view").innerHTML = top ? PAGES[top.k](top) : VIEWS[tab]();
   const prow1 = document.querySelector("#view .prow");
   if (prow1 && pscroll != null) prow1.scrollLeft = pscroll;
+  if (top && top.k === "photo") fitPhotoCard();
   const sroot = document.getElementById("sheetRoot");
   if (sheet){
     let title = "", content = "", foot = `<button data-act="shcancel">Close</button>`;
@@ -2576,7 +2612,7 @@ document.addEventListener("click", e => {
     gAdd = false; save(); render(); return;
   }
   if (a === "paddphoto"){ const f = document.querySelector('input[data-act="pfile"]'); if (f) f.click(); return; }
-  if (a === "popen"){ pushPage({ k: "photo", id: el.dataset.p }); return; }
+  if (a === "popen"){ photoCardH = 0; pushPage({ k: "photo", id: el.dataset.p }); return; }
   if (a === "gaddphoto"){ const f = document.querySelector('input[data-act="gfile"]'); if (f) f.click(); return; }
   if (a === "gopen"){ pushPage({ k: "goalph" }); return; }
   if (a === "gdel"){
@@ -3049,6 +3085,28 @@ document.addEventListener("input", e => {
     }
   }
 });
+
+/* ---------- the photo page's gestures ---------- */
+let pSwipe = null;
+document.addEventListener("pointerdown", e => { if (e.target.closest("#view .pcard")) pSwipe = { x: e.clientX, y: e.clientY }; });
+document.addEventListener("pointercancel", () => { pSwipe = null; });
+document.addEventListener("pointerup", e => {
+  if (!pSwipe) return;
+  const s0 = pSwipe; pSwipe = null;
+  const pg = pages[pages.length - 1]; if (!pg || pg.k !== "photo") return;
+  const dx = e.clientX - s0.x, dy = e.clientY - s0.y;
+  if (Math.abs(dy) > 40 && Math.abs(dy) > Math.abs(dx)){
+    const on = dy < 0; if (!!pg.edit === on) return;
+    pg.edit = on; photoEditAnim = on; dock = null; armed = null; render(); return;
+  }
+  const i = photos.findIndex(p => p.id === pg.id);
+  let j;
+  if (Math.abs(dx) > 40) j = dx < 0 ? i + 1 : i - 1;
+  else { const card = document.querySelector("#view .pcard"); if (!card) return; const r = card.getBoundingClientRect(); j = e.clientX - r.left > r.width / 2 ? i + 1 : i - 1; }
+  if (i < 0 || j < 0 || j >= photos.length) return;
+  pg.id = photos[j].id; dock = null; armed = null; render();
+});
+window.addEventListener("resize", () => { const t = pages[pages.length - 1]; if (t && t.k === "photo") fitPhotoCard(); });
 
 /* ---------- drag to reorder ---------- */
 const DRAG_LISTS = {
