@@ -328,7 +328,10 @@ nav svg{width:25px;height:25px;stroke:currentColor;fill:none;stroke-width:1.8;st
 .pbars i{flex:1;height:3px;border-radius:9px;background:rgba(255,255,255,.35)}
 .pbars i.on{background:#fff}
 .pccap{position:absolute;left:14px;right:14px;bottom:14px;text-shadow:0 1px 3px rgba(0,0,0,.6);pointer-events:none}
-.pccap b{display:block;font-size:24px;font-weight:650;color:#f2f5f7}
+.pccap b{display:flex;align-items:center;gap:6px;font-size:24px;font-weight:650;color:#f2f5f7}
+.pcard.goal::after{content:"";position:absolute;inset:0;border-radius:18px;box-shadow:inset 0 0 0 2px var(--acc);pointer-events:none}
+.pbars i.g{background:rgba(195,245,60,.4)}
+.pbars i.g.on{background:var(--acc)}
 .pccap span{display:block;font-size:15px;color:#e6e9ee;margin-top:1px}
 .pedit{margin-top:12px}
 .pedit.anim{animation:pedup .25s ease}
@@ -1323,17 +1326,24 @@ function photosRow(){
 // a photo's own page, like Tinder: the photo fills the screen, bars on top show where you are,
 // its date and weight sit on it. Editing (date, delete) exists only after a swipe up.
 let photoCardH = 0, photoEditAnim = false;
+// the viewer's order: oldest to newest from left to right, then the goal photo (the destination)
+const photoSeq = () => [...photos].reverse().concat(goalPhoto ? [goalPhoto] : []);
 function pagePhoto(pg){
-  const ph = photos.find(x => x.id === pg.id); if (!ph) return backLink();
-  const w = lastValTo("weight", ph.date);
+  const seq = photoSeq(), ph = seq.find(x => x.id === pg.id); if (!ph) return backLink();
+  const goal = ph.id === "goal";
+  const w = goal ? (vEmpty(state.profile.weightTarget) ? null : num(state.profile.weightTarget)) : lastValTo("weight", ph.date);
   const anim = photoEditAnim; photoEditAnim = false;
+  const edit = goal
+    ? `<div class="lst">${li(`${svgI(NICONS.photos)}<span>Replace photo</span>`, `data-act="gaddphoto"`, "acts tap")}</div>
+      ${delLink("gdel", "goal", "", "Delete photo")}`
+    : `<div class="lst">${vrow("photo", 0, "Date", vDisp({ t: "date" }, ph.date), `data-id="${ph.id}"`)}</div>
+      ${delLink("pdel", ph.id, `data-p="${ph.id}"`, "Delete photo")}`;
   return `${backLink()}
-    <div class="pcard"><img src="${ph.url}" alt="" decoding="async"><i class="pfade"></i>
-      <div class="pbars">${photos.map(p => `<i class="${p.id === ph.id ? "on" : ""}"></i>`).join("")}</div>
-      <div class="pccap"><b>${pdate(ph.date)}</b>${w != null ? `<span>${fmt(w)} kg</span>` : ""}</div></div>
-    ${pg.edit ? `<div class="pedit${anim ? " anim" : ""}">
-      <div class="lst">${vrow("photo", 0, "Date", vDisp({ t: "date" }, ph.date), `data-id="${ph.id}"`)}</div>
-      ${delLink("pdel", ph.id, `data-p="${ph.id}"`, "Delete photo")}</div>` : ""}`;
+    <div class="pcard${goal ? " goal" : ""}"><img src="${ph.url}" alt="" decoding="async"><i class="pfade"></i>
+      <div class="pbars">${seq.map(p => `<i class="${p.id === "goal" ? "g" : ""}${p.id === ph.id ? " on" : ""}"></i>`).join("")}</div>
+      <div class="pccap">${goal ? `<b style="color:var(--acc)"><svg class="pic" viewBox="0 0 24 24" style="width:22px;height:22px">${FLAG}</svg>Goal</b>` : `<b>${pdate(ph.date)}</b>`}${w != null ? `<span>${fmt(w)} kg</span>` : ""}</div></div>
+    ${pg.edit ? `<div class="pedit${anim ? " anim" : ""}">${edit}</div>` : ""}
+    ${goal ? `<input type="file" accept="image/*" data-act="gfile" style="display:none">` : ""}`;
 }
 // the photo takes exactly the height that's left, so the page never scrolls; a height change
 // (editing on/off) animates from the previous height
@@ -1350,15 +1360,6 @@ function fitPhotoCard(){
     requestAnimationFrame(() => { card.style.height = target + "px"; });
   } else { card.style.transition = ""; card.style.height = target + "px"; }
   photoCardH = target;
-}
-// the goal photo's page: replace or delete
-function pageGoal(){
-  if (!goalPhoto) return backLink();
-  return `${backLink()}<h1>Goal</h1>
-    <div class="pview"><img src="${goalPhoto.url}" alt="" decoding="async"></div>
-    <div class="lst">${li(`${svgI(NICONS.photos)}<span>Replace photo</span>`, `data-act="gaddphoto"`, "acts tap")}</div>
-    ${delLink("gdel", "goal", "", "Delete photo")}
-    <input type="file" accept="image/*" data-act="gfile" style="display:none">`;
 }
 
 function photoMeta(p){
@@ -1792,8 +1793,7 @@ const baseTxt = ex => ex.type === "time" ? `${num(ex.tsets, 1) > 1 ? `${num(ex.t
 function pageTitle(pg){
   const k = pg.k;
   if (k === "cycle") return modeLbl(state.profile.mode);
-  if (k === "photo"){ const ph = photos.find(x => x.id === pg.id); return ph ? pdate(ph.date) : "Photo"; }
-  if (k === "goalph") return "Goal";
+  if (k === "photo"){ if (pg.id === "goal") return "Goal"; const ph = photos.find(x => x.id === pg.id); return ph ? pdate(ph.date) : "Photo"; }
   if (k === "wks") return "Workouts";
   if (k === "wk"){ const w = findWk(pg.id); return w ? w.title : "Workout"; }
   if (k === "ex"){ const w = findWk(pg.w), ex = w && (w.exercises || []).find(x => x.id === pg.id); return ex ? ex.name : "Exercise"; }
@@ -2082,7 +2082,7 @@ const pageRules = () => `${backLink()}<h1>Autorules</h1><div style="margin-top:1
 
 const PAGES = { cycle: pageCycle, review: pageReview, onb: pageOnb, wks: pageWks, wk: pageWk, ex: pageEx,
   menu: pageMenu, mi: pageMi, habits: pageHabits, habit: pageHabit, cheats: pageCheats, xo: pageXo,
-  presets: pagePresets, rules: pageRules, photo: pagePhoto, goalph: pageGoal };
+  presets: pagePresets, rules: pageRules, photo: pagePhoto };
 
 function pushPage(pg){
   const sc = document.getElementById("scroll");
@@ -2614,11 +2614,11 @@ document.addEventListener("click", e => {
   if (a === "paddphoto"){ const f = document.querySelector('input[data-act="pfile"]'); if (f) f.click(); return; }
   if (a === "popen"){ photoCardH = 0; pushPage({ k: "photo", id: el.dataset.p }); return; }
   if (a === "gaddphoto"){ const f = document.querySelector('input[data-act="gfile"]'); if (f) f.click(); return; }
-  if (a === "gopen"){ pushPage({ k: "goalph" }); return; }
+  if (a === "gopen"){ photoCardH = 0; pushPage({ k: "photo", id: "goal" }); return; }
   if (a === "gdel"){
     if (armed !== "gdel:goal"){ armed = "gdel:goal"; render(); return; }
     armed = null;
-    delGoalPhoto().then(() => popIf("goalph", undefined));
+    delGoalPhoto().then(() => popIf("photo", "goal"));
     return;
   }
   if (a === "pdel"){
@@ -3099,12 +3099,12 @@ document.addEventListener("pointerup", e => {
     const on = dy < 0; if (!!pg.edit === on) return;
     pg.edit = on; photoEditAnim = on; dock = null; armed = null; render(); return;
   }
-  const i = photos.findIndex(p => p.id === pg.id);
+  const seq = photoSeq(), i = seq.findIndex(p => p.id === pg.id);
   let j;
   if (Math.abs(dx) > 40) j = dx < 0 ? i + 1 : i - 1;
   else { const card = document.querySelector("#view .pcard"); if (!card) return; const r = card.getBoundingClientRect(); j = e.clientX - r.left > r.width / 2 ? i + 1 : i - 1; }
-  if (i < 0 || j < 0 || j >= photos.length) return;
-  pg.id = photos[j].id; dock = null; armed = null; render();
+  if (i < 0 || j < 0 || j >= seq.length) return;
+  pg.id = seq[j].id; dock = null; armed = null; render();
 });
 window.addEventListener("resize", () => { const t = pages[pages.length - 1]; if (t && t.k === "photo") fitPhotoCard(); });
 
